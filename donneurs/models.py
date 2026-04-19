@@ -1,28 +1,39 @@
 from django.db import models
-from django.conf import settings
+from accounts.models import DonneurProfile, HopitalProfile
 
-class DonneurProfile(models.Model):
-    GROUPE_CHOICES = (
-        ('A+', 'A+'), ('A-', 'A-'),
-        ('B+', 'B+'), ('B-', 'B-'),
-        ('AB+', 'AB+'), ('AB-', 'AB-'),
-        ('O+', 'O+'), ('O-', 'O-'),
-    )
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='donneur_profile')
-    groupe_sanguin = models.CharField(max_length=5, choices=GROUPE_CHOICES)
-    date_naissance = models.DateField()
-    telephone = models.CharField(max_length=15)
-    adresse = models.TextField()
-
-    def __str__(self):
-        return f"{self.user.username} - {self.groupe_sanguin}"
+# HISTORIQUE DES DONS
 
 class Don(models.Model):
-    donneur = models.ForeignKey(DonneurProfile, on_delete=models.CASCADE, related_name='dons')
+    donneur = models.ForeignKey(
+        DonneurProfile,
+        on_delete=models.CASCADE,
+        related_name='dons'
+    )
+
+    hopital = models.ForeignKey(
+        HopitalProfile,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
     date_don = models.DateField(auto_now_add=True)
-    lieu = models.CharField(max_length=200) # Nom de l'hôpital ou du centre
     quantite = models.PositiveIntegerField(help_text="Quantité en ml")
+    lieu = models.CharField(max_length=200)
     observations = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"Don de {self.donneur.user.username} le {self.date_don}"
+        return f"Don de {self.donneur.user.username} - {self.date_don}"
+
+
+
+# RÉPONSE AUX APPELS URGENTS
+
+class ReponseAppel(models.Model):
+    donneur = models.ForeignKey(DonneurProfile, on_delete=models.CASCADE)
+    demande_id = models.IntegerField()  # (sera lié à hopitaux.DemandeSang)
+    date_reponse = models.DateTimeField(auto_now_add=True)
+    statut = models.CharField(max_length=50, default="en attente")
+
+    def __str__(self):
+        return f"Réponse de {self.donneur.user.username}"
