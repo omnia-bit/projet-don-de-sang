@@ -4,6 +4,9 @@ from . import views
 app_name = 'hopitaux'
 
 urlpatterns = [
+    # Redirection par défaut vers le dashboard (évite le 404 sur /hopitaux/)
+    path('', views.dashboard_hopital, name='index'),
+
     # Tableau de bord principal de l'hôpital
     path('dashboard/', views.dashboard_hopital, name='dashboard'),
     

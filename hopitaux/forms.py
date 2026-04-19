@@ -12,5 +12,5 @@ class DemandeSangForm(forms.ModelForm):
         widgets = {
             'groupe_sanguin': forms.Select(attrs={'class': 'form-select'}),
             'quantite_necessaire': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de poches'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Motif de l'urgence...'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': "Motif de l'urgence..."}),
         }
