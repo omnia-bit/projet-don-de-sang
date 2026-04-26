@@ -33,7 +33,10 @@
                     <a class="nav-link" href="{% url 'hopitaux:creer_demande' %}"><i class="bi bi-plus-circle me-2"></i> Nouvelle Demande</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="bi bi-calendar-event me-2"></i> Campagnes</a>
+                    <a class="nav-link" href="{% url 'hopitaux:liste_campagnes' %}"><i class="bi bi-calendar-event me-2"></i> Campagnes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'hopitaux:gestion_stock' %}"><i class="bi bi-box-seam me-2"></i> Inventaire Sang</a>
                 </li>
                 <hr>
                 <li class="nav-item">
@@ -59,14 +62,14 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card p-3">
-                        <span class="text-muted">Donneurs Compatibles</span>
-                        <h2 class="fw-bold text-success">--</h2>
+                        <span class="text-muted">Stock Total (Poches)</span>
+                        <h2 class="fw-bold text-success">{{ stock_total }}</h2>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card p-3">
                         <span class="text-muted">Campagnes à venir</span>
-                        <h2 class="fw-bold text-primary">0</h2>
+                        <h2 class="fw-bold text-primary">{{ campagnes_count }}</h2>
                     </div>
                 </div>
             </div>

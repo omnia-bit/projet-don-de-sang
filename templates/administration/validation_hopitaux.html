@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation Hôpitaux - DonSang Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root { --primary-color: #1d3557; --accent-color: #e63946; --bg-light: #f1f4f8; }
+        body { background-color: var(--bg-light); font-family: 'Inter', sans-serif; }
+        .sidebar { background-color: var(--primary-color); height: 100vh; color: white; }
+        .sidebar .nav-link { color: rgba(255,255,255,0.8); border-radius: 8px; margin-bottom: 5px; }
+        .sidebar .nav-link.active { background-color: rgba(255,255,255,0.1); color: white; border-left: 4px solid var(--accent-color); }
+        .card { border: none; border-radius: 16px; }
+        .table thead th { background-color: #f8f9fa; border-top: none; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3 position-fixed">
+            <div class="d-flex align-items-center mb-4 ps-2">
+                <i class="bi bi-shield-check text-danger fs-4 me-2"></i>
+                <span class="fw-bold fs-5">ADMIN DonSang</span>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="{% url 'administration:dashboard' %}"><i class="bi bi-grid-1x2-fill me-2"></i> Vue d'ensemble</a></li>
+                <li class="nav-item"><a class="nav-link active" href="{% url 'administration:validation_hopitaux' %}"><i class="bi bi-hospital me-2"></i> Validation Hôpitaux</a></li>
+                <hr>
+                <li class="nav-item"><a class="nav-link text-warning" href="/"><i class="bi bi-house me-2"></i> Retour Accueil</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 offset-md-3 offset-lg-2">
+            <h1 class="h3 fw-bold mb-4">Gestion des Comptes Hospitaliers</h1>
+
+            <!-- En attente -->
+            <div class="card mb-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="mb-0 text-danger fw-bold"><i class="bi bi-hourglass-split me-2"></i>Demandes en Attente</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">Hôpital</th>
+                                    <th>Ville</th>
+                                    <th>Agrément</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for h in en_attente %}
+                                <tr>
+                                    <td class="ps-4 fw-bold text-dark">{{ h.nom }}</td>
+                                    <td>{{ h.ville }}</td>
+                                    <td><code class="small text-muted">{{ h.agrement }}</code></td>
+                                    <td>
+                                        <a href="{% url 'administration:action_validation' h.pk 'valider' %}" class="btn btn-sm btn-success rounded-pill px-3">Valider</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center py-4 text-muted">Aucun compte en attente de validation.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Déjà validés -->
+            <div class="card">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="mb-0 text-success fw-bold"><i class="bi bi-check-circle me-2"></i>Établissements Certifiés</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">Hôpital</th>
+                                    <th>Ville</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for h in valides %}
+                                <tr>
+                                    <td class="ps-4 fw-bold text-dark">{{ h.nom }}</td>
+                                    <td>{{ h.ville }}</td>
+                                    <td><span class="badge bg-success">Validé</span></td>
+                                    <td>
+                                        <a href="{% url 'administration:action_validation' h.pk 'suspendre' %}" class="btn btn-sm btn-outline-danger rounded-pill px-3">Suspendre</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center py-4 text-muted">Aucun établissement validé.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

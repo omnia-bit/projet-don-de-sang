@@ -12,4 +12,11 @@ urlpatterns = [
     
     # Formulaire de nouvelle demande urgente
     path('creer-demande/', views.creer_demande, name='creer_demande'),
+
+    # Gestion des campagnes
+    path('campagnes/', views.liste_campagnes, name='liste_campagnes'),
+    path('campagnes/creer/', views.creer_campagne, name='creer_campagne'),
+
+    # Gestion de stock
+    path('stock/', views.gestion_stock, name='gestion_stock'),
 ]

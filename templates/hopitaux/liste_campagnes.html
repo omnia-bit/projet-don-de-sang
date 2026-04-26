@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Campagnes - DonSang</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { background-color: #fff; height: 100vh; border-right: 1px solid #dee2e6; }
+        .nav-link { color: #333; font-weight: 500; margin-bottom: 10px; border-radius: 8px; }
+        .nav-link:hover, .nav-link.active { background-color: #e63946; color: white !important; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        .btn-danger { background-color: #e63946; border: none; }
+        .btn-danger:hover { background-color: #d62828; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3 position-fixed">
+            <div class="d-flex align-items-center mb-4 ps-2">
+                <i class="bi bi-droplet-fill text-danger fs-4 me-2"></i>
+                <span class="fw-bold fs-5">DonSang</span>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'hopitaux:dashboard' %}"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'hopitaux:creer_demande' %}"><i class="bi bi-plus-circle me-2"></i> Nouvelle Demande</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'hopitaux:liste_campagnes' %}"><i class="bi bi-calendar-event me-2"></i> Campagnes</a>
+                </li>
+                <hr>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="/"><i class="bi bi-box-arrow-left me-2"></i> Retour Accueil</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 offset-md-3 offset-lg-2">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2">Gestion des Campagnes</h1>
+                <a href="{% url 'hopitaux:creer_campagne' %}" class="btn btn-danger"><i class="bi bi-plus-lg me-2"></i>Organiser une Campagne</a>
+            </div>
+
+            <div class="row g-4">
+                {% if campagnes %}
+                    {% for c in campagnes %}
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title fw-bold text-dark">{{ c.titre }}</h5>
+                                    <span class="badge bg-primary">Collecte</span>
+                                </div>
+                                <p class="card-text text-muted small mb-3">{{ c.description|truncatewords:20 }}</p>
+                                <div class="mb-2">
+                                    <i class="bi bi-geo-alt text-danger me-2"></i>{{ c.lieu }}
+                                </div>
+                                <div class="mb-3">
+                                    <i class="bi bi-calendar3 text-primary me-2"></i>
+                                    <span class="small">{{ c.date_debut|date:"d/m/Y H:i" }} - {{ c.date_fin|date:"d/m/Y H:i" }}</span>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil me-1"></i> Modifier</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                        <p class="mt-3 fs-5 text-muted">Aucune campagne organisée pour le moment.</p>
+                        <a href="{% url 'hopitaux:creer_campagne' %}" class="btn btn-danger mt-2">Créer ma première campagne</a>
+                    </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
