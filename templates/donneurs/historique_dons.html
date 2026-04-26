@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Historique des Dons — DonSang{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <div class="container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb-custom">
+          <li><a href="{% url 'donneurs:dashboard' %}">Tableau de bord</a></li>
+          <li class="active">Historique des dons</li>
+        </ol>
+      </nav>
+      <h1 class="page-header-title">
+        <i class="bi bi-journal-medical me-2"></i>Historique des dons
+      </h1>
+    </div>
+  </div>
+
+  <div class="container py-4">
+
+    {% include 'includes/messages.html' %}
+
+    <!-- Résumé -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-mini-card">
+          <div class="stat-icon icon-red"><i class="bi bi-droplet-fill"></i></div>
+          <span class="stat-num">{{ total_dons }}</span>
+          <span class="stat-lbl">Dons effectués</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-mini-card">
+          <div class="stat-icon icon-blue"><i class="bi bi-bag-fill"></i></div>
+          <span class="stat-num">{{ total_ml }} ml</span>
+          <span class="stat-lbl">Volume total donné</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-mini-card">
+          <div class="stat-icon icon-green"><i class="bi bi-people-fill"></i></div>
+          <span class="stat-num">{{ total_dons|add:total_dons|add:total_dons }}</span>
+          <span class="stat-lbl">Vies potentiellement sauvées</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-mini-card">
+          <div class="stat-icon icon-amber"><i class="bi bi-droplet-half"></i></div>
+          <span class="stat-num">{{ donneur.groupe_sanguin }}</span>
+          <span class="stat-lbl">Groupe sanguin</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tableau dons -->
+    <div class="dash-card">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="section-title-sm mb-0">
+          <i class="bi bi-list-ul me-2 text-danger"></i>Tous mes dons
+        </h2>
+        <a href="{% url 'donneurs:enregistrer_don' %}" class="btn-red-sm">
+          <i class="bi bi-plus-circle-fill me-1"></i>Nouveau don
+        </a>
+      </div>
+
+      {% if dons %}
+      <div class="table-responsive">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th><i class="bi bi-calendar3 me-1"></i>Date</th>
+              <th><i class="bi bi-hospital me-1"></i>Lieu / Hôpital</th>
+              <th><i class="bi bi-droplet me-1"></i>Quantité</th>
+              <th><i class="bi bi-chat-text me-1"></i>Observations</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for don in dons %}
+            <tr>
+              <td>
+                <span class="date-badge">{{ don.date_don|date:"d/m/Y" }}</span>
+              </td>
+              <td>
+                <div class="lieu-cell">
+                  <span class="lieu-nom">{{ don.lieu }}</span>
+                  {% if don.hopital %}
+                    <span class="lieu-hopital"><i class="bi bi-hospital me-1"></i>{{ don.hopital.nom }}</span>
+                  {% endif %}
+                </div>
+              </td>
+              <td>
+                <span class="qty-badge">{{ don.quantite }} ml</span>
+              </td>
+              <td class="obs-cell">{{ don.observations|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state-lg">
+        <div class="empty-icon"><i class="bi bi-droplet"></i></div>
+        <h3>Aucun don enregistré</h3>
+        <p>Enregistrez votre premier don pour commencer votre suivi.</p>
+        <a href="{% url 'donneurs:enregistrer_don' %}" class="btn-red-sm">
+          <i class="bi bi-plus-circle-fill me-2"></i>Enregistrer mon premier don
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

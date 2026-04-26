@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Répondre à un Appel Urgent — DonSang{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <div class="container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb-custom">
+          <li><a href="{% url 'donneurs:dashboard' %}">Tableau de bord</a></li>
+          <li><a href="{% url 'donneurs:appels_urgents' %}">Appels urgents</a></li>
+          <li class="active">Répondre</li>
+        </ol>
+      </nav>
+      <h1 class="page-header-title">
+        <i class="bi bi-send-fill me-2"></i>Répondre à un appel urgent
+      </h1>
+    </div>
+  </div>
+
+  <div class="container py-4">
+    {% include 'includes/messages.html' %}
+
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+
+        <!-- Détails de la demande -->
+        {% if demande %}
+        <div class="demande-detail-card mb-4">
+          <div class="demande-detail-header">
+            <span class="badge-groupe-lg">{{ demande.groupe_sanguin }}</span>
+            <h2 class="demande-hopital-name">{{ demande.hopital.nom }}</h2>
+          </div>
+          <div class="demande-detail-body">
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="detail-item">
+                  <i class="bi bi-geo-alt-fill text-danger"></i>
+                  <div>
+                    <span class="detail-label">Ville</span>
+                    <span class="detail-value">{{ demande.hopital.ville }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="detail-item">
+                  <i class="bi bi-bag-fill text-danger"></i>
+                  <div>
+                    <span class="detail-label">Quantité requise</span>
+                    <span class="detail-value">{{ demande.quantite }} poche{{ demande.quantite|pluralize }}</span>
+                  </div>
+                </div>
+              </div>
+              {% if demande.delai %}
+              <div class="col-6">
+                <div class="detail-item">
+                  <i class="bi bi-clock-fill text-danger"></i>
+                  <div>
+                    <span class="detail-label">Délai</span>
+                    <span class="detail-value">{{ demande.delai }}</span>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+              <div class="col-6">
+                <div class="detail-item">
+                  <i class="bi bi-droplet-fill text-danger"></i>
+                  <div>
+                    <span class="detail-label">Groupe sanguin</span>
+                    <span class="detail-value">{{ demande.groupe_sanguin }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% if demande.description %}
+            <div class="detail-description mt-3">
+              <p class="detail-label mb-1">Description</p>
+              <p class="mb-0">{{ demande.description }}</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Formulaire -->
+        <div class="dash-card">
+          <h2 class="section-title-sm mb-1">
+            <i class="bi bi-hand-thumbs-up-fill text-success me-2"></i>Confirmer votre intention
+          </h2>
+          <p class="text-muted mb-4" style="font-size:.9rem;">
+            En confirmant, vous exprimez votre intention de donner. L'hôpital sera notifié et vous contactera.
+          </p>
+
+          <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group mb-4">
+              <label class="form-label-custom">
+                <i class="bi bi-chat-text me-1"></i>Message à l'hôpital (optionnel)
+              </label>
+              {{ form.message }}
+            </div>
+
+            <!-- Rappel donneur -->
+            <div class="alert-custom alert-info mb-4">
+              <i class="bi bi-person-fill me-2"></i>
+              Vous répondez en tant que <strong>{{ donneur.user.first_name|default:donneur.user.username }}</strong>
+              — Groupe <strong>{{ donneur.groupe_sanguin }}</strong> — {{ donneur.ville }}
+            </div>
+
+            <div class="d-flex gap-3">
+              <button type="submit" class="btn-red-full">
+                <i class="bi bi-send-fill me-2"></i>Confirmer ma réponse
+              </button>
+              <a href="{% url 'donneurs:appels_urgents' %}" class="btn-outline-custom">
+                Annuler
+              </a>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

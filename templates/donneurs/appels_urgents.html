@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Appels Urgents — DonSang{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <div class="container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb-custom">
+          <li><a href="{% url 'donneurs:dashboard' %}">Tableau de bord</a></li>
+          <li class="active">Appels urgents</li>
+        </ol>
+      </nav>
+      <h1 class="page-header-title">
+        <i class="bi bi-exclamation-circle-fill me-2"></i>Appels urgents compatibles
+      </h1>
+      <p class="page-header-sub mt-1">
+        Demandes filtrées pour votre groupe sanguin <strong>{{ donneur.groupe_sanguin }}</strong>.
+        Groupes compatibles : 
+        {% for g in groupes_compatibles %}
+          <span class="badge-groupe-sm">{{ g }}</span>
+        {% endfor %}
+      </p>
+    </div>
+  </div>
+
+  <div class="container py-4">
+
+    {% include 'includes/messages.html' %}
+
+    <!-- Alerte éligibilité -->
+    {% if not est_eligible %}
+    <div class="alert-custom alert-warning mb-4">
+      <i class="bi bi-clock-history me-2"></i>
+      Vous n'êtes <strong>pas éligible</strong> avant le <strong>{{ prochaine_date }}</strong>.
+      Vous pouvez consulter les appels mais pas encore y répondre.
+    </div>
+    {% endif %}
+
+    <!-- Grille des appels -->
+    {% if appels %}
+    <div class="row g-4">
+      {% for appel in appels %}
+      <div class="col-md-6 col-lg-4">
+        <div class="appel-card {% if appel.id in reponses_ids %}appel-deja-repondu{% endif %}">
+
+          <!-- Badge groupe + urgence -->
+          <div class="appel-card-header">
+            <span class="badge-groupe-lg">{{ appel.groupe_sanguin }}</span>
+            <span class="badge-urgence
+              {% if appel.urgence == 'critique' %}urgence-critique
+              {% elif appel.urgence == 'haute' %}urgence-haute
+              {% else %}urgence-normale{% endif %}">
+              <i class="bi bi-fire me-1"></i>
+              {{ appel.get_urgence_display|default:"Urgente" }}
+            </span>
+          </div>
+
+          <!-- Infos hôpital -->
+          <div class="appel-card-body">
+            <h3 class="appel-hopital-name">{{ appel.hopital.nom }}</h3>
+            <div class="appel-details">
+              <span><i class="bi bi-geo-alt-fill me-1 text-danger"></i>{{ appel.hopital.ville }}</span>
+              <span><i class="bi bi-bag-fill me-1 text-danger"></i>{{ appel.quantite }} poche{{ appel.quantite|pluralize }}</span>
+              {% if appel.delai %}
+              <span><i class="bi bi-clock-fill me-1 text-danger"></i>Avant le {{ appel.delai }}</span>
+              {% endif %}
+            </div>
+            {% if appel.description %}
+            <p class="appel-description">{{ appel.description|truncatewords:20 }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Actions -->
+          <div class="appel-card-footer">
+            {% if appel.id in reponses_ids %}
+              <span class="btn-repondu">
+                <i class="bi bi-check-circle-fill me-1"></i>Réponse envoyée
+              </span>
+            {% elif est_eligible %}
+              <a href="{% url 'donneurs:repondre_appel' appel.id %}" class="btn-red-sm w-100 text-center">
+                <i class="bi bi-send-fill me-1"></i>Répondre à cet appel
+              </a>
+            {% else %}
+              <button class="btn-disabled w-100" disabled>
+                <i class="bi bi-lock me-1"></i>Non éligible ({{ prochaine_date }})
+              </button>
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state-lg">
+      <div class="empty-icon"><i class="bi bi-check-circle-fill"></i></div>
+      <h3>Aucun appel urgent</h3>
+      <p>Il n'y a actuellement aucune demande urgente compatible avec votre groupe sanguin <strong>{{ donneur.groupe_sanguin }}</strong>.</p>
+      <a href="{% url 'donneurs:dashboard' %}" class="btn-red-sm">
+        <i class="bi bi-arrow-left me-1"></i>Retour au tableau de bord
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

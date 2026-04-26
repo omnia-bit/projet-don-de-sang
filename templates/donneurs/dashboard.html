@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mon Tableau de Bord — DonSang{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+
+  <!-- ── En-tête ── -->
+  <div class="page-header">
+    <div class="container">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar-circle">
+          <i class="bi bi-person-fill"></i>
+        </div>
+        <div>
+          <p class="page-header-sub mb-0">Tableau de bord</p>
+          <h1 class="page-header-title mb-0">
+            Bonjour, {{ donneur.user.first_name|default:donneur.user.username }} 
+            <span class="badge-groupe">{{ donneur.groupe_sanguin }}</span>
+          </h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container py-4">
+
+    {% include 'includes/messages.html' %}
+
+    <!-- ── Éligibilité ── -->
+    <div class="row g-4 mb-4">
+      <div class="col-lg-5">
+        <div class="dash-card eligibilite-card {% if est_eligible %}eligible{% else %}non-eligible{% endif %}">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="card-icon-wrap {% if est_eligible %}icon-green{% else %}icon-red{% endif %}">
+              <i class="bi {% if est_eligible %}bi-heart-pulse-fill{% else %}bi-clock-history{% endif %}"></i>
+            </div>
+            <div>
+              <p class="card-label mb-0">Statut d'éligibilité</p>
+              <h3 class="card-value mb-0">
+                {% if est_eligible %}
+                  <span class="text-success">Éligible au don</span>
+                {% else %}
+                  <span class="text-danger">Non éligible</span>
+                {% endif %}
+              </h3>
+            </div>
+          </div>
+
+          {% if not est_eligible %}
+            <p class="card-desc">Prochaine date : <strong>{{ prochaine_date }}</strong> ({{ jours_restants }} jour{{ jours_restants|pluralize }} restant{{ jours_restants|pluralize }})</p>
+            <div class="progress-wrap">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="prog-label">Progression vers éligibilité</span>
+                <span class="prog-label">{{ progression }}%</span>
+              </div>
+              <div class="progress" style="height:8px;border-radius:8px;">
+                <div class="progress-bar bg-danger" style="width:{{ progression }}%;border-radius:8px;"></div>
+              </div>
+            </div>
+          {% else %}
+            <p class="card-desc">Vous pouvez donner dès aujourd'hui. Chaque don peut sauver jusqu'à 3 vies.</p>
+            <a href="{% url 'donneurs:enregistrer_don' %}" class="btn btn-success-custom mt-2">
+              <i class="bi bi-plus-circle-fill me-2"></i>Enregistrer un don
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ── Statistiques rapides ── -->
+      <div class="col-lg-7">
+        <div class="row g-3 h-100">
+          <div class="col-6">
+            <div class="stat-mini-card">
+              <div class="stat-icon icon-red"><i class="bi bi-droplet-fill"></i></div>
+              <span class="stat-num">{{ total_dons }}</span>
+              <span class="stat-lbl">Don{{ total_dons|pluralize }} effectué{{ total_dons|pluralize }}</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="stat-mini-card">
+              <div class="stat-icon icon-blue"><i class="bi bi-geo-alt-fill"></i></div>
+              <span class="stat-num">{{ donneur.ville|default:"—" }}</span>
+              <span class="stat-lbl">Ville</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="stat-mini-card">
+              <div class="stat-icon icon-amber"><i class="bi bi-calendar-check-fill"></i></div>
+              <span class="stat-num">{% if prochaine_date %}{{ prochaine_date|date:"d/m" }}{% else %}Dès maintenant{% endif %}</span>
+              <span class="stat-lbl">Prochain don possible</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="stat-mini-card">
+              <div class="stat-icon icon-green"><i class="bi bi-gender-ambiguous"></i></div>
+              <span class="stat-num">{{ donneur.get_sexe_display }}</span>
+              <span class="stat-lbl">Sexe (délai {{ donneur.sexe|yesno:"84,56,56" }}j)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Appels urgents compatibles ── -->
+    <div class="row g-4 mb-4">
+      <div class="col-lg-7">
+        <div class="dash-card">
+          <div class="section-head d-flex justify-content-between align-items-center mb-3">
+            <h2 class="section-title-sm">
+              <i class="bi bi-exclamation-circle-fill text-danger me-2"></i>Appels urgents compatibles
+            </h2>
+            <a href="{% url 'donneurs:appels_urgents' %}" class="btn-link-red">Voir tout <i class="bi bi-arrow-right"></i></a>
+          </div>
+          {% if appels_compatibles %}
+            <div class="d-flex flex-column gap-2">
+              {% for appel in appels_compatibles %}
+              <div class="appel-row">
+                <div class="appel-groupe">{{ appel.groupe_sanguin }}</div>
+                <div class="appel-info">
+                  <p class="appel-hopital mb-0">{{ appel.hopital.nom }}</p>
+                  <p class="appel-ville mb-0"><i class="bi bi-geo-alt me-1"></i>{{ appel.hopital.ville }} · {{ appel.quantite }} poche{{ appel.quantite|pluralize }}</p>
+                </div>
+                <a href="{% url 'donneurs:repondre_appel' appel.id %}" class="btn-appel-sm">Répondre</a>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <i class="bi bi-check-circle-fill"></i>
+              <p>Aucun appel urgent compatible pour l'instant.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ── Dons récents ── -->
+      <div class="col-lg-5">
+        <div class="dash-card">
+          <div class="section-head d-flex justify-content-between align-items-center mb-3">
+            <h2 class="section-title-sm">
+              <i class="bi bi-clock-history text-muted me-2"></i>Dons récents
+            </h2>
+            <a href="{% url 'donneurs:historique_dons' %}" class="btn-link-red">Historique <i class="bi bi-arrow-right"></i></a>
+          </div>
+          {% if dons_recents %}
+            <div class="d-flex flex-column gap-2">
+              {% for don in dons_recents %}
+              <div class="don-row">
+                <div class="don-date">{{ don.date_don|date:"d M Y" }}</div>
+                <div class="don-lieu">{{ don.lieu }}</div>
+                <div class="don-qty">{{ don.quantite }} ml</div>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <i class="bi bi-droplet"></i>
+              <p>Aucun don enregistré.</p>
+              <a href="{% url 'donneurs:enregistrer_don' %}" class="btn-link-red">Enregistrer mon premier don</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Actions rapides ── -->
+    <div class="dash-card">
+      <h2 class="section-title-sm mb-3"><i class="bi bi-lightning-fill text-amber me-2"></i>Actions rapides</h2>
+      <div class="row g-3">
+        <div class="col-6 col-md-3">
+          <a href="{% url 'donneurs:enregistrer_don' %}" class="quick-action {% if not est_eligible %}disabled-action{% endif %}">
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>Enregistrer un don</span>
+          </a>
+        </div>
+        <div class="col-6 col-md-3">
+          <a href="{% url 'donneurs:appels_urgents' %}" class="quick-action">
+            <i class="bi bi-bell-fill"></i>
+            <span>Appels urgents</span>
+          </a>
+        </div>
+        <div class="col-6 col-md-3">
+          <a href="{% url 'donneurs:historique_dons' %}" class="quick-action">
+            <i class="bi bi-journal-medical"></i>
+            <span>Mon historique</span>
+          </a>
+        </div>
+        <div class="col-6 col-md-3">
+          <a href="{% url 'accounts:modifier_profil' %}" class="quick-action">
+            <i class="bi bi-person-gear"></i>
+            <span>Mon profil</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

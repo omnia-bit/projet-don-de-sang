@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Enregistrer un Don — DonSang{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <div class="container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb-custom">
+          <li><a href="{% url 'donneurs:dashboard' %}">Tableau de bord</a></li>
+          <li class="active">Enregistrer un don</li>
+        </ol>
+      </nav>
+      <h1 class="page-header-title">
+        <i class="bi bi-plus-circle-fill me-2"></i>Enregistrer un don
+      </h1>
+    </div>
+  </div>
+
+  <div class="container py-4">
+    {% include 'includes/messages.html' %}
+
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+
+        <!-- Rappel éligibilité -->
+        <div class="alert-custom alert-info mb-4">
+          <i class="bi bi-info-circle-fill me-2"></i>
+          Vous enregistrez un don effectué par <strong>{{ donneur.user.first_name|default:donneur.user.username }}</strong>
+          (groupe <strong>{{ donneur.groupe_sanguin }}</strong>).
+          Délai minimal entre deux dons : <strong>{% if donneur.sexe == 'F' %}84{% else %}56{% endif %} jours</strong>.
+        </div>
+
+        <div class="dash-card">
+          <h2 class="section-title-sm mb-4">
+            <i class="bi bi-droplet-fill text-danger me-2"></i>Informations du don
+          </h2>
+
+          <form method="post" novalidate>
+            {% csrf_token %}
+
+            <!-- Hôpital -->
+            <div class="form-group mb-3">
+              <label class="form-label-custom">
+                <i class="bi bi-hospital me-1"></i>Hôpital (optionnel)
+              </label>
+              {{ form.hopital }}
+              {% if form.hopital.errors %}
+                <div class="form-error">{{ form.hopital.errors }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Lieu -->
+            <div class="form-group mb-3">
+              <label class="form-label-custom" for="{{ form.lieu.id_for_label }}">
+                <i class="bi bi-geo-alt me-1"></i>Lieu du don <span class="required">*</span>
+              </label>
+              {{ form.lieu }}
+              {% if form.lieu.errors %}
+                <div class="form-error">{{ form.lieu.errors }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Quantité -->
+            <div class="form-group mb-3">
+              <label class="form-label-custom" for="{{ form.quantite.id_for_label }}">
+                <i class="bi bi-droplet me-1"></i>Quantité donnée (ml) <span class="required">*</span>
+              </label>
+              {{ form.quantite }}
+              <p class="form-hint">La quantité standard est de 450 ml.</p>
+              {% if form.quantite.errors %}
+                <div class="form-error">{{ form.quantite.errors }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Observations -->
+            <div class="form-group mb-4">
+              <label class="form-label-custom" for="{{ form.observations.id_for_label }}">
+                <i class="bi bi-chat-text me-1"></i>Observations
+              </label>
+              {{ form.observations }}
+              {% if form.observations.errors %}
+                <div class="form-error">{{ form.observations.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="d-flex gap-3">
+              <button type="submit" class="btn-red-full">
+                <i class="bi bi-check-circle-fill me-2"></i>Enregistrer le don
+              </button>
+              <a href="{% url 'donneurs:dashboard' %}" class="btn-outline-custom">
+                Annuler
+              </a>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tableau compatibilité -->
+        <div class="dash-card mt-4">
+          <h2 class="section-title-sm mb-3">
+            <i class="bi bi-table me-2 text-danger"></i>Compatibilité sanguine
+          </h2>
+          <div class="table-responsive">
+            <table class="table-compat">
+              <thead>
+                <tr>
+                  <th>Votre groupe</th>
+                  <th>Peut donner à</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr {% if donneur.groupe_sanguin == 'O-' %}class="compat-highlight"{% endif %}>
+                  <td><span class="groupe-badge">O−</span></td>
+                  <td class="compat-cell">O−, O+, A−, A+, B−, B+, AB−, AB+ <span class="badge-donneur-univ">Donneur universel</span></td>
+                </tr>
+                <tr {% if donneur.groupe_sanguin == 'O+' %}class="compat-highlight"{% endif %}>
+                  <td><span class="groupe-badge">O+</span></td>
+                  <td class="compat-cell">O+, A+, B+, AB+</td>
+                </tr>
+                <tr {% if donneur.groupe_sanguin == 'A-' %}class="compat-highlight"{% endif %}>
+                  <td><span class="groupe-badge">A−</span></td>
+                  <td class="compat-cell">A−, A+, AB−, AB+</td>
+                </tr>
+                <tr {% if donneur.groupe_sanguin == 'A+' %}class="compat-highlight"{% endif %}>
+                  <td><span class="groupe-badge">A+</span></td>
+                  <td class="compat-cell">A+, AB+</td>
+                </tr>
+                <tr {% if donneur.groupe_sanguin == 'B-' %}class="compat-highlight"{% endif %}>
+                  <td><span class="groupe-badge">B−</span></td>
+                  <td class="compat-cell">B−, B+, AB−, AB+</td>
+                </tr>
+                <tr {% if donneur.groupe_sanguin == 'B+' %}class="compat-highlight"{% endif %}>
+                  <td><span class="groupe-badge">B+</span></td>
+                  <td class="compat-cell">B+, AB+</td>
+                </tr>
+                <tr {% if donneur.groupe_sanguin == 'AB-' %}class="compat-highlight"{% endif %}>
+                  <td><span class="groupe-badge">AB−</span></td>
+                  <td class="compat-cell">AB−, AB+</td>
+                </tr>
+                <tr {% if donneur.groupe_sanguin == 'AB+' %}class="compat-highlight"{% endif %}>
+                  <td><span class="groupe-badge">AB+</span></td>
+                  <td class="compat-cell">AB+ <span class="badge-receveur-univ">Receveur universel</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% if messages %}
+  {% for message in messages %}
+  <div class="flash-msg flash-{{ message.tags }} mb-2">
+    <i class="bi
+      {% if 'success' in message.tags %}bi-check-circle-fill
+      {% elif 'warning' in message.tags %}bi-exclamation-triangle-fill
+      {% elif 'danger' in message.tags or 'error' in message.tags %}bi-x-circle-fill
+      {% else %}bi-info-circle-fill
+      {% endif %} me-2"></i>
+    {{ message }}
+    <button class="flash-close" onclick="this.parentElement.remove()">
+      <i class="bi bi-x"></i>
+    </button>
+  </div>
+  {% endfor %}
+{% endif %}
