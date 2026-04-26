@@ -38,10 +38,10 @@ class DonneurProfile(models.Model):
         ('O+', 'O+'), ('O-', 'O-'),
     )
 
-    groupe_sanguin = models.CharField(max_length=5, choices=GROUPE_CHOICES)
-    sexe = models.CharField(max_length=10)
-    date_naissance = models.DateField()
-    ville = models.CharField(max_length=100)
+    groupe_sanguin = models.CharField(max_length=5, choices=GROUPE_CHOICES, null=True, blank=True)
+    sexe = models.CharField(max_length=10, null=True, blank=True)
+    date_naissance = models.DateField(null=True, blank=True)
+    ville = models.CharField(max_length=100, null=True, blank=True)
     actif = models.BooleanField(default=True)
 
     def __str__(self):

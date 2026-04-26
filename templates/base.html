@@ -76,7 +76,7 @@
         {% else %}
           <!-- NON CONNECTÉ -->
           <a href="/" class="nav-link-item">Accueil</a>
-          <a href="/accounts/inscription-donneur/" class="nav-link-item">
+          <a href="{% url 'accounts:register' %}" class="nav-link-item">
             <i class="bi bi-person-plus me-1"></i>S'inscrire
           </a>
         {% endif %}
@@ -93,7 +93,7 @@
             <i class="bi bi-box-arrow-right me-1"></i>Déconnexion
           </a>
         {% else %}
-          <a href="/accounts/connexion/" class="btn-nav-red">
+          <a href="{% url 'accounts:login' %}" class="btn-nav-red">
             <i class="bi bi-box-arrow-in-right me-1"></i>Connexion
           </a>
         {% endif %}

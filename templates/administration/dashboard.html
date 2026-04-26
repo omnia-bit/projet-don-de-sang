@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titre_page }} - DonSang Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --primary-color: #1d3557; --accent-color: #e63946; --bg-light: #f1f4f8; }
+        body { background-color: var(--bg-light); font-family: 'Inter', sans-serif; }
+        .sidebar { background-color: var(--primary-color); height: 100vh; color: white; border-right: none; }
+        .sidebar .nav-link { color: rgba(255,255,255,0.8); border-radius: 8px; margin-bottom: 5px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: rgba(255,255,255,0.1); color: white; }
+        .sidebar .nav-link.active { border-left: 4px solid var(--accent-color); }
+        .card { border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+        .stat-card { transition: transform 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .icon-box { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .bg-soft-danger { background-color: #ffe5e5; color: #e63946; }
+        .bg-soft-primary { background-color: #e5edff; color: #1d3557; }
+        .bg-soft-success { background-color: #e5fff2; color: #2a9d8f; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3 position-fixed">
+            <div class="d-flex align-items-center mb-4 ps-2">
+                <i class="bi bi-shield-check text-danger fs-4 me-2"></i>
+                <span class="fw-bold fs-5">ADMIN DonSang</span>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'administration:dashboard' %}"><i class="bi bi-grid-1x2-fill me-2"></i> Vue d'ensemble</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'administration:validation_hopitaux' %}"><i class="bi bi-hospital me-2"></i> Validation Hôpitaux</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="bi bi-people me-2"></i> Utilisateurs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="bi bi-bar-chart-line me-2"></i> Rapports</a>
+                </li>
+                <hr>
+                <li class="nav-item">
+                    <a class="nav-link text-warning" href="/"><i class="bi bi-house me-2"></i> Retour Accueil</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 offset-md-3 offset-lg-2">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 fw-bold">{{ titre_page }}</h1>
+                <div class="text-muted small"><i class="bi bi-clock me-1"></i> Dernière mise à jour : À l'instant</div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card stat-card p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="text-muted small fw-bold">Donneurs</span>
+                                <h3 class="mb-0 fw-bold">{{ stats.total_donneurs }}</h3>
+                            </div>
+                            <div class="icon-box bg-soft-primary"><i class="bi bi-people fs-4"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="text-muted small fw-bold">Hôpitaux</span>
+                                <h3 class="mb-0 fw-bold">{{ stats.total_hopitaux }}</h3>
+                            </div>
+                            <div class="icon-box bg-soft-danger"><i class="bi bi-hospital fs-4"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="text-muted small fw-bold">Demandes Actives</span>
+                                <h3 class="mb-0 fw-bold">{{ stats.demandes_actives }}</h3>
+                            </div>
+                            <div class="icon-box bg-soft-primary"><i class="bi bi-megaphone fs-4"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="text-muted small fw-bold">Volume Total</span>
+                                <h3 class="mb-0 fw-bold">{{ stats.volume_sang }}<span class="fs-6">ml</span></h3>
+                            </div>
+                            <div class="icon-box bg-soft-success"><i class="bi bi-droplet fs-4"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Chart placeholder -->
+                <div class="col-lg-7">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-4">Stock National par Groupe Sanguin</h5>
+                        <div style="height: 250px;">
+                            <canvas id="donsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Recent Activities -->
+                <div class="col-lg-5">
+                    <div class="card p-4 h-100">
+                        <h5 class="fw-bold mb-4">Dernières Urgences</h5>
+                        <div class="list-group list-group-flush">
+                            {% for d in dernieres_demandes %}
+                            <div class="list-group-item bg-transparent border-0 px-0 mb-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-danger rounded-pill">{{ d.groupe_sanguin }}</span>
+                                    <small class="text-muted">{{ d.date_publication|timesince }}</small>
+                                </div>
+                                <div class="mt-1 small fw-bold text-dark">{{ d.hopital.nom }}</div>
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-4 text-muted small">Aucune demande récente.</div>
+                            {% endfor %}
+                        </div>
+                        <hr>
+                        <h5 class="fw-bold mb-3 mt-2">Campagnes</h5>
+                        {% for c in dernieres_campagnes %}
+                            <div class="small mb-2 text-primary fw-bold"><i class="bi bi-calendar-check me-2"></i>{{ c.titre }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('donsChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ labels_stock|safe }},
+            datasets: [{
+                label: 'Nombre de poches',
+                data: {{ data_stock|safe }},
+                backgroundColor: '#e63946',
+                borderRadius: 8,
+                maxBarThickness: 40,
+                barPercentage: 0.6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { 
+                y: { beginAtZero: true, grid: { color: '#f0f0f0' } }, 
+                x: { grid: { display: false } } 
+            }
+        }
+    });
+</script>
+</body>
+</html>

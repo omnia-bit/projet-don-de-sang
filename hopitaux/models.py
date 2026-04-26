@@ -45,3 +45,29 @@ class CampagneCollecte(models.Model):
 
     def __str__(self):
         return f"{self.titre} - {self.hopital.nom}"
+
+
+# STOCK DE SANG PAR HÔPITAL
+
+class StockSang(models.Model):
+    GROUPE_CHOICES = (
+        ('A+', 'A+'), ('A-', 'A-'),
+        ('B+', 'B+'), ('B-', 'B-'),
+        ('AB+', 'AB+'), ('AB-', 'AB-'),
+        ('O+', 'O+'), ('O-', 'O-'),
+    )
+
+    hopital = models.ForeignKey(
+        HopitalProfile,
+        on_delete=models.CASCADE,
+        related_name='stocks'
+    )
+    groupe_sanguin = models.CharField(max_length=5, choices=GROUPE_CHOICES)
+    quantite_poches = models.PositiveIntegerField(default=0)
+    derniere_mise_a_jour = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('hopital', 'groupe_sanguin')
+
+    def __str__(self):
+        return f"{self.hopital.nom} - {self.groupe_sanguin} : {self.quantite_poches} poches"

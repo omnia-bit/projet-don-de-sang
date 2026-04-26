@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Modifier mon profil — DonSang{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb-custom">
+          <li><a href="{% url 'accounts:dashboard_donneur' %}">Tableau de bord</a></li>
+          <li class="active">Modifier profil</li>
+        </ol>
+      </nav>
+      <h1 class="page-header-title">
+        <i class="bi bi-person-gear me-2"></i>Modifier mon profil
+      </h1>
+    </div>
+  </div>
+
+  <div class="container py-4">
+    {% include 'includes/messages.html' %}
+
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+
+        <div class="dash-card">
+          <h2 class="section-title-sm mb-4">
+            <i class="bi bi-pencil-square text-primary me-2"></i>Informations personnelles
+          </h2>
+
+          <form method="post">
+            {% csrf_token %}
+
+            <!-- Groupe sanguin -->
+            <div class="form-group mb-3">
+              <label class="form-label-custom">Groupe sanguin</label>
+              {{ form.groupe_sanguin }}
+              {% if form.groupe_sanguin.errors %}
+                <div class="form-error">{{ form.groupe_sanguin.errors }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Sexe -->
+            <div class="form-group mb-3">
+              <label class="form-label-custom">Sexe</label>
+              {{ form.sexe }}
+              {% if form.sexe.errors %}
+                <div class="form-error">{{ form.sexe.errors }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Date naissance -->
+            <div class="form-group mb-3">
+              <label class="form-label-custom">Date de naissance</label>
+              {{ form.date_naissance }}
+              {% if form.date_naissance.errors %}
+                <div class="form-error">{{ form.date_naissance.errors }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Ville -->
+            <div class="form-group mb-4">
+              <label class="form-label-custom">Ville</label>
+              {{ form.ville }}
+              {% if form.ville.errors %}
+                <div class="form-error">{{ form.ville.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="d-flex gap-3">
+              <button type="submit" class="btn-red-full">
+                <i class="bi bi-check-circle-fill me-2"></i>Enregistrer
+              </button>
+
+              <a href="{% url 'accounts:dashboard_donneur' %}" class="btn-outline-custom">
+                Annuler
+              </a>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
