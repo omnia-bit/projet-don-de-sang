@@ -296,7 +296,7 @@
           <li class="nav-item"><a class="nav-link" href="/donneurs/">Donneurs</a></li>
           <li class="nav-item"><a class="nav-link" href="/administration/">Administration</a></li>
           <li class="nav-item ms-2">
-            <a class="btn-nav nav-link" href="/accounts/connexion/">
+            <a href="{% url 'login' %}">
               <i class="bi bi-box-arrow-in-right me-1"></i>Connexion
             </a>
           </li>
@@ -318,7 +318,7 @@
       <h1 data-aos="fade-up" data-aos-delay="100">Chaque don compte.<br><span>Sauvez des vies.</span></h1>
       <p data-aos="fade-up" data-aos-delay="200">Mettez en relation donneurs volontaires et établissements hospitaliers pour répondre aux besoins urgents en sang.</p>
       <div class="d-flex justify-content-center gap-3 flex-wrap" data-aos="fade-up" data-aos-delay="300">
-        <a href="/accounts/inscription-donneur/" class="btn btn-danger px-4 py-2 fw-600 floating-el" style="border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;box-shadow: 0 4px 15px rgba(230,57,70,0.3);">
+        <a href="{% url 'register' %}" class="btn btn-danger px-4 py-2 fw-600 floating-el" style="border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;box-shadow: 0 4px 15px rgba(230,57,70,0.3);">
           <i class="bi bi-person-plus-fill me-2"></i>Devenir donneur
         </a>
         <a href="/hopitaux/" class="btn btn-outline-danger px-4 py-2" style="border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;">

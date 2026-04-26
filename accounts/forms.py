@@ -14,8 +14,12 @@ class UserRegisterForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'role', 'password1', 'password2']
 
-
-
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
 # PROFIL DONNEUR
 
 class DonneurProfileForm(forms.ModelForm):
@@ -30,3 +34,4 @@ class HopitalProfileForm(forms.ModelForm):
     class Meta:
         model = HopitalProfile
         fields = ['nom', 'adresse', 'ville', 'agrement', 'valide']
+        
