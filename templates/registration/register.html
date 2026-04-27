@@ -1,68 +1,511 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Inscription</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+{% extends 'base.html' %}
+{% load static %}
 
-<body style="background:#f8f9fb;">
+{% block title %}Inscription — DonSang{% endblock %}
 
-<div class="container d-flex justify-content-center align-items-center" style="min-height:100vh;">
+{% block extra_css %}
+<style>
+  :root {
+    --red:        #E63946;
+    --red-dark:   #c1121f;
+    --red-light:  #fff0f0;
+    --surface:    #ffffff;
+    --bg:         #f8f9fb;
+    --text:       #1a1a2e;
+    --muted:      #6c757d;
+    --border:     #e5e7eb;
+    --radius:     16px;
+  }
 
-  <div class="card shadow-lg p-4" style="width:420px; border-radius:15px;">
+  .auth-wrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 3rem 1rem;
+    background: var(--bg);
+    min-height: calc(100vh - 65px);
+  }
+  .auth-panel { width: 100%; max-width: 480px; }
 
-    <h3 class="text-center mb-4">Inscription</h3>
+  .auth-brand { text-align: center; margin-bottom: 2rem; }
+  .auth-brand .brand-icon {
+    width: 64px; height: 64px;
+    background: var(--red-light);
+    border-radius: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: var(--red);
+    margin-bottom: 1rem;
+  }
+  .auth-brand h1 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    color: var(--text);
+    margin-bottom: .3rem;
+  }
+  .auth-brand p { font-size: .9rem; color: var(--muted); }
 
-    <!-- 🔥 AFFICHAGE DES ERREURS -->
-    {% if form.errors %}
-    <div class="alert alert-danger">
-        {{ form.errors }}
+  .auth-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2.2rem 2rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,.05);
+  }
+
+  .form-section-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+  }
+  .form-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .form-group { margin-bottom: 1.15rem; }
+  .form-label {
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: .45rem;
+    display: block;
+  }
+
+  .input-wrap { position: relative; }
+  .input-icon {
+    position: absolute;
+    left: .95rem; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 1rem;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* ── Champ texte / email / password ── */
+  .auth-control {
+    width: 100%;
+    padding: .72rem 1rem .72rem 2.6rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: .92rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+    box-sizing: border-box;
+  }
+  .auth-control:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(230,57,70,.1);
+    background: #fff;
+  }
+
+  /* ── Select ── */
+  .select-wrap { position: relative; }
+  .auth-select {
+    width: 100%;
+    padding: .72rem 2.8rem .72rem 2.6rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: .92rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    /* Supprime la flèche native du navigateur */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  .auth-select:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(230,57,70,.1);
+    background: #fff;
+  }
+  .select-chevron {
+    position: absolute;
+    right: .95rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: .85rem;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* ── Role cards (sélecteur visuel) ── */
+  .role-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: .6rem;
+    margin-top: .45rem;
+  }
+  .role-card {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: .75rem .5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+    background: var(--bg);
+  }
+  .role-card:hover {
+    border-color: var(--red);
+    background: var(--red-light);
+  }
+  .role-card.selected {
+    border-color: var(--red);
+    background: var(--red-light);
+    box-shadow: 0 0 0 3px rgba(230,57,70,.1);
+  }
+  .role-card i {
+    font-size: 1.3rem;
+    color: var(--muted);
+    display: block;
+    margin-bottom: .3rem;
+    transition: color .2s;
+  }
+  .role-card.selected i, .role-card:hover i { color: var(--red); }
+  .role-card span {
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--muted);
+    transition: color .2s;
+  }
+  .role-card.selected span, .role-card:hover span { color: var(--red); }
+  /* input caché qui envoie la valeur réelle */
+  #id_role { display: none; }
+
+  /* ── Password toggle ── */
+  .pw-toggle {
+    position: absolute;
+    right: .9rem; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    background: none;
+    border: none;
+    padding: 0;
+    transition: color .2s;
+    z-index: 2;
+  }
+  .pw-toggle:hover { color: var(--text); }
+
+  /* ── Password strength ── */
+  .pw-strength-bar {
+    height: 4px;
+    border-radius: 4px;
+    background: var(--border);
+    margin-top: .5rem;
+    overflow: hidden;
+  }
+  .pw-strength-fill {
+    height: 100%;
+    border-radius: 4px;
+    width: 0%;
+    transition: width .4s ease, background .4s ease;
+  }
+  .pw-strength-label {
+    font-size: .75rem;
+    color: var(--muted);
+    margin-top: .3rem;
+  }
+
+  /* ── Button ── */
+  .btn-auth {
+    width: 100%;
+    padding: .78rem;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background .2s, box-shadow .2s, transform .15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    margin-top: .5rem;
+  }
+  .btn-auth:hover {
+    background: var(--red-dark);
+    box-shadow: 0 6px 20px rgba(230,57,70,.3);
+    transform: translateY(-1px);
+  }
+  .btn-auth:active { transform: translateY(0); }
+
+  .alert-auth {
+    background: #fff5f5;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: .75rem 1rem;
+    font-size: .86rem;
+    color: #b91c1c;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+  }
+
+  .auth-divider {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    margin: 1.3rem 0;
+    color: var(--muted);
+    font-size: .82rem;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .auth-footer {
+    text-align: center;
+    margin-top: 0;
+    font-size: .88rem;
+    color: var(--muted);
+  }
+  .auth-footer a {
+    color: var(--red);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .auth-footer a:hover { text-decoration: underline; }
+
+  .benefits-strip {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: .6rem;
+    background: var(--red-light);
+    border-radius: 12px;
+    padding: .9rem 1rem;
+    margin-bottom: 1.6rem;
+  }
+  .benefit-item {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--red);
+  }
+
+  ul.errorlist { list-style: none; padding: 0; margin: .4rem 0 0; }
+  ul.errorlist li { font-size: .8rem; color: #b91c1c; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-panel">
+
+    <!-- Brand -->
+    <div class="auth-brand">
+      <div class="brand-icon"><i class="bi bi-person-plus-fill"></i></div>
+      <h1>Créer un compte</h1>
+      <p>Rejoignez la communauté des donneurs et sauvez des vies</p>
     </div>
-    {% endif %}
 
-    <form method="post">
-      {% csrf_token %}
+    <!-- Benefits -->
+    <div class="benefits-strip">
+      <div class="benefit-item"><i class="bi bi-check-circle-fill"></i> Gratuit</div>
+      <div class="benefit-item"><i class="bi bi-bell-fill"></i> Alertes urgentes</div>
+      <div class="benefit-item"><i class="bi bi-journal-medical"></i> Suivi des dons</div>
+    </div>
 
-      <div class="mb-3">
-        <label class="form-label">Nom d'utilisateur</label>
-        {{ form.username }}
+    <!-- Card -->
+    <div class="auth-card">
+
+      {% if form.errors %}
+      <div class="alert-auth">
+        <i class="bi bi-exclamation-triangle-fill mt-1"></i>
+        <span>Veuillez corriger les erreurs ci-dessous.</span>
+      </div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+
+        <!-- ── Informations du compte ── -->
+        <p class="form-section-title"><i class="bi bi-person-circle"></i> Informations du compte</p>
+
+        <!-- Username -->
+        <div class="form-group">
+          <label class="form-label" for="id_username">Nom d'utilisateur</label>
+          <div class="input-wrap">
+            <i class="bi bi-at input-icon"></i>
+            <input type="text" name="username" id="id_username"
+              class="auth-control"
+              value="{{ form.username.value|default:'' }}"
+              autocomplete="username" />
+          </div>
+          {{ form.username.errors }}
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label class="form-label" for="id_email">Adresse email</label>
+          <div class="input-wrap">
+            <i class="bi bi-envelope input-icon"></i>
+            <input type="email" name="email" id="id_email"
+              class="auth-control"
+              value="{{ form.email.value|default:'' }}"
+              autocomplete="email" />
+          </div>
+          {{ form.email.errors }}
+        </div>
+
+        <!-- Rôle — sélecteur visuel par cartes -->
+        <div class="form-group">
+          <label class="form-label">Rôle</label>
+          <!-- Input caché envoyé au serveur -->
+          <input type="hidden" name="role" id="id_role" value="{{ form.role.value|default:'donneur' }}" />
+          <div class="role-cards">
+            <div class="role-card {% if form.role.value == 'donneur' or not form.role.value %}selected{% endif %}"
+                 onclick="selectRole('donneur', this)">
+              <i class="bi bi-droplet-fill"></i>
+              <span>Donneur</span>
+            </div>
+            <div class="role-card {% if form.role.value == 'hopital' %}selected{% endif %}"
+                 onclick="selectRole('hopital', this)">
+              <i class="bi bi-hospital-fill"></i>
+              <span>Hôpital</span>
+            </div>
+            <div class="role-card {% if form.role.value == 'admin' %}selected{% endif %}"
+                 onclick="selectRole('admin', this)">
+              <i class="bi bi-shield-check"></i>
+              <span>Admin</span>
+            </div>
+          </div>
+          {{ form.role.errors }}
+        </div>
+
+        <!-- ── Sécurité ── -->
+        <p class="form-section-title" style="margin-top:1.5rem;"><i class="bi bi-shield-lock"></i> Sécurité</p>
+
+        <!-- Password 1 -->
+        <div class="form-group">
+          <label class="form-label" for="id_password1">Mot de passe</label>
+          <div class="input-wrap">
+            <i class="bi bi-lock input-icon"></i>
+            <input type="password" name="password1" id="id_password1"
+              class="auth-control"
+              autocomplete="new-password"
+              style="padding-right:2.6rem;"
+              oninput="checkStrength(this.value)" />
+            <button type="button" class="pw-toggle" onclick="togglePw('id_password1','icon1')">
+              <i class="bi bi-eye" id="icon1"></i>
+            </button>
+          </div>
+          <div class="pw-strength-bar"><div class="pw-strength-fill" id="strengthFill"></div></div>
+          <p class="pw-strength-label" id="strengthLabel"></p>
+          {{ form.password1.errors }}
+        </div>
+
+        <!-- Password 2 -->
+        <div class="form-group">
+          <label class="form-label" for="id_password2">Confirmer le mot de passe</label>
+          <div class="input-wrap">
+            <i class="bi bi-lock-fill input-icon"></i>
+            <input type="password" name="password2" id="id_password2"
+              class="auth-control"
+              autocomplete="new-password"
+              style="padding-right:2.6rem;" />
+            <button type="button" class="pw-toggle" onclick="togglePw('id_password2','icon2')">
+              <i class="bi bi-eye" id="icon2"></i>
+            </button>
+          </div>
+          {{ form.password2.errors }}
+        </div>
+
+        <button type="submit" class="btn-auth">
+          <i class="bi bi-person-check-fill"></i>
+          Créer mon compte
+        </button>
+      </form>
+
+      <div class="auth-divider">ou</div>
+
+      <div class="auth-footer">
+        Déjà un compte ?
+        <a href="{% url 'accounts:login' %}">Se connecter</a>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">Email</label>
-        {{ form.email }}
-      </div>
+    </div><!-- /auth-card -->
 
-      <div class="mb-3">
-        <label class="form-label">Rôle</label>
-        {{ form.role }}
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Mot de passe</label>
-        {{ form.password1 }}
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Confirmer mot de passe</label>
-        {{ form.password2 }}
-      </div>
-
-      <button type="submit" class="btn btn-danger w-100">
-        S'inscrire
-      </button>
-
-    </form>
-
-    <p class="text-center mt-3">
-      Déjà un compte ?
-      <a href="{% url 'login' %}">Connexion</a>
-    </p>
+    <div class="auth-footer" style="margin-top:1.4rem;">
+      En vous inscrivant, vous contribuez à sauver des vies. <i class="bi bi-heart-fill text-danger"></i>
+    </div>
 
   </div>
-
 </div>
+{% endblock %}
 
-</body>
-</html>
+{% block extra_js %}
+<script>
+  /* ── Sélecteur de rôle ── */
+  function selectRole(value, el) {
+    document.getElementById('id_role').value = value;
+    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  /* ── Toggle password ── */
+  function togglePw(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    icon.className = input.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+  }
+
+  /* ── Force du mot de passe ── */
+  function checkStrength(val) {
+    const fill  = document.getElementById('strengthFill');
+    const label = document.getElementById('strengthLabel');
+    let score = 0;
+    if (val.length >= 8)           score++;
+    if (/[A-Z]/.test(val))         score++;
+    if (/[0-9]/.test(val))         score++;
+    if (/[^A-Za-z0-9]/.test(val))  score++;
+
+    const levels = [
+      { pct: '0%',   color: '#e5e7eb', text: '' },
+      { pct: '25%',  color: '#ef4444', text: 'Faible' },
+      { pct: '50%',  color: '#f97316', text: 'Moyen' },
+      { pct: '75%',  color: '#eab308', text: 'Bien' },
+      { pct: '100%', color: '#22c55e', text: 'Fort' },
+    ];
+    const l = levels[score];
+    fill.style.width      = l.pct;
+    fill.style.background = l.color;
+    label.textContent     = l.text;
+    label.style.color     = l.color;
+  }
+</script>
+{% endblock %}

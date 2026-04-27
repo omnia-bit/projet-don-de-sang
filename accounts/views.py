@@ -9,9 +9,6 @@ from .forms import ModifierProfilForm
 def index(request):
     return HttpResponse("Page accounts fonctionne")
 
-#def connexion(request):
-    #return render(request, 'registration/login.html')
-
 
 # HOME = LOGIN PAGE
 def home(request):
@@ -27,12 +24,11 @@ def register(request):
 
             role = form.cleaned_data.get('role')
 
-            #  création selon rôle
             if role == 'donneur':
                 DonneurProfile.objects.create(
                     user=user,
-                    groupe_sanguin='O+',      # valeur par défaut
-                    sexe='Homme',             # ou 'Femme'
+                    groupe_sanguin='O+',
+                    sexe='Homme',
                     date_naissance='2000-01-01',
                     ville='Non définie'
                 )
@@ -46,7 +42,7 @@ def register(request):
                     agrement="N/A"
                 )
 
-            return redirect('login')
+            return redirect('accounts:login')  # ✅ corrigé
 
     else:
         form = UserRegisterForm()
@@ -65,28 +61,26 @@ def custom_login(request):
         if user is not None:
             login(request, user)
 
-            # ADMIN
             if user.role == 'admin':
                 return redirect('accounts:dashboard_admin')
-
-            # DONNEUR
-            if user.role == 'donneur':
+            elif user.role == 'donneur':
                 return redirect('accounts:dashboard_donneur')
-
-            # HOPITAL
-            if user.role == 'hopital':
+            elif user.role == 'hopital':
                 return redirect('accounts:dashboard_hopital')
 
-            # fallback
-            return redirect('accounts:login')
+        return render(request, 'registration/login.html', {
+            'error': 'Nom utilisateur ou mot de passe incorrect'
+        })
 
     return render(request, 'registration/login.html')
+
 
 from django.contrib.auth import logout
 
 def logout_view(request):
     logout(request)
     return redirect('accounts:login')
+
 
 # DASHBOARDS
 @login_required
@@ -114,9 +108,6 @@ def dashboard_hopital(request):
 def dashboard_admin(request):
     return render(request, 'administration/dashboard.html')
 
-@login_required
-def modifier_profil(request):
-    return render(request, 'accounts/modifier_profil.html')
 
 @login_required
 def modifier_profil(request):
