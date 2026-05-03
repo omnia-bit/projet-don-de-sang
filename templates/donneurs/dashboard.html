@@ -18,6 +18,11 @@
           <h1 class="page-header-title mb-0">
             Bonjour, {{ donneur.user.first_name|default:donneur.user.username }} 
             <span class="badge-groupe">{{ donneur.groupe_sanguin }}</span>
+            {% if not donneur.actif %}
+              <span class="badge bg-warning text-dark fs-6 ms-2" style="border-radius:20px; vertical-align: middle;">
+                <i class="bi bi-moon-stars-fill me-1"></i> Indisponible
+              </span>
+            {% endif %}
           </h1>
         </div>
       </div>
@@ -120,7 +125,7 @@
                 <div class="appel-groupe">{{ appel.groupe_sanguin }}</div>
                 <div class="appel-info">
                   <p class="appel-hopital mb-0">{{ appel.hopital.nom }}</p>
-                  <p class="appel-ville mb-0"><i class="bi bi-geo-alt me-1"></i>{{ appel.hopital.ville }} · {{ appel.quantite }} poche{{ appel.quantite|pluralize }}</p>
+                  <p class="appel-ville mb-0"><i class="bi bi-geo-alt me-1"></i>{{ appel.hopital.ville }} · {{ appel.quantite_necessaire }} poche{{ appel.quantite_necessaire|pluralize }}</p>
                 </div>
                 <a href="{% url 'donneurs:repondre_appel' appel.id %}" class="btn-appel-sm">Répondre</a>
               </div>
@@ -135,8 +140,45 @@
         </div>
       </div>
 
-      <!-- ── Dons récents ── -->
-      <div class="col-lg-5">
+    <!-- ── Campagnes & Inscriptions (Point 3.4) ── -->
+    <div class="row g-4 mb-4">
+      <div class="col-lg-6">
+        <div class="dash-card">
+          <div class="section-head d-flex justify-content-between align-items-center mb-3">
+            <h2 class="section-title-sm">
+              <i class="bi bi-calendar2-heart text-danger me-2"></i>Mes rendez-vous (Campagnes)
+            </h2>
+            <a href="{% url 'donneurs:liste_campagnes' %}" class="btn-link-red">Découvrir <i class="bi bi-arrow-right"></i></a>
+          </div>
+          {% if prochaines_campagnes %}
+            <div class="d-flex flex-column gap-2">
+              {% for insc in prochaines_campagnes %}
+              <div class="appel-row" style="border-left-color: #22c55e;">
+                <div class="appel-info">
+                  <p class="appel-hopital mb-0">{{ insc.campagne.titre }}</p>
+                  <p class="appel-ville mb-0">
+                    <i class="bi bi-clock me-1"></i>{{ insc.creneau_horaire }} · 
+                    <i class="bi bi-geo-alt me-1"></i>{{ insc.campagne.lieu }}
+                  </p>
+                </div>
+                <div class="text-end">
+                   <span class="badge bg-success-light text-success">{{ insc.campagne.date_debut|date:"d M" }}</span>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <i class="bi bi-calendar2-x"></i>
+              <p>Aucune inscription à une campagne.</p>
+              <a href="{% url 'donneurs:liste_campagnes' %}" class="btn-link-red">Voir les collectes à venir</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ── Dons récents (Déplacé) ── -->
+      <div class="col-lg-6">
         <div class="dash-card">
           <div class="section-head d-flex justify-content-between align-items-center mb-3">
             <h2 class="section-title-sm">
@@ -158,7 +200,6 @@
             <div class="empty-state">
               <i class="bi bi-droplet"></i>
               <p>Aucun don enregistré.</p>
-              <a href="{% url 'donneurs:enregistrer_don' %}" class="btn-link-red">Enregistrer mon premier don</a>
             </div>
           {% endif %}
         </div>
@@ -188,9 +229,9 @@
           </a>
         </div>
         <div class="col-6 col-md-3">
-          <a href="{% url 'accounts:modifier_profil' %}" class="quick-action">
-            <i class="bi bi-person-gear"></i>
-            <span>Mon profil</span>
+          <a href="{% url 'donneurs:toggle_status' %}" class="quick-action {% if not donneur.actif %}bg-warning-light{% endif %}">
+            <i class="bi {% if donneur.actif %}bi-eye-slash-fill{% else %}bi-eye-fill{% endif %}"></i>
+            <span>{% if donneur.actif %}Se mettre indisponible{% else %}Se remettre actif{% endif %}</span>
           </a>
         </div>
       </div>

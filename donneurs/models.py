@@ -1,10 +1,6 @@
 from django.db import models
 from accounts.models import DonneurProfile, HopitalProfile
 
-
-# ─────────────────────────────────────────────
-# HISTORIQUE DES DONS
-# ─────────────────────────────────────────────
 class Don(models.Model):
     donneur = models.ForeignKey(
         DonneurProfile,
@@ -13,7 +9,7 @@ class Don(models.Model):
     )
     hopital = models.ForeignKey(
         HopitalProfile,
-        on_delete=models.SET_NULL,   # SET_NULL : si l'hôpital est supprimé, le don reste
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='dons_recus'
@@ -30,11 +26,6 @@ class Don(models.Model):
 
     def __str__(self):
         return f"Don de {self.donneur.user.username} — {self.date_don}"
-
-
-# ─────────────────────────────────────────────
-# RÉPONSE AUX APPELS URGENTS
-# ─────────────────────────────────────────────
 class ReponseAppel(models.Model):
     STATUT_CHOICES = [
         ('en_attente', 'En attente'),
@@ -47,9 +38,12 @@ class ReponseAppel(models.Model):
         on_delete=models.CASCADE,
         related_name='reponses_appels'
     )
-    # Clé vers hopitaux.DemandeUrgente stockée en entier
-    # (évite une dépendance circulaire entre les apps)
-    demande_id   = models.IntegerField(verbose_name="ID de la demande urgente")
+    demande = models.ForeignKey(
+        'hopitaux.DemandeSang',
+        on_delete=models.CASCADE,
+        related_name='reponses',
+        null=True 
+    )
     date_reponse = models.DateTimeField(auto_now_add=True)
     statut       = models.CharField(
         max_length=20,
@@ -61,8 +55,28 @@ class ReponseAppel(models.Model):
         ordering = ['-date_reponse']
         verbose_name = "Réponse à un appel"
         verbose_name_plural = "Réponses aux appels"
-        # Un donneur ne peut répondre qu'une seule fois par demande
-        unique_together = [('donneur', 'demande_id')]
+        unique_together = [('donneur', 'demande')]
 
     def __str__(self):
-        return f"Réponse de {self.donneur.user.username} — demande #{self.demande_id}"
+        return f"Réponse de {self.donneur.user.username} — demande #{self.demande.id}"
+class InscriptionCampagne(models.Model):
+    donneur = models.ForeignKey(
+        DonneurProfile,
+        on_delete=models.CASCADE,
+        related_name='inscriptions'
+    )
+    campagne = models.ForeignKey(
+        'hopitaux.CampagneCollecte',
+        on_delete=models.CASCADE,
+        related_name='inscriptions'
+    )
+    creneau_horaire = models.CharField(max_length=100, help_text="Ex: 09:00 - 10:00")
+    date_inscription = models.DateTimeField(auto_now_add=True)
+    present = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "Inscription à une campagne"
+        unique_together = [('donneur', 'campagne')]
+
+    def __str__(self):
+        return f"{self.donneur.user.username} - {self.campagne.titre} ({self.creneau_horaire})"

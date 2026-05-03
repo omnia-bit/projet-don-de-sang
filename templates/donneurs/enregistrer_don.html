@@ -42,6 +42,34 @@
           <form method="post" novalidate>
             {% csrf_token %}
 
+            {% if form.errors %}
+            <div class="alert alert-danger border-0 rounded-4 mb-4">
+                <i class="bi bi-exclamation-circle-fill me-2"></i>
+                Veuillez corriger les erreurs suivantes :
+                <ul class="mb-0 mt-2">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li><strong>{{ field.label }}</strong> : {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Date du don -->
+            <div class="form-group mb-3">
+              <label class="form-label-custom" for="{{ form.date_don.id_for_label }}">
+                <i class="bi bi-calendar-event me-1"></i>Date du don <span class="required">*</span>
+              </label>
+              {{ form.date_don }}
+              {% if form.date_don.errors %}
+                <div class="form-error">{{ form.date_don.errors }}</div>
+              {% endif %}
+            </div>
+
             <!-- Hôpital -->
             <div class="form-group mb-3">
               <label class="form-label-custom">

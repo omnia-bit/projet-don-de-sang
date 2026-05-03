@@ -2,7 +2,7 @@ from django import forms
 from django.utils import timezone
 from .models import Don, ReponseAppel
 
-# Import sécurisé de HopitalProfile
+
 try:
     from accounts.models import HopitalProfile
     HOPITAL_QUERYSET = HopitalProfile.objects.filter(valide=True)

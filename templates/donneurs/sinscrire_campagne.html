@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Inscription Campagne — BloodConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="bg-danger py-4 text-center text-white">
+                    <h3 class="mb-0 fw-bold">Choix du Créneau</h3>
+                    <p class="mb-0 opacity-75">Campagne : {{ campagne.titre }}</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <p class="text-muted mb-4 text-center">Veuillez sélectionner l'heure de votre passage :</p>
+                        
+                        <div class="list-group mb-4">
+                            {% for c in creneaux %}
+                                <label class="list-group-item d-flex justify-content-between align-items-center p-3 {% if not c.disponible %}bg-light opacity-50{% else %}cursor-pointer{% endif %}">
+                                    <div>
+                                        <input class="form-check-input me-3" type="radio" name="creneau" value="{{ c.label }}" {% if not c.disponible %}disabled{% endif %} required>
+                                        <span class="fw-bold">{{ c.label }}</span>
+                                    </div>
+                                    {% if c.disponible %}
+                                        <span class="badge bg-success rounded-pill">{{ c.places_restantes }} places</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary rounded-pill">Complet</span>
+                                    {% endif %}
+                                </label>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg rounded-pill shadow-sm">
+                                <i class="bi bi-calendar-check"></i> Confirmer mon inscription
+                            </button>
+                            <a href="{% url 'donneurs:liste_campagnes' %}" class="btn btn-link text-secondary">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .cursor-pointer { cursor: pointer; transition: background 0.2s; }
+    .cursor-pointer:hover { background-color: #fff5f5; }
+</style>
+{% endblock %}
