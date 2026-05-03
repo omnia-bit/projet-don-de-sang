@@ -1,100 +1,172 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organiser une Campagne - DonSang</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { background-color: #fff; height: 100vh; border-right: 1px solid #dee2e6; }
-        .nav-link { color: #333; font-weight: 500; margin-bottom: 10px; border-radius: 8px; }
-        .nav-link:hover, .nav-link.active { background-color: #e63946; color: white !important; }
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .btn-danger { background-color: #e63946; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; }
-        .btn-danger:hover { background-color: #d62828; }
-        .form-label { font-weight: 600; color: #444; }
-        .form-control, .form-select { padding: 12px; border-radius: 10px; border: 1px solid #ddd; }
-        .form-control:focus { border-color: #e63946; box-shadow: 0 0 0 0.25rem rgba(230, 57, 70, 0.1); }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3 position-fixed">
-            <div class="d-flex align-items-center mb-4 ps-2">
-                <i class="bi bi-droplet-fill text-danger fs-4 me-2"></i>
-                <span class="fw-bold fs-5">DonSang</span>
-            </div>
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'hopitaux:dashboard' %}"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'hopitaux:creer_demande' %}"><i class="bi bi-plus-circle me-2"></i> Nouvelle Demande</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'hopitaux:liste_campagnes' %}"><i class="bi bi-calendar-event me-2"></i> Campagnes</a>
-                </li>
-                <hr>
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="/"><i class="bi bi-box-arrow-left me-2"></i> Retour Accueil</a>
-                </li>
-            </ul>
-        </nav>
+{% block title %}Organiser une Campagne — DonSang{% endblock %}
 
-        <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 offset-md-3 offset-lg-2">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="d-flex align-items-center mb-4">
-                        <a href="{% url 'hopitaux:liste_campagnes' %}" class="btn btn-link text-dark p-0 me-3"><i class="bi bi-arrow-left fs-4"></i></a>
-                        <h1 class="h2 mb-0">Organiser une Campagne</h1>
-                    </div>
+{% block extra_css %}
+<style>
+    .auth-card {
+        background: #fff;
+        border-radius: 24px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        padding: 2.5rem;
+        margin-top: 2rem;
+        margin-bottom: 4rem;
+    }
+    .form-section-title {
+        font-weight: 800;
+        color: #1d3557;
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .form-label {
+        font-weight: 700;
+        color: #457b9d;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .auth-control {
+        border: 2px solid #f1f4f9;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    .auth-control:focus {
+        border-color: #e63946;
+        box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.1);
+        outline: none;
+    }
+    .btn-publish {
+        background: #e63946;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 1rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+    .btn-publish:hover {
+        background: #d62828;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(230, 57, 70, 0.3);
+        color: white;
+    }
+</style>
+{% endblock %}
 
-                    <div class="card p-4">
-                        <form method="post">
-                            {% csrf_token %}
-                            <div class="mb-4">
-                                <label for="{{ form.titre.id_for_label }}" class="form-label">Titre de la Campagne</label>
-                                {{ form.titre }}
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="{{ form.lieu.id_for_label }}" class="form-label">Lieu de Collecte</label>
-                                {{ form.lieu }}
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
-                                    <label for="{{ form.date_debut.id_for_label }}" class="form-label">Date et Heure de Début</label>
-                                    {{ form.date_debut }}
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <label for="{{ form.date_fin.id_for_label }}" class="form-label">Date et Heure de Fin</label>
-                                    {{ form.date_fin }}
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="{{ form.description.id_for_label }}" class="form-label">Détails et Informations</label>
-                                {{ form.description }}
-                            </div>
-
-                            <div class="d-grid mt-2">
-                                <button type="submit" class="btn btn-danger">Publier la Campagne</button>
-                            </div>
-                        </form>
-                    </div>
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="auth-card">
+                <div class="d-flex align-items-center mb-4">
+                    <a href="{% url 'hopitaux:liste_campagnes' %}" class="btn btn-link text-dark p-0 me-3">
+                        <i class="bi bi-arrow-left fs-4"></i>
+                    </a>
+                    <h1 class="fw-bold mb-0" style="color: #1d3557;">{{ titre_page|default:"Organiser une Campagne" }}</h1>
                 </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger border-0 rounded-4 mb-4">
+                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                        Veuillez corriger les erreurs ci-dessous.
+                    </div>
+                    {% endif %}
+
+                    <div class="form-section-title">
+                        <i class="bi bi-info-circle-fill text-danger"></i> Informations Générales
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.titre.id_for_label }}" class="form-label">Titre de la campagne</label>
+                        <input type="text" name="titre" id="{{ form.titre.id_for_label }}" 
+                               class="auth-control {% if form.titre.errors %}is-invalid{% endif %}"
+                               placeholder="Ex: Grande Collecte de Printemps" value="{{ form.titre.value|default:'' }}">
+                        {% if form.titre.errors %}<div class="invalid-feedback">{{ form.titre.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.lieu.id_for_label }}" class="form-label">Lieu de la collecte</label>
+                        <input type="text" name="lieu" id="{{ form.lieu.id_for_label }}" 
+                               class="auth-control {% if form.lieu.errors %}is-invalid{% endif %}"
+                               placeholder="Ex: Place des Nations Unies, Casablanca" value="{{ form.lieu.value|default:'' }}">
+                        {% if form.lieu.errors %}<div class="invalid-feedback">{{ form.lieu.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.date_debut.id_for_label }}" class="form-label">Date et Heure de Début</label>
+                            <input type="datetime-local" name="date_debut" id="{{ form.date_debut.id_for_label }}" 
+                                   class="auth-control {% if form.date_debut.errors %}is-invalid{% endif %}"
+                                   value="{{ form.date_debut.value|date:'Y-m-dT' }}{{ form.date_debut.value|time:'H:i' }}">
+                            {% if form.date_debut.errors %}<div class="invalid-feedback">{{ form.date_debut.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.date_fin.id_for_label }}" class="form-label">Date et Heure de Fin</label>
+                            <input type="datetime-local" name="date_fin" id="{{ form.date_fin.id_for_label }}" 
+                                   class="auth-control {% if form.date_fin.errors %}is-invalid{% endif %}"
+                                   value="{{ form.date_fin.value|date:'Y-m-dT' }}{{ form.date_fin.value|time:'H:i' }}">
+                            {% if form.date_fin.errors %}<div class="invalid-feedback">{{ form.date_fin.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-section-title mt-2">
+                        <i class="bi bi-gear-fill text-danger"></i> Paramètres & Cibles
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.groupes_cibles.id_for_label }}" class="form-label">Groupes sanguins ciblés</label>
+                        <input type="text" name="groupes_cibles" id="{{ form.groupes_cibles.id_for_label }}" 
+                               class="auth-control {% if form.groupes_cibles.errors %}is-invalid{% endif %}"
+                               placeholder="Ex: O-, A+, Tous" value="{{ form.groupes_cibles.value|default:'Tous' }}">
+                        {% if form.groupes_cibles.errors %}<div class="invalid-feedback">{{ form.groupes_cibles.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.capacite_totale.id_for_label }}" class="form-label">Capacité totale (Donneurs)</label>
+                            <input type="number" name="capacite_totale" id="{{ form.capacite_totale.id_for_label }}" 
+                                   class="auth-control {% if form.capacite_totale.errors %}is-invalid{% endif %}"
+                                   value="{{ form.capacite_totale.value|default:50 }}">
+                            {% if form.capacite_totale.errors %}<div class="invalid-feedback">{{ form.capacite_totale.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.nb_creneaux.id_for_label }}" class="form-label">Nombre de créneaux</label>
+                            <input type="number" name="nb_creneaux" id="{{ form.nb_creneaux.id_for_label }}" 
+                                   class="auth-control {% if form.nb_creneaux.errors %}is-invalid{% endif %}"
+                                   value="{{ form.nb_creneaux.value|default:5 }}">
+                            {% if form.nb_creneaux.errors %}<div class="invalid-feedback">{{ form.nb_creneaux.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description de la campagne</label>
+                        <textarea name="description" id="{{ form.description.id_for_label }}" rows="4"
+                                  class="auth-control {% if form.description.errors %}is-invalid{% endif %}"
+                                  placeholder="Décrivez les objectifs, l'importance et les consignes pour les donneurs...">{{ form.description.value|default:'' }}</textarea>
+                        {% if form.description.errors %}<div class="invalid-feedback">{{ form.description.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-publish">
+                            <i class="bi bi-check-circle-fill me-2"></i>Publier la Campagne
+                        </button>
+                    </div>
+                </form>
             </div>
-        </main>
+        </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

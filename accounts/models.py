@@ -3,8 +3,6 @@ from django.contrib.auth.models import AbstractUser
 
 
 # USER PERSONNALISÉ
-
-
 class User(AbstractUser):
     ROLE_CHOICES = (
         ('donneur', 'Donneur'),

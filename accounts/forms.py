@@ -5,21 +5,29 @@ from .models import User, DonneurProfile, HopitalProfile
 
 
 # INSCRIPTION USER
-
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
     role = forms.ChoiceField(choices=User.ROLE_CHOICES)
+    
+    # Champs additionnels pour le donneur (seront affichés via JS)
+    groupe_sanguin = forms.ChoiceField(
+        choices=[('', 'Choisir votre groupe')] + list(DonneurProfile.GROUPE_CHOICES), 
+        required=False
+    )
+    ville = forms.CharField(max_length=100, required=False)
+    sexe = forms.ChoiceField(
+        choices=[('', 'Sexe'), ('M', 'Homme'), ('F', 'Femme')], 
+        required=False
+    )
+
+    # Champs additionnels pour l'hôpital
+    nom_hopital = forms.CharField(max_length=200, required=False, label="Nom de l'hôpital")
+    adresse_hopital = forms.CharField(max_length=500, required=False, label="Adresse complète")
+    agrement = forms.CharField(max_length=100, required=False, label="Numéro d'agrément")
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'role', 'password1', 'password2']
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password1"])
-        if commit:
-            user.save()
-        return user
+        fields = ['username', 'email', 'role']
 # PROFIL DONNEUR
 
 class DonneurProfileForm(forms.ModelForm):

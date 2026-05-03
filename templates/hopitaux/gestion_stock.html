@@ -1,107 +1,157 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventaire de Sang - DonSang</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { background-color: #fff; height: 100vh; border-right: 1px solid #dee2e6; }
-        .nav-link { color: #333; font-weight: 500; margin-bottom: 10px; border-radius: 8px; }
-        .nav-link:hover, .nav-link.active { background-color: #e63946; color: white !important; }
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .stock-level { height: 10px; border-radius: 5px; background-color: #eee; }
-        .stock-bar { height: 100%; border-radius: 5px; transition: width 0.5s ease; }
-        .bg-low { background-color: #e63946; }
-        .bg-medium { background-color: #f4a261; }
-        .bg-high { background-color: #2a9d8f; }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3 position-fixed">
-            <div class="d-flex align-items-center mb-4 ps-2">
-                <i class="bi bi-droplet-fill text-danger fs-4 me-2"></i>
-                <span class="fw-bold fs-5">DonSang</span>
+{% block title %}Gestion du Stock - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stock-card {
+        border: none;
+        border-radius: 20px;
+        background: white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+    .stock-header {
+        background: linear-gradient(135deg, #1d3557 0%, #457b9d 100%);
+        color: white;
+        padding: 2rem;
+    }
+    .group-pill {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.2rem;
+        background: #f8f9fa;
+        color: #1d3557;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .group-pill.low-stock {
+        background: #ffe5e5;
+        color: #e63946;
+        animation: pulse-red 2s infinite;
+    }
+    @keyframes pulse-red {
+        0% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(230, 57, 70, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0); }
+    }
+    .form-section {
+        background: #f1f4f8;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+    .table thead th {
+        border: none;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Formulaire de mise à jour -->
+        <div class="col-lg-4">
+            <div class="stock-card p-4 h-100">
+                <h4 class="fw-bold mb-4 text-primary">Mettre à jour</h4>
+                <p class="text-muted small mb-4">Ajustez les niveaux de stock pour chaque groupe sanguin disponible dans votre établissement.</p>
+                
+                <form method="post" class="form-section">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Groupe Sanguin</label>
+                        {{ form.groupe_sanguin }}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small">Quantité (Poches)</label>
+                        {{ form.quantite_poches }}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold">
+                        <i class="bi bi-save me-2"></i>Enregistrer
+                    </button>
+                </form>
             </div>
-            <ul class="nav flex-column">
-                <li class="nav-item"><a class="nav-link" href="{% url 'hopitaux:dashboard' %}"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'hopitaux:creer_demande' %}"><i class="bi bi-plus-circle me-2"></i> Nouvelle Demande</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'hopitaux:liste_campagnes' %}"><i class="bi bi-calendar-event me-2"></i> Campagnes</a></li>
-                <li class="nav-item"><a class="nav-link active" href="{% url 'hopitaux:gestion_stock' %}"><i class="bi bi-box-seam me-2"></i> Inventaire Sang</a></li>
-                <hr>
-                <li class="nav-item"><a class="nav-link text-danger" href="/"><i class="bi bi-box-arrow-left me-2"></i> Retour Accueil</a></li>
-            </ul>
-        </nav>
+        </div>
 
-        <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 offset-md-3 offset-lg-2">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            <h1 class="h2 mb-4">Inventaire des Stocks de Sang</h1>
-
-            <div class="row g-4">
-                <!-- Formulaire de mise à jour -->
-                <div class="col-lg-4">
-                    <div class="card p-4 h-100">
-                        <h5 class="fw-bold mb-3">Mettre à jour le Stock</h5>
-                        <form method="post">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label class="form-label">Groupe Sanguin</label>
-                                {{ form.groupe_sanguin }}
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Nombre de Poches</label>
-                                {{ form.quantite_poches }}
-                            </div>
-                            <button type="submit" class="btn btn-danger w-100">Enregistrer</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Liste des stocks -->
-                <div class="col-lg-8">
-                    <div class="card p-4">
-                        <h5 class="fw-bold mb-4">État des Stocks par Groupe</h5>
-                        <div class="row g-3">
-                            {% for s in stocks %}
-                            <div class="col-md-6 mb-3">
-                                <div class="p-3 border rounded-3 bg-white">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="badge bg-danger rounded-pill fs-6">{{ s.groupe_sanguin }}</span>
-                                        <span class="fw-bold">{{ s.quantite_poches }} poches</span>
-                                    </div>
-                                    <div class="stock-level">
-                                        <div class="stock-bar {% if s.quantite_poches < 5 %}bg-low{% elif s.quantite_poches < 20 %}bg-medium{% else %}bg-high{% endif %}" style="width: {{ s.quantite_poches|add:"0" }}%;"></div>
-                                    </div>
-                                    <small class="text-muted mt-2 d-block">MàJ : {{ s.derniere_mise_a_jour|date:"d/m/Y H:i" }}</small>
-                                </div>
-                            </div>
-                            {% empty %}
-                            <div class="col-12 text-center py-4">
-                                <p class="text-muted">Aucun stock enregistré. Utilisez le formulaire pour commencer.</p>
-                            </div>
-                            {% endfor %}
+        <!-- Liste des stocks -->
+        <div class="col-lg-8">
+            <div class="stock-card h-100">
+                <div class="stock-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-1 fw-bold">Inventaire Actuel</h3>
+                            <p class="mb-0 opacity-75">Visualisez l'état de vos réserves en temps réel.</p>
                         </div>
+                        <i class="bi bi-box-seam fs-1 opacity-25"></i>
+                    </div>
+                </div>
+                
+                <div class="p-4">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Groupe</th>
+                                    <th>Quantité disponible</th>
+                                    <th>Statut</th>
+                                    <th>Dernière MAJ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for s in stocks %}
+                                <tr>
+                                    <td>
+                                        <div class="group-pill {% if s.quantite_poches < 5 %}low-stock{% endif %}">
+                                            {{ s.groupe_sanguin }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h5 class="mb-0 fw-bold">{{ s.quantite_poches }} <span class="fs-6 text-muted fw-normal">poches</span></h5>
+                                    </td>
+                                    <td>
+                                        {% if s.quantite_poches < 5 %}
+                                            <span class="badge bg-danger rounded-pill px-3">Critique</span>
+                                        {% elif s.quantite_poches < 15 %}
+                                            <span class="badge bg-warning text-dark rounded-pill px-3">Faible</span>
+                                        {% else %}
+                                            <span class="badge bg-success rounded-pill px-3">Optimal</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="small text-muted">
+                                        {{ s.derniere_mise_a_jour|date:"d/m/Y H:i" }}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-5 text-muted">
+                                        <i class="bi bi-inbox fs-2 d-block mb-3"></i>
+                                        Aucun stock enregistré.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}
