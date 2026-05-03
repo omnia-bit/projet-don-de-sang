@@ -406,6 +406,87 @@
           {{ form.role.errors }}
         </div>
 
+        <!-- ── Champs spécifiques au Donneur (masqués si hôpital) ── -->
+        <div id="donneur_fields" style="{% if form.role.value == 'hopital' or form.role.value == 'admin' %}display:none;{% endif %}">
+          <p class="form-section-title" style="margin-top:1.5rem;"><i class="bi bi-heart-fill"></i> Détails médicaux</p>
+          
+          <div class="form-group">
+            <label class="form-label" for="id_groupe_sanguin">Groupe Sanguin</label>
+            <div class="select-wrap">
+              <i class="bi bi-droplet input-icon"></i>
+              <select name="groupe_sanguin" id="id_groupe_sanguin" class="auth-select">
+                {% for val, label in form.groupe_sanguin.field.choices %}
+                  <option value="{{ val }}" {% if form.groupe_sanguin.value == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <i class="bi bi-chevron-down select-chevron"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_ville">Ville de résidence</label>
+            <div class="input-wrap">
+              <i class="bi bi-geo-alt input-icon"></i>
+              <input type="text" name="ville" id="id_ville" class="auth-control" 
+                placeholder="Ex: Casablanca" value="{{ form.ville.value|default:'' }}">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_sexe">Sexe</label>
+            <div class="select-wrap">
+              <i class="bi bi-gender-ambiguous input-icon"></i>
+              <select name="sexe" id="id_sexe" class="auth-select">
+                {% for val, label in form.sexe.field.choices %}
+                  <option value="{{ val }}" {% if form.sexe.value == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <i class="bi bi-chevron-down select-chevron"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- ── Champs spécifiques à l'Hôpital (masqués si donneur/admin) ── -->
+        <div id="hopital_fields" style="{% if form.role.value != 'hopital' %}display:none;{% endif %}">
+          <p class="form-section-title" style="margin-top:1.5rem;"><i class="bi bi-building"></i> Informations Hospitalières</p>
+          
+          <div class="form-group">
+            <label class="form-label" for="id_nom_hopital">Nom de l'hôpital</label>
+            <div class="input-wrap">
+              <i class="bi bi-hospital input-icon"></i>
+              <input type="text" name="nom_hopital" id="id_nom_hopital" class="auth-control" 
+                placeholder="Ex: Hôpital Ibn Sina" value="{{ form.nom_hopital.value|default:'' }}">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_adresse_hopital">Adresse complète</label>
+            <div class="input-wrap">
+              <i class="bi bi-map input-icon"></i>
+              <input type="text" name="adresse_hopital" id="id_adresse_hopital" class="auth-control" 
+                placeholder="Ex: 123 Rue de la Santé" value="{{ form.adresse_hopital.value|default:'' }}">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_agrement">Numéro d'agrément</label>
+            <div class="input-wrap">
+              <i class="bi bi-card-checklist input-icon"></i>
+              <input type="text" name="agrement" id="id_agrement" class="auth-control" 
+                placeholder="Ex: AGR-2024-001" value="{{ form.agrement.value|default:'' }}">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="id_ville_hop">Ville</label>
+            <div class="input-wrap">
+              <i class="bi bi-geo-alt input-icon"></i>
+              <input type="text" name="ville" id="id_ville_hop" class="auth-control" 
+                placeholder="Ex: Rabat" value="{{ form.ville.value|default:'' }}">
+            </div>
+          </div>
+        </div>
+
         <!-- ── Sécurité ── -->
         <p class="form-section-title" style="margin-top:1.5rem;"><i class="bi bi-shield-lock"></i> Sécurité</p>
 
@@ -474,6 +555,21 @@
     document.getElementById('id_role').value = value;
     document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
+
+    // Afficher/Masquer les champs médicaux
+    const donorFields = document.getElementById('donneur_fields');
+    const hospitalFields = document.getElementById('hopital_fields');
+    
+    if (value === 'donneur') {
+      donorFields.style.display = 'block';
+      hospitalFields.style.display = 'none';
+    } else if (value === 'hopital') {
+      donorFields.style.display = 'none';
+      hospitalFields.style.display = 'block';
+    } else {
+      donorFields.style.display = 'none';
+      hospitalFields.style.display = 'none';
+    }
   }
 
   /* ── Toggle password ── */

@@ -191,17 +191,54 @@
   <div class="auth-panel">
 
     <div class="auth-brand">
-      <div class="brand-icon"><i class="bi bi-droplet-fill"></i></div>
-      <h1>Bon retour !</h1>
-      <p>Connectez-vous pour accéder à votre espace donneur</p>
+      <div class="brand-icon">
+        {% if 'hopitaux' in next %}
+          <i class="bi bi-hospital"></i>
+        {% elif 'administration' in next %}
+          <i class="bi bi-shield-lock"></i>
+        {% else %}
+          <i class="bi bi-droplet-fill"></i>
+        {% endif %}
+      </div>
+      <h1>
+        {% if 'hopitaux' in next %}
+          Espace Hôpital
+        {% elif 'administration' in next %}
+          Administration
+        {% else %}
+          Bon retour !
+        {% endif %}
+      </h1>
+      <p>
+        {% if 'hopitaux' in next %}
+          Gérez vos demandes et campagnes de collecte
+        {% elif 'administration' in next %}
+          Accès réservé aux administrateurs du système
+        {% else %}
+          Connectez-vous pour accéder à votre espace personnel
+        {% endif %}
+      </p>
     </div>
 
     <div class="info-strip">
       <i class="bi bi-heart-pulse-fill"></i>
-      Chaque connexion, une vie potentiellement sauvée.
+      {% if 'hopitaux' in next %}
+        Optimisez la gestion de vos stocks de sang.
+      {% elif 'administration' in next %}
+        Supervision globale de la plateforme BloodConnect.
+      {% else %}
+        Chaque connexion, une vie potentiellement sauvée.
+      {% endif %}
     </div>
 
     <div class="auth-card">
+
+      {% if error %}
+      <div class="alert-auth">
+        <i class="bi bi-exclamation-triangle-fill mt-1"></i>
+        <span>{{ error }}</span>
+      </div>
+      {% endif %}
 
       {% if form.non_field_errors %}
       <div class="alert-auth">
@@ -212,6 +249,9 @@
 
       <form method="post">
         {% csrf_token %}
+        {% if next and next != 'None' %}
+          <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
 
         <div class="form-group">
           <label class="form-label" for="id_username">Nom d'utilisateur</label>
