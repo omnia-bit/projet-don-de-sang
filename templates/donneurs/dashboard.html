@@ -210,25 +210,31 @@
     <div class="dash-card">
       <h2 class="section-title-sm mb-3"><i class="bi bi-lightning-fill text-amber me-2"></i>Actions rapides</h2>
       <div class="row g-3">
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-md-4 col-lg">
           <a href="{% url 'donneurs:enregistrer_don' %}" class="quick-action {% if not est_eligible %}disabled-action{% endif %}">
             <i class="bi bi-plus-circle-fill"></i>
             <span>Enregistrer un don</span>
           </a>
         </div>
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-md-4 col-lg">
           <a href="{% url 'donneurs:appels_urgents' %}" class="quick-action">
             <i class="bi bi-bell-fill"></i>
             <span>Appels urgents</span>
           </a>
         </div>
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-md-4 col-lg">
           <a href="{% url 'donneurs:historique_dons' %}" class="quick-action">
             <i class="bi bi-journal-medical"></i>
             <span>Mon historique</span>
           </a>
         </div>
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-md-4 col-lg">
+          <a href="{% url 'accounts:modifier_profil' %}" class="quick-action">
+            <i class="bi bi-person-gear"></i>
+            <span>Modifier profil</span>
+          </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg">
           <a href="{% url 'donneurs:toggle_status' %}" class="quick-action {% if not donneur.actif %}bg-warning-light{% endif %}">
             <i class="bi {% if donneur.actif %}bi-eye-slash-fill{% else %}bi-eye-fill{% endif %}"></i>
             <span>{% if donneur.actif %}Se mettre indisponible{% else %}Se remettre actif{% endif %}</span>
