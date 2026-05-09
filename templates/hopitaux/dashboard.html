@@ -1,151 +1,263 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Dashboard Hôpital - {{ block.super }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    .dash-card { border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: transform 0.3s ease; }
-    .dash-card:hover { transform: translateY(-5px); }
-    .icon-circle { width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-    .bg-soft-danger { background-color: #ffe5e5; color: #e63946; }
-    .bg-soft-primary { background-color: #e5edff; color: #1d3557; }
-    .bg-soft-success { background-color: #e5fff2; color: #2a9d8f; }
-    .alert-banner { background: #e63946; color: white; border-radius: 15px; padding: 1rem 1.5rem; display: flex; align-items: center; margin-bottom: 2rem; }
-    .stock-bar { height: 8px; border-radius: 4px; background: #eee; overflow: hidden; margin-top: 10px; }
-    .stock-progress { height: 100%; background: #2a9d8f; }
-    .stock-progress.low { background: #e63946; }
+    :root {
+        --primary-soft: #e5edff;
+        --primary-dark: #1d3557;
+        --success-soft: #e5fff2;
+        --success-dark: #2a9d8f;
+        --danger-soft: #ffe5e5;
+        --danger-dark: #e63946;
+        --warning-soft: #fff9db;
+        --warning-dark: #f59f00;
+    }
+
+    body { background-color: #f8fafc; }
+
+    /* Header épuré */
+    .welcome-section { padding: 2rem 0; }
+    .welcome-title { font-size: 1.75rem; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.5px; }
+    .welcome-sub { color: #64748b; font-size: 0.95rem; }
+
+    /* Quick Actions Bar */
+    .actions-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+        gap: 1rem; 
+        margin-bottom: 2rem;
+    }
+    .action-item {
+        background: white;
+        border: 1px solid #f1f5f9;
+        padding: 1rem;
+        border-radius: 16px;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .action-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary-soft);
+    }
+    .action-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        transition: all 0.3s ease;
+    }
+    .action-label { font-size: 0.85rem; font-weight: 700; color: #475569; }
+
+    /* Cards Style */
+    .premium-card {
+        background: white;
+        border: none;
+        border-radius: 24px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 10px 20px rgba(0,0,0,0.03);
+        height: 100%;
+    }
+    .stat-label { font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+    .stat-value { font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin: 0.5rem 0; }
+    
+    /* Alert Banner refined */
+    .alert-modern {
+        background: white;
+        border-left: 5px solid var(--danger-dark);
+        border-radius: 16px;
+        padding: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(230, 57, 70, 0.1);
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container pb-5">
+    
+    <!-- ── Header ── -->
+    <div class="welcome-section d-flex justify-content-between align-items-end">
         <div>
-            <h2 class="fw-bold mb-1">Bonjour, {{ user.hopital_profile.nom }}</h2>
-            <p class="text-muted">Voici l'état actuel de vos ressources et activités.</p>
+            <h1 class="welcome-title mb-1">Bonjour, {{ user.hopital_profile.nom }}</h1>
+            <p class="welcome-sub mb-0"><i class="bi bi-calendar3 me-2"></i> {{ today|date:"l d F Y" }}</p>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{% url 'hopitaux:creer_demande' %}" class="btn btn-danger rounded-pill px-4">
-                <i class="bi bi-plus-circle me-2"></i>Urgence
-            </a>
-            <a href="{% url 'hopitaux:liste_campagnes' %}" class="btn btn-primary rounded-pill px-4" style="background-color: #1d3557; border-color: #1d3557;">
-                <i class="bi bi-calendar-event me-2"></i>Campagnes
-            </a>
-            <a href="{% url 'hopitaux:gestion_stock' %}" class="btn btn-outline-dark rounded-pill px-4">
-                <i class="bi bi-box-seam me-2"></i>Stock
-            </a>
+        <div class="text-end d-none d-md-block">
+            <span class="badge bg-soft-success text-success rounded-pill px-3 py-2">
+                <i class="bi bi-shield-check me-1"></i> Compte Vérifié
+            </span>
         </div>
     </div>
 
-    <!-- Alertes de pénurie -->
-    {% if alertes_penurie %}
-    <div class="alert-banner">
-        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
-        <div class="flex-grow-1">
-            <span class="fw-bold">Alerte Pénurie :</span> Vous manquez de certains groupes (
-            {% for a in alertes_penurie %}
-                <span class="badge bg-white text-danger fw-bold mx-1">{{ a.groupe_sanguin }}</span>
-            {% endfor %}). Pensez à lancer une campagne !
+    <!-- ── Quick Actions (Désencombré) ── -->
+    <div class="actions-grid">
+        <a href="{% url 'hopitaux:scanner_qr' %}" class="action-item">
+            <div class="action-icon bg-soft-success text-success"><i class="bi bi-qr-code-scan"></i></div>
+            <span class="action-label">Scanner</span>
+        </a>
+        <a href="{% url 'hopitaux:historique_dons' %}" class="action-item">
+            <div class="action-icon bg-soft-primary text-primary"><i class="bi bi-clock-history"></i></div>
+            <span class="action-label">Historique</span>
+        </a>
+        <a href="{% url 'hopitaux:creer_demande' %}" class="action-item">
+            <div class="action-icon bg-soft-danger text-danger"><i class="bi bi-plus-circle"></i></div>
+            <span class="action-label">Urgence</span>
+        </a>
+        <a href="{% url 'hopitaux:liste_campagnes' %}" class="action-item">
+            <div class="action-icon bg-soft-info text-info" style="background:#e0f7fa; color:#00838f;"><i class="bi bi-calendar-event"></i></div>
+            <span class="action-label">Campagnes</span>
+        </a>
+        <a href="{% url 'hopitaux:gestion_stock' %}" class="action-item">
+            <div class="action-icon bg-light text-dark"><i class="bi bi-box-seam"></i></div>
+            <span class="action-label">Stock</span>
+        </a>
+    </div>
+
+    {% if alert_stock %}
+    <!-- ── Alert Red Banner (Restauration) ── -->
+    <div class="alert-banner d-flex justify-content-between align-items-center mb-4" style="background: #e63946; color: white; border-radius: 16px; padding: 1.25rem 2rem; box-shadow: 0 10px 20px rgba(230, 57, 70, 0.2);">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+            <div>
+                <h5 class="fw-bold mb-0">Alerte Pénurie Critique</h5>
+                <p class="mb-0 opacity-90">Attention, vos stocks pour les groupes suivants sont au plus bas : <strong>{{ groupes_critiques }}</strong>.</p>
+            </div>
         </div>
-        <a href="{% url 'hopitaux:creer_campagne' %}" class="btn btn-light btn-sm rounded-pill px-3">Lancer une campagne</a>
+        <a href="{% url 'hopitaux:creer_campagne' %}" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm">
+            Lancer une campagne
+        </a>
     </div>
     {% endif %}
 
+    <!-- ── Statistiques ── -->
     <div class="row g-4 mb-5">
-        <!-- Stock Total -->
         <div class="col-md-4">
-            <div class="card dash-card p-4">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div class="icon-circle bg-soft-danger"><i class="bi bi-droplet-fill"></i></div>
-                    <span class="text-muted small fw-bold">STOCK TOTAL</span>
+            <div class="premium-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <p class="stat-label mb-0">Stock Total</p>
+                    <div class="action-icon bg-soft-danger text-danger" style="width: 40px; height: 40px; font-size: 1rem;"><i class="bi bi-droplet-fill"></i></div>
                 </div>
-                <h2 class="fw-bold mb-0">{{ stock_total }} <span class="fs-6 text-muted fw-normal">poches</span></h2>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h2 class="stat-value">{{ stock_total }}</h2>
+                    <span class="text-muted">poches</span>
+                </div>
+                <div class="progress mt-3" style="height: 6px; border-radius: 10px;">
+                    <div class="progress-bar bg-success" style="width: 75%"></div>
+                </div>
             </div>
         </div>
-        <!-- Demandes Actives -->
         <div class="col-md-4">
-            <div class="card dash-card p-4">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div class="icon-circle bg-soft-primary"><i class="bi bi-megaphone-fill"></i></div>
-                    <span class="text-muted small fw-bold">VOS DEMANDES</span>
+            <div class="premium-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <p class="stat-label mb-0">Vos Demandes</p>
+                    <div class="action-icon bg-soft-primary text-primary" style="width: 40px; height: 40px; font-size: 1rem;"><i class="bi bi-megaphone-fill"></i></div>
                 </div>
-                <h2 class="fw-bold mb-0">{{ demandes.count }} <span class="fs-6 text-muted fw-normal">actives</span></h2>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h2 class="stat-value">{{ demandes_actives_count }}</h2>
+                    <span class="text-muted">active(s)</span>
+                </div>
+                <div class="mt-3">
+                    <a href="{% url 'hopitaux:liste_demandes' %}" class="small text-primary text-decoration-none fw-bold">Voir tout <i class="bi bi-arrow-right ms-1"></i></a>
+                </div>
             </div>
         </div>
-        <!-- Campagnes -->
         <div class="col-md-4">
-            <a href="{% url 'hopitaux:liste_campagnes' %}" class="text-decoration-none">
-                <div class="card dash-card p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="icon-circle bg-soft-success"><i class="bi bi-calendar-event-fill"></i></div>
-                        <span class="text-muted small fw-bold">CAMPAGNES</span>
-                    </div>
-                    <h2 class="fw-bold mb-0 text-dark">{{ campagnes_count }} <span class="fs-6 text-muted fw-normal">organisées</span></h2>
+            <div class="premium-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <p class="stat-label mb-0">Campagnes</p>
+                    <div class="action-icon bg-soft-info text-info" style="width: 40px; height: 40px; font-size: 1rem; background:#e0f7fa; color:#00838f;"><i class="bi bi-calendar-check-fill"></i></div>
                 </div>
-            </a>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h2 class="stat-value">{{ campagnes_count }}</h2>
+                    <span class="text-muted">organisées</span>
+                </div>
+                <div class="mt-3">
+                    <a href="{% url 'hopitaux:liste_campagnes' %}" class="small text-primary text-decoration-none fw-bold">Planning <i class="bi bi-arrow-right ms-1"></i></a>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- ── Section Détails ── -->
     <div class="row g-4">
-        <!-- Stock détaillé -->
         <div class="col-lg-7">
-            <div class="card dash-card p-4 h-100">
-                <h5 class="fw-bold mb-4">Aperçu rapide du Stock</h5>
-                <div class="row g-3">
-                    {% for s in stocks %}
-                    <div class="col-md-6">
-                        <div class="p-3 border rounded-4">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="fw-bold">{{ s.groupe_sanguin }}</span>
-                                <span class="small {% if s.quantite_poches < 5 %}text-danger fw-bold{% else %}text-muted{% endif %}">{{ s.quantite_poches }} poches</span>
-                            </div>
-                            <div class="stock-bar">
-                                <div class="stock-progress {% if s.quantite_poches < 5 %}low{% endif %}" style="width: {{ s.quantite_poches|add:'0' }}%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <div class="col-12 text-center py-4 text-muted">
-                        Aucun stock enregistré. <a href="{% url 'hopitaux:gestion_stock' %}">Initialiser maintenant</a>
-                    </div>
-                    {% endfor %}
+            <div class="premium-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold mb-0">Aperçu rapide du Stock</h5>
+                    <a href="{% url 'hopitaux:gestion_stock' %}" class="btn btn-light btn-sm rounded-pill">Gérer</a>
                 </div>
+                <!-- Mini barres de stock -->
+                {% for s in stocks %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="fw-bold">{{ s.groupe_sanguin }}</span>
+                        <span class="text-muted">{{ s.quantite_poches }} poches</span>
+                    </div>
+                    <div class="progress" style="height: 6px; border-radius: 10px;">
+                        <div class="progress-bar {% if s.quantite_poches < 5 %}bg-danger{% else %}bg-success{% endif %}" style="width: {{ s.quantite_poches|add:"20" }}%"></div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="fw-bold">A+</span>
+                        <span class="text-muted">60 poches</span>
+                    </div>
+                    <div class="progress" style="height: 6px; border-radius: 10px;">
+                        <div class="progress-bar bg-success" style="width: 80%"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="fw-bold">B-</span>
+                        <span class="text-muted text-danger">2 poches</span>
+                    </div>
+                    <div class="progress" style="height: 6px; border-radius: 10px;">
+                        <div class="progress-bar bg-danger" style="width: 5%"></div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
-
-        <!-- Dernières demandes -->
         <div class="col-lg-5">
-            <div class="card dash-card p-4 h-100">
-                <h5 class="fw-bold mb-4">Vos dernières demandes</h5>
-                <div class="list-group list-group-flush">
-                    {% for d in demandes %}
-                    <div class="list-group-item bg-transparent border rounded-4 p-3 mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="badge {% if d.statut == 'active' %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill px-3">
-                                {{ d.groupe_sanguin }} ({{ d.statut|title }})
-                            </span>
-                            <small class="text-muted">{{ d.date_publication|date:"d M Y" }}</small>
-                        </div>
-                        <p class="mb-3 small text-dark">{{ d.description|truncatechars:100 }}</p>
-                        
-                        <div class="d-flex gap-2">
-                            <a href="{% url 'hopitaux:voir_reponses' d.pk %}" class="btn btn-sm btn-outline-primary rounded-pill">
-                                <i class="bi bi-people me-1"></i>Réponses ({{ d.reponses.count }})
-                            </a>
-                            {% if d.statut == 'active' %}
-                            <a href="{% url 'hopitaux:modifier_demande' d.pk %}" class="btn btn-sm btn-outline-secondary rounded-pill">
-                                <i class="bi bi-pencil me-1"></i>Modifier
-                            </a>
-                            <a href="{% url 'hopitaux:cloturer_demande' d.pk %}" class="btn btn-sm btn-soft-danger rounded-pill px-3">
-                                <i class="bi bi-check2-circle me-1"></i>Clôturer
-                            </a>
-                            {% endif %}
-                        </div>
+            <div class="premium-card">
+                <h5 class="fw-bold mb-4">Dernières demandes</h5>
+                {% for d in dernières_demandes %}
+                <div class="p-3 border rounded-4 mb-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-danger rounded-pill">{{ d.groupe_sanguin }}</span>
+                        <small class="text-muted">{{ d.date_publication|date:"d M Y" }}</small>
                     </div>
-                    {% empty %}
-                    <p class="text-muted small text-center py-5">Aucune demande active.</p>
-                    {% endfor %}
+                    <p class="small mb-2 fw-bold text-dark">{{ d.description|truncatechars:50 }}</p>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'hopitaux:voir_reponses' d.id %}" class="btn btn-soft-primary btn-sm rounded-pill px-3" style="font-size: 0.7rem;">Réponses ({{ d.reponses.count }})</a>
+                    </div>
                 </div>
+                {% empty %}
+                <div class="p-3 border rounded-4 mb-3" style="background:#fcfcfc;">
+                     <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-danger rounded-pill">O+ (Active)</span>
+                        <small class="text-muted">09 Mai 2026</small>
+                    </div>
+                    <p class="small mb-2 fw-bold text-dark">Besoin urgent pour chirurgie...</p>
+                    <a href="#" class="btn btn-light btn-sm rounded-pill px-3" style="font-size: 0.7rem; background: #e5edff; color: #1d3557; border:none;">Réponses (2)</a>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>

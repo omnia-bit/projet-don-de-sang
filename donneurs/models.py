@@ -18,6 +18,7 @@ class Don(models.Model):
     quantite     = models.PositiveIntegerField(help_text="Quantité en ml (ex: 450)")
     lieu         = models.CharField(max_length=200)
     observations = models.TextField(blank=True, null=True)
+    signature_donneur = models.TextField(blank=True, null=True, help_text="Signature Base64 du donneur lors du don")
 
     class Meta:
         ordering = ['-date_don']

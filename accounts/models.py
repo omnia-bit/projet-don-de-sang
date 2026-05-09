@@ -20,6 +20,8 @@ class User(AbstractUser):
 
 
 
+import uuid
+
 # PROFIL DONNEUR
 
 class DonneurProfile(models.Model):
@@ -41,6 +43,9 @@ class DonneurProfile(models.Model):
     date_naissance = models.DateField(null=True, blank=True)
     ville = models.CharField(max_length=100, null=True, blank=True)
     actif = models.BooleanField(default=True)
+    
+    # Identifiant pour QR Code
+    qr_code_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def __str__(self):
         return f"{self.user.username} ({self.groupe_sanguin})"
@@ -60,6 +65,9 @@ class HopitalProfile(models.Model):
     ville = models.CharField(max_length=100)
     agrement = models.CharField(max_length=100)
     valide = models.BooleanField(default=False)
+    
+    # Nouveaux champs pour la vérification moderne
+    licence_doc = models.FileField(upload_to='licences/', null=True, blank=True)
 
     def __str__(self):
         return self.nom

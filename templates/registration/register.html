@@ -19,11 +19,12 @@
 
   .auth-wrapper {
     display: flex;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    padding: 3rem 1rem;
+    padding: 4rem 1rem;
     background: var(--bg);
-    min-height: calc(100vh - 65px);
+    min-height: 100vh;
   }
   .auth-panel { width: 100%; max-width: 480px; }
 
@@ -349,7 +350,7 @@
       </div>
       {% endif %}
 
-      <form method="post">
+      <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
         <!-- ── Informations du compte ── -->
@@ -460,6 +461,15 @@
           </div>
 
           <div class="form-group">
+            <label class="form-label" for="id_ville_hopital">Ville</label>
+            <div class="input-wrap">
+              <i class="bi bi-geo-alt input-icon"></i>
+              <input type="text" name="ville_hopital" id="id_ville_hopital" class="auth-control" 
+                placeholder="Ex: Casablanca" value="{{ form.ville_hopital.value|default:'' }}">
+            </div>
+          </div>
+
+          <div class="form-group">
             <label class="form-label" for="id_adresse_hopital">Adresse complète</label>
             <div class="input-wrap">
               <i class="bi bi-map input-icon"></i>
@@ -478,11 +488,10 @@
           </div>
           
           <div class="form-group">
-            <label class="form-label" for="id_ville_hop">Ville</label>
+            <label class="form-label" for="id_licence_doc">Licence Médicale (PDF)</label>
             <div class="input-wrap">
-              <i class="bi bi-geo-alt input-icon"></i>
-              <input type="text" name="ville" id="id_ville_hop" class="auth-control" 
-                placeholder="Ex: Rabat" value="{{ form.ville.value|default:'' }}">
+              <i class="bi bi-file-earmark-pdf input-icon"></i>
+              <input type="file" name="licence_doc" id="id_licence_doc" class="auth-control" accept="application/pdf" style="padding-top: .6rem;">
             </div>
           </div>
         </div>
@@ -525,7 +534,7 @@
           {{ form.password2.errors }}
         </div>
 
-        <button type="submit" class="btn-auth">
+        <button type="submit" class="btn-auth" id="submit-btn">
           <i class="bi bi-person-check-fill"></i>
           Créer mon compte
         </button>
@@ -549,7 +558,12 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 <script>
+  document.querySelector('form').addEventListener('submit', function(e) {
+    // Plus besoin de gérer la signature à l'inscription
+  });
+
   /* ── Sélecteur de rôle ── */
   function selectRole(value, el) {
     document.getElementById('id_role').value = value;
@@ -566,10 +580,16 @@
     } else if (value === 'hopital') {
       donorFields.style.display = 'none';
       hospitalFields.style.display = 'block';
+      // Ajuster le canvas si nécessaire
+      resizeCanvas();
     } else {
       donorFields.style.display = 'none';
       hospitalFields.style.display = 'none';
     }
+  }
+
+  function resizeCanvas() {
+    // Fonction désactivée car le canvas de signature a été retiré de cette page
   }
 
   /* ── Toggle password ── */

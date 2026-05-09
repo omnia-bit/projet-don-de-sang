@@ -6,6 +6,7 @@
 <style>
     .response-card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
     .avatar-circle { width: 50px; height: 50px; background: #e5edff; color: #1d3557; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .bg-soft-primary { background: #e5edff; color: #1d3557; }
 </style>
 {% endblock %}
 
@@ -21,6 +22,8 @@
         <h2 class="fw-bold">Réponses pour le groupe <span class="text-danger">{{ demande.groupe_sanguin }}</span></h2>
         <p class="text-muted small">Publié le {{ demande.date_publication|date:"d M Y" }}</p>
     </div>
+
+    {% include 'includes/messages.html' %}
 
     <div class="row">
         <div class="col-lg-8">
@@ -44,9 +47,13 @@
                             </div>
                         </div>
                         <div class="mt-3 text-end">
-                            <a href="mailto:{{ r.donneur.user.email }}" class="btn btn-sm btn-primary rounded-pill px-3">
+                            <button class="btn btn-sm btn-primary rounded-pill px-3" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#emailModal" 
+                                    data-donneur-email="{{ r.donneur.user.email }}"
+                                    data-donneur-nom="{{ r.donneur.user.username }}">
                                 <i class="bi bi-envelope me-1"></i>Contacter
-                            </a>
+                            </button>
                         </div>
                     </div>
                     {% empty %}
@@ -79,4 +86,58 @@
         </div>
     </div>
 </div>
+
+<!-- Modal pour l'envoi d'email -->
+<div class="modal fade" id="emailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0 p-4">
+                <h5 class="modal-title fw-bold">Contacter le donneur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'hopitaux:envoyer_email_donneur' demande.pk %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-body p-4 pt-0">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Destinataire</label>
+                        <input type="email" name="email" id="modal-email" class="form-control bg-light" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Sujet</label>
+                        <input type="text" name="sujet" class="form-control" value="Besoin urgent de votre don - BloodConnect">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Votre message</label>
+                        <textarea name="message" class="form-control" rows="5" placeholder="Bonjour, nous avons besoin de votre don..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-send me-1"></i>Envoyer l'email
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const emailModal = document.getElementById('emailModal');
+    if (emailModal) {
+        emailModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const email = button.getAttribute('data-donneur-email');
+            const nom = button.getAttribute('data-donneur-nom');
+            
+            const modalEmailInput = emailModal.querySelector('#modal-email');
+            const modalTitle = emailModal.querySelector('.modal-title');
+            
+            modalEmailInput.value = email;
+            modalTitle.innerText = "Contacter " + nom;
+        });
+    }
+</script>
 {% endblock %}

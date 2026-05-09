@@ -11,6 +11,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard_hopital, name='dashboard'),
     
     # Gestion des demandes urgentes
+    path('demandes/', views.liste_demandes_hopital, name='liste_demandes'),
     path('demande/creer/', views.creer_demande, name='creer_demande'),
     path('demande/modifier/<int:pk>/', views.modifier_demande, name='modifier_demande'),
     path('demande/cloturer/<int:pk>/', views.cloturer_demande, name='cloturer_demande'),
@@ -24,4 +25,10 @@ urlpatterns = [
 
     # Gestion de stock
     path('stock/', views.gestion_stock, name='gestion_stock'),
+
+    # Scanner QR Code et Historique
+    path('scanner/', views.scanner_qr, name='scanner_qr'),
+    path('scanner/process/', views.process_scan, name='process_scan'),
+    path('dons/historique/', views.historique_dons_hopital, name='historique_dons'),
+    path('contact/email/<int:pk>/', views.envoyer_email_donneur, name='envoyer_email_donneur'),
 ]

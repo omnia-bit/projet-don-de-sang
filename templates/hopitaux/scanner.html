@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Scanner Check-in - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .scanner-card {
+        border: none;
+        border-radius: 24px;
+        background: white;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+    #reader {
+        width: 100%;
+        border-radius: 16px;
+        overflow: hidden;
+        border: none !important;
+    }
+    #reader__scan_region {
+        background: #f8f9fa;
+    }
+    .result-card {
+        display: none;
+        animation: slideUp 0.4s ease-out;
+    }
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .status-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="scanner-card p-4 text-center">
+                <div class="mb-4">
+                    <h3 class="fw-bold text-primary">Scanner de Check-in</h3>
+                    <p class="text-muted">Scannez le QR Code du donneur pour enregistrer son don instantanément.</p>
+                </div>
+
+                <!-- Zone du Scanner -->
+                <div id="reader" class="mb-4"></div>
+
+                <!-- Résultat du Scan -->
+                <div id="scan-result" class="result-card p-4 rounded-4 border">
+                    <div id="status-icon" class="status-icon"></div>
+                    <h4 id="result-title" class="fw-bold mb-1"></h4>
+                    <p id="result-message" class="text-muted mb-3"></p>
+                    
+                    <div id="donneur-info" class="bg-light p-3 rounded-3 mb-3 text-start d-none">
+                        <div class="small text-muted mb-1">Détails du donneur</div>
+                        <div class="fw-bold"><i class="bi bi-person me-2"></i><span id="donneur-nom"></span></div>
+                        <div class="fw-bold text-danger"><i class="bi bi-droplet me-2"></i>Groupe: <span id="donneur-groupe"></span></div>
+                    </div>
+
+                    <!-- Zone Signature (Option A) -->
+                    <div id="signature-section" class="mb-4 d-none">
+                        <p class="small fw-bold text-start mb-2"><i class="bi bi-pencil-fill me-1"></i> Signature du donneur pour confirmation :</p>
+                        <div style="border: 2px solid #e5e7eb; border-radius: 15px; background: #fff; position: relative;">
+                            <canvas id="signature-pad" width="400" height="150" style="width: 100%; height: 150px; cursor: crosshair;"></canvas>
+                            <button type="button" class="btn btn-sm btn-light border" style="position: absolute; bottom: 5px; right: 5px;" id="clear-signature">Effacer</button>
+                        </div>
+                    </div>
+
+                    <button id="btn-confirm" class="btn btn-primary w-100 rounded-pill py-3 fw-bold d-none" onclick="finalizeDonation()">
+                        <i class="bi bi-check-circle me-2"></i>Confirmer le Don
+                    </button>
+
+                    <button id="btn-next" class="btn btn-outline-secondary w-100 rounded-pill py-3 fw-bold d-none" onclick="resetScanner()">
+                        Scanner le suivant
+                    </button>
+                </div>
+
+                <div id="scanner-instructions" class="mt-4 p-3 bg-light rounded-4">
+                    <div class="d-flex align-items-center gap-3 text-start">
+                        <i class="bi bi-camera fs-3 text-primary"></i>
+                        <p class="mb-0 small text-muted">
+                            Placez le QR Code du donneur devant la caméra. La détection est automatique.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+<script>
+    const html5QrCode = new Html5Qrcode("reader");
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+    let currentUUID = null;
+
+    function startScanner() {
+        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+        .catch(err => {
+            console.error("Erreur caméra:", err);
+            document.getElementById('reader').innerHTML = `
+                <div class="alert alert-danger rounded-4">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Erreur d'accès à la caméra. Veuillez vérifier les permissions.
+                </div>`;
+        });
+    }
+
+    const canvas = document.getElementById('signature-pad');
+    const signaturePad = new SignaturePad(canvas, {
+        backgroundColor: 'rgba(255, 255, 255, 0)',
+        penColor: 'rgb(29, 53, 87)'
+    });
+
+    document.getElementById('clear-signature').addEventListener('click', () => signaturePad.clear());
+
+    function onScanSuccess(decodedText, decodedResult) {
+        html5QrCode.pause(true);
+        currentUUID = decodedText;
+        if ("vibrate" in navigator) navigator.vibrate(200);
+        prepareConfirmation(decodedText);
+    }
+
+    function prepareConfirmation(uuid) {
+        document.getElementById('reader').style.display = 'none';
+        document.getElementById('scanner-instructions').style.display = 'none';
+        
+        const resultCard = document.getElementById('scan-result');
+        const icon = document.getElementById('status-icon');
+        const title = document.getElementById('result-title');
+        const message = document.getElementById('result-message');
+        const info = document.getElementById('donneur-info');
+        const sigSection = document.getElementById('signature-section');
+        const btnConfirm = document.getElementById('btn-confirm');
+
+        resultCard.style.display = 'block';
+        icon.className = 'status-icon bg-primary text-white';
+        icon.innerHTML = '<i class="bi bi-person-check"></i>';
+        title.innerText = "Donneur Identifié";
+        title.className = "fw-bold mb-1 text-primary";
+        message.innerText = "Veuillez demander au donneur de signer pour confirmer sa présence.";
+        
+        sigSection.classList.remove('d-none');
+        btnConfirm.classList.remove('d-none');
+        document.getElementById('btn-next').classList.add('d-none');
+
+        fetch(`{% url 'hopitaux:process_scan' %}?check_only=1&uuid=${uuid}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                info.classList.remove('d-none');
+                document.getElementById('donneur-nom').innerText = data.donneur;
+                document.getElementById('donneur-groupe').innerText = data.groupe;
+            }
+        });
+        
+        resizeCanvas();
+    }
+
+    function finalizeDonation() {
+        if (!currentUUID) {
+            alert("Erreur : Aucun donneur n'a été scanné. Veuillez recommencer le scan.");
+            resetScanner();
+            return;
+        }
+
+        if (signaturePad.isEmpty()) {
+            alert("La signature du donneur est obligatoire pour valider le don.");
+            return;
+        }
+
+        const btn = document.getElementById('btn-confirm');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Envoi en cours...';
+
+        const formData = new FormData();
+        formData.append('uuid', currentUUID);
+        formData.append('signature', signaturePad.toDataURL());
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        fetch("{% url 'hopitaux:process_scan' %}", {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Erreur serveur (' + response.status + ')');
+            return response.json();
+        })
+        .then(data => {
+            showFinalResult(data);
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showFinalResult({ success: false, error: "Impossible de communiquer avec le serveur. Vérifiez votre connexion." });
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        });
+    }
+
+    function showFinalResult(data) {
+        const icon = document.getElementById('status-icon');
+        const title = document.getElementById('result-title');
+        const message = document.getElementById('result-message');
+        
+        document.getElementById('signature-section').classList.add('d-none');
+        document.getElementById('btn-confirm').classList.add('d-none');
+        document.getElementById('btn-next').classList.remove('d-none');
+
+        if (data.success) {
+            icon.className = 'status-icon bg-success text-white';
+            icon.innerHTML = '<i class="bi bi-check-lg"></i>';
+            title.innerText = "Don Validé !";
+            title.className = "fw-bold mb-1 text-success";
+            message.innerText = data.message;
+        } else {
+            icon.className = 'status-icon bg-danger text-white';
+            icon.innerHTML = '<i class="bi bi-x-lg"></i>';
+            title.innerText = "Erreur";
+            title.className = "fw-bold mb-1 text-danger";
+            message.innerText = data.error;
+        }
+    }
+
+    function resetScanner() {
+        currentUUID = null;
+        signaturePad.clear();
+        document.getElementById('scan-result').style.display = 'none';
+        document.getElementById('reader').style.display = 'block';
+        document.getElementById('scanner-instructions').style.display = 'block';
+        html5QrCode.resume();
+    }
+
+    function resizeCanvas() {
+        const ratio =  Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+        signaturePad.clear();
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    document.addEventListener('DOMContentLoaded', startScanner);
+</script>
+{% endblock %}

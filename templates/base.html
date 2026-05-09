@@ -45,7 +45,7 @@
               <i class="bi bi-people me-1"></i>Donneurs
             </a>
 
-          {% elif user.donneurprofile %}
+          {% elif user.donneur_profile %}
             <!-- DONNEUR -->
             <a href="{% url 'donneurs:dashboard' %}" class="nav-link-item">
               <i class="bi bi-speedometer2 me-1"></i>Tableau de bord
@@ -60,16 +60,19 @@
               <i class="bi bi-plus-circle-fill me-1"></i>Donner
             </a>
 
-          {% elif user.hopitalprofile %}
+          {% elif user.hopital_profile %}
             <!-- HÔPITAL -->
             <a href="/hopitaux/dashboard/" class="nav-link-item">
               <i class="bi bi-speedometer2 me-1"></i>Dashboard
             </a>
-            <a href="/hopitaux/demandes/" class="nav-link-item">
+            <a href="{% url 'hopitaux:liste_demandes' %}" class="nav-link-item">
               <i class="bi bi-exclamation-circle me-1"></i>Demandes
             </a>
             <a href="/hopitaux/campagnes/" class="nav-link-item">
               <i class="bi bi-calendar-event me-1"></i>Campagnes
+            </a>
+            <a href="{% url 'hopitaux:scanner_qr' %}" class="nav-link-item nav-link-accent text-white">
+              <i class="bi bi-qr-code-scan me-1"></i>Scanner Check-in
             </a>
           {% endif %}
 

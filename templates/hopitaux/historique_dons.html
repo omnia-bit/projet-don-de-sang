@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Historique des Collectes - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Historique des Collectes</h2>
+            <p class="text-muted">Retrouvez tous les dons scannés et validés par votre établissement.</p>
+        </div>
+        <a href="{% url 'hopitaux:scanner_qr' %}" class="btn btn-success rounded-pill px-4">
+            <i class="bi bi-qr-code-scan me-2"></i>Nouveau Scan
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Date</th>
+                        <th>Donneur</th>
+                        <th>Groupe</th>
+                        <th>Quantité</th>
+                        <th>Signature / Preuve</th>
+                        <th class="text-end pe-4">Détails</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for don in dons %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="fw-bold">{{ don.date_don|date:"d M Y" }}</div>
+                            <small class="text-muted">ID: #{{ don.id }}</small>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                    {{ don.donneur.user.username|slice:":2"|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ don.donneur.user.get_full_name|default:don.donneur.user.username }}</div>
+                                    <small class="text-muted">{{ don.donneur.user.email }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-danger rounded-pill px-3">{{ don.donneur.groupe_sanguin }}</span>
+                        </td>
+                        <td>{{ don.quantite }} ml</td>
+                        <td>
+                            {% if don.signature_donneur %}
+                                <div class="p-1 border rounded bg-white d-inline-block">
+                                    <img src="{{ don.signature_donneur }}" alt="Signature" style="height: 30px; max-width: 100px; filter: contrast(150%);">
+                                </div>
+                                <span class="badge bg-success-light text-success ms-1" style="font-size: 0.7rem;">CERTIFIÉ</span>
+                            {% else %}
+                                <span class="text-muted small">Non signée</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4 text-muted small">
+                            {{ don.observations|truncatechars:30 }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-journal-x fs-1 d-block mb-3 opacity-25"></i>
+                            Aucun don scanné dans votre historique.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

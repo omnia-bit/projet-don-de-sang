@@ -140,6 +140,26 @@
         </div>
       </div>
 
+      <!-- ── Pass Donneur (QR Code pour Scanner) ── -->
+      <div class="col-lg-5">
+        <div class="dash-card text-center p-4" style="border: 2px solid #e5e7eb; border-radius: 20px; background: #fff;">
+          <h2 class="section-title-sm mb-3">
+            <i class="bi bi-qr-code text-primary me-2"></i>Mon Pass Donneur
+          </h2>
+          <div class="qr-container mb-3 p-3 bg-light rounded-4 d-inline-block">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ donneur.qr_code_uuid }}" 
+                 alt="Mon QR Code" 
+                 class="img-fluid"
+                 style="mix-blend-mode: multiply;">
+          </div>
+          <p class="small text-muted mb-0">Présentez ce code à l'hôpital pour valider votre don instantanément.</p>
+          <div class="mt-2">
+            <span class="badge bg-light text-dark font-monospace border">{{ donneur.qr_code_uuid|stringformat:"s"|slice:":13" }}...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── Campagnes & Inscriptions (Point 3.4) ── -->
     <div class="row g-4 mb-4">
       <div class="col-lg-6">

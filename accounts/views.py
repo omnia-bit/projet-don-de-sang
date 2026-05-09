@@ -18,7 +18,7 @@ def home(request):
 # REGISTER
 def register(request):
     if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
+        form = UserRegisterForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
 
@@ -38,8 +38,9 @@ def register(request):
                     user=user,
                     nom=form.cleaned_data.get('nom_hopital') or user.username,
                     adresse=form.cleaned_data.get('adresse_hopital') or "Non définie",
-                    ville=form.cleaned_data.get('ville') or "Non définie",
-                    agrement=form.cleaned_data.get('agrement') or "N/A"
+                    ville=form.cleaned_data.get('ville_hopital') or "Non définie",
+                    agrement=form.cleaned_data.get('agrement') or "N/A",
+                    licence_doc=form.cleaned_data.get('licence_doc')
                 )
 
             return redirect('accounts:login')  

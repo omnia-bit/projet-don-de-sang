@@ -22,8 +22,10 @@ class UserRegisterForm(UserCreationForm):
 
     # Champs additionnels pour l'hôpital
     nom_hopital = forms.CharField(max_length=200, required=False, label="Nom de l'hôpital")
+    ville_hopital = forms.CharField(max_length=100, required=False, label="Ville")
     adresse_hopital = forms.CharField(max_length=500, required=False, label="Adresse complète")
     agrement = forms.CharField(max_length=100, required=False, label="Numéro d'agrément")
+    licence_doc = forms.FileField(required=False, label="Licence Médicale (PDF)")
 
     class Meta:
         model = User

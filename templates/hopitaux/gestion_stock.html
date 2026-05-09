@@ -34,10 +34,33 @@
         color: #e63946;
         animation: pulse-red 2s infinite;
     }
-    @keyframes pulse-red {
-        0% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.4); }
-        70% { box-shadow: 0 0 0 10px rgba(230, 57, 70, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0); }
+    /* Jauge de stock (Stock Santé) */
+    .stock-progress-container {
+        height: 10px;
+        background: #e9ecef;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-top: 8px;
+        width: 100%;
+    }
+    .stock-progress-bar {
+        height: 100%;
+        transition: width 0.6s ease;
+    }
+    .bg-critical {
+        background-color: #e63946 !important;
+        animation: blink-danger 1s infinite;
+    }
+    .bg-low {
+        background-color: #f4a261 !important;
+    }
+    .bg-optimal {
+        background-color: #2a9d8f !important;
+    }
+    @keyframes blink-danger {
+        0% { opacity: 1; }
+        50% { opacity: 0.4; }
+        100% { opacity: 1; }
     }
     .form-section {
         background: #f1f4f8;
@@ -57,6 +80,13 @@
 
 {% block content %}
 <div class="container py-5">
+    <!-- Bouton Retour -->
+    <div class="mb-4">
+        <a href="{% url 'hopitaux:dashboard' %}" class="btn btn-outline-primary rounded-pill px-4 fw-bold">
+            <i class="bi bi-arrow-left me-2"></i>Retour au Dashboard
+        </a>
+    </div>
+
     <div class="row g-4">
         <!-- Formulaire de mise à jour -->
         <div class="col-lg-4">
@@ -124,14 +154,24 @@
                                     </td>
                                     <td>
                                         <h5 class="mb-0 fw-bold">{{ s.quantite_poches }} <span class="fs-6 text-muted fw-normal">poches</span></h5>
+                                        <!-- Jauge de Stock Santé (Nouveauté) -->
+                                        <div class="stock-progress-container">
+                                            <div class="stock-progress-bar {{ s.status_class }}" 
+                                                 role="progressbar" 
+                                                 style="width: {{ s.pourcentage }}%" 
+                                                 aria-valuenow="{{ s.pourcentage }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                            </div>
+                                        </div>
                                     </td>
                                     <td>
                                         {% if s.quantite_poches < 5 %}
-                                            <span class="badge bg-danger rounded-pill px-3">Critique</span>
+                                            <span class="badge bg-danger rounded-pill px-3">Pénurie Critique</span>
                                         {% elif s.quantite_poches < 15 %}
-                                            <span class="badge bg-warning text-dark rounded-pill px-3">Faible</span>
+                                            <span class="badge bg-warning text-dark rounded-pill px-3">Stock Bas</span>
                                         {% else %}
-                                            <span class="badge bg-success rounded-pill px-3">Optimal</span>
+                                            <span class="badge bg-success rounded-pill px-3">Stock OK</span>
                                         {% endif %}
                                     </td>
                                     <td class="small text-muted">
