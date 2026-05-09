@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegisterForm
 from django.http import HttpResponse
+from .forms import UserRegisterForm, ModifierProfilForm, ModifierHopitalProfilForm
+from django.contrib import messages
 from .models import DonneurProfile, HopitalProfile
-from .forms import ModifierProfilForm
 
 def index(request):
     return HttpResponse("Page accounts fonctionne")
@@ -116,17 +116,29 @@ def dashboard_admin(request):
 
 @login_required
 def modifier_profil(request):
-    donneur = DonneurProfile.objects.get(user=request.user)
+    if request.user.role == 'donneur':
+        profil = DonneurProfile.objects.get(user=request.user)
+        form_class = ModifierProfilForm
+    elif request.user.role == 'hopital':
+        profil = HopitalProfile.objects.get(user=request.user)
+        form_class = ModifierHopitalProfilForm
+    else:
+        return redirect('accueil')
 
     if request.method == 'POST':
-        form = ModifierProfilForm(request.POST, instance=donneur)
+        form = form_class(request.POST, request.FILES, instance=profil)
         if form.is_valid():
             form.save()
-            return redirect('accounts:dashboard_donneur')
+            messages.success(request, "Votre profil a été mis à jour avec succès.")
+            if request.user.role == 'donneur':
+                return redirect('donneurs:dashboard')
+            else:
+                return redirect('hopitaux:dashboard')
     else:
-        form = ModifierProfilForm(instance=donneur)
+        form = form_class(instance=profil)
 
     return render(request, 'registration/modifier_profil.html', {
         'form': form,
-        'donneur': donneur
+        'profil': profil,
+        'role': request.user.role
     })

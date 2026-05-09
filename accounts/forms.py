@@ -56,3 +56,15 @@ class ModifierProfilForm(forms.ModelForm):
             'date_naissance': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'ville': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+class ModifierHopitalProfilForm(forms.ModelForm):
+    class Meta:
+        model = HopitalProfile
+        fields = ['nom', 'adresse', 'ville', 'agrement', 'licence_doc']
+        widgets = {
+            'nom': forms.TextInput(attrs={'class': 'form-control'}),
+            'adresse': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'ville': forms.TextInput(attrs={'class': 'form-control'}),
+            'agrement': forms.TextInput(attrs={'class': 'form-control'}),
+            'licence_doc': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }

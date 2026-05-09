@@ -2,11 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from accounts.models import User, DonneurProfile, HopitalProfile
 from hopitaux.models import DemandeSang, CampagneCollecte, StockSang
 from donneurs.models import Don
-from django.db.models import Sum
+from django.db.models import Sum, Q, Count
 
 import csv
 from django.http import HttpResponse
-from django.db.models import Count
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 
@@ -61,13 +60,23 @@ def dashboard_admin(request):
 @login_required
 @user_passes_test(is_admin)
 def valider_hopitaux(request):
+    query = request.GET.get('q')
     hopitaux_en_attente = HopitalProfile.objects.filter(valide=False)
     hopitaux_valides = HopitalProfile.objects.filter(valide=True)
     
+    if query:
+        hopitaux_en_attente = hopitaux_en_attente.filter(
+            Q(nom__icontains=query) | Q(ville__icontains=query) | Q(agrement__icontains=query)
+        )
+        hopitaux_valides = hopitaux_valides.filter(
+            Q(nom__icontains=query) | Q(ville__icontains=query) | Q(agrement__icontains=query)
+        )
+
     context = {
         'en_attente': hopitaux_en_attente,
         'valides': hopitaux_valides,
-        'titre_page': "Validation des Comptes Hospitaliers"
+        'titre_page': "Validation des Comptes Hospitaliers",
+        'query': query
     }
     return render(request, 'administration/validation_hopitaux.html', context)
 
@@ -85,15 +94,13 @@ def action_validation_hopital(request, pk, action):
 @login_required
 @user_passes_test(is_admin)
 def export_donneurs_csv(request):
-    # Création de la réponse avec le type MIME CSV
+    # ... (code existing)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="donneurs_bloodconnect.csv"'
 
     writer = csv.writer(response)
-    # En-têtes
     writer.writerow(['Nom d\'utilisateur', 'Email', 'Groupe Sanguin', 'Ville', 'Date d\'inscription'])
 
-    # Données
     donneurs = DonneurProfile.objects.select_related('user').all()
     for d in donneurs:
         writer.writerow([
@@ -105,3 +112,19 @@ def export_donneurs_csv(request):
         ])
 
     return response
+
+@login_required
+@user_passes_test(is_admin)
+def liste_demandes_urgentes(request):
+    demandes = DemandeSang.objects.all().select_related('hopital').order_by('-date_publication')
+    query = request.GET.get('q')
+    if query:
+        demandes = demandes.filter(
+            Q(hopital__nom__icontains=query) | Q(groupe_sanguin__icontains=query) | Q(hopital__ville__icontains=query)
+        )
+    
+    return render(request, 'administration/liste_demandes.html', {
+        'demandes': demandes,
+        'titre_page': "Toutes les Demandes Urgentes",
+        'query': query
+    })

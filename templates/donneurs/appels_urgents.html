@@ -40,6 +40,41 @@
     </div>
     {% endif %}
 
+    <!-- Tableau de compatibilité (Cahier des charges Point 5) -->
+    <div class="card shadow-sm mb-4 border-0 rounded-4">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-3 text-danger"><i class="bi bi-info-circle-fill me-2"></i>Règle de compatibilité</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="small text-muted">Votre groupe <strong>{{ donneur.groupe_sanguin }}</strong> peut donner aux groupes listés ci-dessous :</p>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        {% for g in groupes_compatibles %}
+                            <span class="badge bg-danger rounded-pill px-3">{{ g }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 border-start">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-borderless text-center mb-0" style="font-size: 0.75rem;">
+                            <thead>
+                                <tr class="text-muted border-bottom">
+                                    <th>Donneur</th>
+                                    <th>Receveur compatible</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>O-</strong></td><td class="text-start">Tous (Universel)</td></tr>
+                                <tr><td><strong>O+</strong></td><td class="text-start">O+, A+, B+, AB+</td></tr>
+                                <tr><td><strong>A-</strong></td><td class="text-start">A±, AB±</td></tr>
+                                <tr><td><strong>A+</strong></td><td class="text-start">A+, AB+</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Grille des appels -->
     {% if appels %}
     <div class="row g-4">

@@ -1,368 +1,303 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validation Hôpitaux - BloodConnect Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-red: #d32f2f;
-            --accent-red: #b71c1c;
-            --light-red: #ffebee;
-            --bg-color: #f8f9fc;
-            --text-dark: #2d3748;
-            --text-muted: #718096;
-            --white: #ffffff;
-            --success-green: #38a169;
-            --light-green: #f0fff4;
-        }
-        body { 
-            background-color: var(--bg-color); 
-            font-family: 'Outfit', sans-serif; 
-            color: var(--text-dark);
-        }
-        
-        /* Sidebar Styling (Same as Dashboard) */
-        .sidebar { 
-            background-color: var(--white); 
-            height: 100vh; 
-            border-right: 1px solid rgba(0,0,0,0.05); 
-            box-shadow: 4px 0 24px rgba(0,0,0,0.02);
-            z-index: 100;
-        }
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 1.5rem 1rem;
-            margin-bottom: 1rem;
-            color: var(--primary-red);
-            text-decoration: none;
-        }
-        .sidebar-brand svg { width: 32px; height: 32px; fill: currentColor; }
-        .sidebar-brand span { font-weight: 700; font-size: 1.25rem; letter-spacing: -0.5px; }
-        .nav-link { 
-            color: var(--text-muted); 
-            border-radius: 12px; 
-            margin-bottom: 8px; 
-            padding: 12px 16px;
-            display: flex; align-items: center; gap: 12px;
-            font-weight: 500; transition: all 0.3s ease;
-        }
-        .nav-link svg {
-            width: 20px; height: 20px;
-            stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none;
-        }
-        .nav-link:hover { background-color: var(--light-red); color: var(--primary-red); }
-        .nav-link.active { 
-            background-color: var(--primary-red); color: var(--white); 
-            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
-        }
-        .nav-link.active svg { stroke: var(--white); }
 
-        /* Content Styling */
-        .page-title { font-weight: 700; color: var(--text-dark); letter-spacing: -0.5px; }
-        
-        .card { 
-            border: none; 
-            border-radius: 20px; 
-            box-shadow: 0 4px 24px rgba(0,0,0,0.04); 
-            background-color: var(--white);
-            overflow: hidden;
-        }
-        .card-header {
-            background-color: var(--white);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding: 20px 24px;
-        }
-        
-        /* Table Premium Styling */
-        .table { margin-bottom: 0; }
-        .table thead th {
-            background-color: #f8fafc;
-            color: var(--text-muted);
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 16px 24px;
-            border-bottom: none;
-        }
-        .table tbody td {
-            padding: 20px 24px;
-            vertical-align: middle;
-            color: var(--text-dark);
-            border-bottom: 1px solid rgba(0,0,0,0.03);
-        }
-        .table tbody tr:hover { background-color: #fcfcfc; }
-        
-        .code-agrement {
-            background-color: #f1f5f9;
-            color: #475569;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 13px;
-        }
+{% block title %}Validation Hôpitaux - Admin Panel{% endblock %}
 
-        .btn-action {
-            border-radius: 50px;
-            padding: 6px 16px;
-            font-weight: 600;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-        }
-        .btn-action svg { width: 16px; height: 16px; }
-        
-        .btn-valider {
-            background-color: var(--success-green);
-            color: white;
-            border: none;
-        }
-        .btn-valider:hover { background-color: #2f855a; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3); }
-        
-        .btn-suspendre {
-            background-color: transparent;
-            color: var(--primary-red);
-            border: 1px solid var(--primary-red);
-        }
-        .btn-suspendre:hover { background-color: var(--light-red); }
+{% block extra_css %}
+<style>
+    /* Isolation from base.html */
+    .main-navbar, .main-footer { display: none !important; }
+    body { background-color: #f8f9fa; font-family: 'Nunito', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+    
+    /* Layout */
+    .admin-wrapper { display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: white; border-right: 1px solid #edf2f7; display: flex; flex-direction: column; padding: 1.5rem 1rem; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; overflow-y: auto;}
+    .main-content { flex-grow: 1; margin-left: 260px; padding: 1.5rem 2rem; background-color: #f8f9fa; }
+    
+    /* Sidebar Links */
+    .sidebar-link { display: flex; align-items: center; padding: 0.8rem 1rem; color: #4a5568; text-decoration: none; border-radius: 0.5rem; margin-bottom: 0.25rem; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; }
+    .sidebar-link:hover { background-color: #fef2f2; color: #dc2626; }
+    .sidebar-link.active { background-color: #ef4444; color: white; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3); }
+    .sidebar-link i { font-size: 1.1rem; margin-right: 0.8rem; width: 20px; text-align: center; }
+    
+    /* Cards */
+    .glass-card { background: white; border-radius: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; overflow: hidden; }
+    
+    /* Table Premium Styling */
+    .table { margin-bottom: 0; }
+    .table thead th {
+        background-color: #f8fafc;
+        color: #64748b;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .table tbody td {
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+        color: #1a202c;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .table tbody tr:hover { background-color: #f8fafc; }
+    
+    .code-agrement {
+        background-color: #f1f5f9;
+        color: #475569;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.85rem;
+    }
 
-        .badge-status {
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .badge-status.valide { background-color: var(--light-green); color: var(--success-green); }
-        .badge-status.attente { background-color: #fffaf0; color: #dd6b20; }
-        
-    </style>
-</head>
-<body>
+    .btn-action {
+        border-radius: 50px;
+        padding: 6px 16px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-valider { background-color: #10b981; color: white; border: none; }
+    .btn-valider:hover { background-color: #059669; color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+    
+    .btn-suspendre { background-color: transparent; color: #ef4444; border: 1px solid #ef4444; }
+    .btn-suspendre:hover { background-color: #fee2e2; color: #ef4444; }
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3 position-fixed">
-            <a href="#" class="sidebar-brand flex-column text-center">
-                <img src="{% static 'img/logo_admin.png' %}" alt="Logo" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px;">
-                <span>BloodConnect<br><small class="text-muted fs-6">Admin Panel</small></span>
+    .badge-status {
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .badge-status.valide { background-color: #d1fae5; color: #059669; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
+    <!-- ═══════════ SIDEBAR ═══════════ -->
+    <aside class="sidebar">
+        <!-- Brand -->
+        <div class="d-flex flex-column align-items-center mb-4 px-2 mt-2 text-center">
+            <img src="{% static 'img/logo_admin.png' %}" alt="Logo" class="mb-2" style="width: 55px; height: 55px; object-fit: contain;">
+            <div>
+                <h4 class="mb-0 fw-bold" style="color: #1a202c; font-size: 1.1rem; letter-spacing: -0.5px;">BloodConnect</h4>
+                <div class="text-muted" style="font-size: 0.6rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Admin Panel</div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-grow-1">
+            <a href="{% url 'administration:dashboard' %}" class="sidebar-link">
+                <i class="bi bi-grid"></i> Vue d'ensemble
             </a>
-            <div class="mt-4">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'administration:dashboard' %}">
-                            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                            Vue d'ensemble
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'administration:validation_hopitaux' %}">
-                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4H6v-2h4V7h2v4h4v2h-4v4z"/></svg>
-                            Hôpitaux
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            
-            <div class="position-absolute bottom-0 start-0 w-100 p-4">
-                <a class="nav-link text-muted" href="/" style="background: rgba(0,0,0,0.03);">
-                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                    Quitter l'Admin
-                </a>
-            </div>
+            <a href="{% url 'administration:validation_hopitaux' %}" class="sidebar-link active">
+                <i class="bi bi-hospital"></i> Hôpitaux
+            </a>
+            <a href="{% url 'administration:liste_demandes' %}" class="sidebar-link">
+                <i class="bi bi-activity"></i> Demandes Urgentes
+            </a>
         </nav>
 
-        <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-5 py-5 offset-md-3 offset-lg-2">
-            
-            <div class="mb-5">
-                <p class="text-muted mb-1 fw-medium">Gestion des accès</p>
-                <h1 class="page-title mb-0">Comptes Hospitaliers</h1>
+        <!-- Sidebar Promo Box -->
+        <div class="mt-4 p-3 rounded-4 text-center bg-light border">
+            <div class="bg-white text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-2 shadow-sm" style="width: 48px; height: 48px;">
+                <i class="bi bi-shield-plus fs-4"></i>
             </div>
+            <h6 class="text-dark fw-bold mb-1" style="font-size: 0.85rem;">Sauvez des vies</h6>
+            <p class="text-muted mb-3" style="font-size: 0.7rem;">Chaque don compte</p>
+            <a href="#" class="btn btn-danger btn-sm rounded-pill w-100 fw-bold shadow-sm" style="font-size: 0.75rem;">Voir les statistiques</a>
+        </div>
 
-            <!-- En attente -->
-            <div class="card mb-5">
-                <div class="card-header d-flex align-items-center gap-2">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#dd6b20" stroke-width="2" style="width:20px; height:20px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 15 15"></polyline></svg>
-                    <h5 class="mb-0 fw-bold" style="color: #dd6b20;">En attente de validation</h5>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead>
-                            <tr>
-                                <th>Établissement</th>
-                                <th>Localisation</th>
-                                <th>N° Agrément</th>
-                                <th class="text-end">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for h in en_attente %}
-                            <tr>
-                                <td>
-                                    <div class="fw-bold fs-6">{{ h.nom }}</div>
-                                    <div class="small text-muted">Inscrit récemment</div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2 text-muted">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                        {{ h.ville }}
-                                    </div>
-                                </td>
-                                <td><span class="code-agrement">{{ h.agrement }}</span></td>
-                                <td class="text-end">
-                                    <button class="btn-action btn-outline-primary border-primary bg-transparent text-primary me-2" 
-                                            onclick="openDossierModal('{{ h.nom }}', '{% if h.licence_doc %}{{ h.licence_doc.url }}{% endif %}', '{{ h.signature_electronique|default:'' }}')">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                        Voir Dossier
-                                    </button>
-                                    <a href="{% url 'administration:action_validation' h.pk 'valider' %}" class="btn-action btn-valider text-decoration-none">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                        Approuver
-                                    </a>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center py-5">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" style="width:48px; opacity:0.5; margin-bottom:12px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                                    <p class="text-muted mb-0 fw-medium">Aucun compte en attente.</p>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+        <a href="{% url 'accounts:logout' %}" class="sidebar-link mt-3 text-muted" style="border-top: 1px solid #edf2f7; border-radius: 0; padding-top: 1rem;">
+            <i class="bi bi-box-arrow-left"></i> Quitter l'Admin
+        </a>
+    </aside>
+
+    <!-- ═══════════ MAIN CONTENT ═══════════ -->
+    <main class="main-content">
+        
+        <!-- Header -->
+        <header class="d-flex justify-content-between align-items-start mb-4">
+            <div class="d-flex align-items-start">
+                <button class="btn btn-link text-dark p-0 me-3 d-lg-none"><i class="bi bi-list fs-4"></i></button>
+                <div>
+                    <div class="text-muted fw-bold" style="font-size: 0.75rem;">Gestion des accès</div>
+                    <h2 class="fw-bold mb-1" style="color: #1a202c; letter-spacing: -1px;">Comptes Hospitaliers</h2>
+                    <div class="text-muted" style="font-size: 0.85rem;">Validez, suspendez ou gérez les comptes des établissements.</div>
                 </div>
             </div>
+            <div class="d-flex align-items-center gap-3 mt-2 mt-lg-0">
+                <form method="GET" action="{% url 'administration:validation_hopitaux' %}" class="position-relative">
+                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                    <input type="text" name="q" value="{{ query|default:'' }}" class="form-control rounded-pill bg-white shadow-sm border-0 ps-5" placeholder="Rechercher un hôpital (nom, ville...)" style="width: 250px; font-size: 0.85rem; height: 38px;">
+                </form>
+            </div>
+        </header>
 
-            <!-- Modal Dossier Hospitalier -->
-            <div class="modal fade" id="dossierModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                        <div class="modal-header border-0 p-4">
-                            <h5 class="modal-title fw-bold" id="modalHopitalNom">Dossier Hospitalier</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body p-4">
-                            <div class="row g-4">
-                                <!-- Licence PDF -->
-                                <div class="col-lg-12">
-                                    <div class="p-3 bg-light rounded-4 h-100">
-                                        <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                            Licence Médicale (PDF)
-                                        </h6>
-                                        <div id="pdfViewer" style="height: 500px;" class="bg-white rounded-3 overflow-hidden border">
-                                            <p class="text-center p-5 text-muted">Aucun document disponible.</p>
-                                        </div>
-                                    </div>
+        <!-- En attente -->
+        <div class="glass-card mb-4">
+            <div class="p-4 border-bottom bg-white d-flex align-items-center gap-2">
+                <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"><i class="bi bi-hourglass-split"></i></div>
+                <h6 class="mb-0 fw-bold text-dark">En attente de validation</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Établissement</th>
+                            <th>Localisation</th>
+                            <th>N° Agrément</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for h in en_attente %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ h.nom }}</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Inscrit récemment</div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2 text-muted" style="font-size: 0.85rem;">
+                                    <i class="bi bi-geo-alt"></i> {{ h.ville }}
                                 </div>
+                            </td>
+                            <td><span class="code-agrement">{{ h.agrement }}</span></td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-primary rounded-pill me-2 fw-bold" 
+                                        style="font-size: 0.8rem;"
+                                        onclick="openDossierModal('{{ h.nom|escapejs }}', '{% if h.licence_doc %}{{ h.licence_doc.url }}{% endif %}')">
+                                    <i class="bi bi-file-earmark-text me-1"></i> Voir Dossier
+                                </button>
+                                <a href="{% url 'administration:action_validation' h.pk 'valider' %}" class="btn-action btn-valider text-decoration-none">
+                                    <i class="bi bi-check2"></i> Approuver
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <div class="text-muted mb-2"><i class="bi bi-inbox fs-1 opacity-50"></i></div>
+                                <p class="text-muted fw-medium mb-0">Aucun compte en attente.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
+        <!-- Déjà validés -->
+        <div class="glass-card">
+            <div class="p-4 border-bottom bg-white d-flex align-items-center gap-2">
+                <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"><i class="bi bi-shield-check"></i></div>
+                <h6 class="mb-0 fw-bold text-dark">Établissements Certifiés</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Établissement</th>
+                            <th>Localisation</th>
+                            <th>Statut</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for h in valides %}
+                        <tr>
+                            <td class="fw-bold text-dark" style="font-size: 0.95rem;">{{ h.nom }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2 text-muted" style="font-size: 0.85rem;">
+                                    <i class="bi bi-geo-alt"></i> {{ h.ville }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="badge-status valide">
+                                    <i class="bi bi-check-circle-fill"></i> Actif
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'administration:action_validation' h.pk 'suspendre' %}" class="btn-action btn-suspendre text-decoration-none">
+                                    <i class="bi bi-pause-circle"></i> Suspendre
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted fw-medium">Aucun établissement certifié.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal Dossier Hospitalier -->
+        <div class="modal fade" id="dossierModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 1rem;">
+                    <div class="modal-header border-0 p-4 pb-0">
+                        <h5 class="modal-title fw-bold text-dark" id="modalHopitalNom">Dossier Hospitalier</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="p-3 bg-light rounded-4 h-100 border">
+                            <h6 class="fw-bold mb-3 text-dark d-flex align-items-center gap-2" style="font-size: 0.9rem;">
+                                <i class="bi bi-file-earmark-pdf text-danger fs-5"></i> Licence Médicale (PDF)
+                            </h6>
+                            <div id="pdfViewer" style="height: 500px;" class="bg-white rounded-3 overflow-hidden border">
+                                <p class="text-center p-5 text-muted">Aucun document disponible.</p>
                             </div>
-                        </div>
-                        <div class="modal-footer border-0 p-4">
-                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Fermer</button>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-            <script>
-                function openDossierModal(nom, pdfUrl, signatureData) {
-                    document.getElementById('modalHopitalNom').innerText = "Dossier : " + nom;
-                    
-                    const pdfViewer = document.getElementById('pdfViewer');
-                    if (pdfUrl) {
-                        // Méthode améliorée avec bouton de secours externe
-                        pdfViewer.innerHTML = `
-                            <div class="d-flex flex-column h-100">
-                                <div class="flex-grow-1">
-                                    <object data="${pdfUrl}" type="application/pdf" width="100%" height="500px">
-                                        <iframe src="${pdfUrl}" width="100%" height="500px" style="border:none;">
-                                            <p>Navigateur incompatible.</p>
-                                        </iframe>
-                                    </object>
-                                </div>
-                                <div class="p-3 bg-light border-top text-center">
-                                    <p class="small text-muted mb-2"><i class="bi bi-info-circle me-1"></i> Si le document ne s'affiche pas ci-dessus :</p>
-                                    <a href="${pdfUrl}" target="_blank" class="btn btn-primary rounded-pill px-4">
-                                        <i class="bi bi-box-arrow-up-right me-2"></i>Ouvrir la Licence PDF
-                                    </a>
-                                </div>
-                            </div>`;
-                    } else {
-                        pdfViewer.innerHTML = `<div class="d-flex flex-column align-items-center justify-content-center h-100 p-5"><i class="bi bi-file-earmark-x fs-1 text-muted mb-3"></i><p class="text-muted">Aucun PDF trouvé pour cet établissement.</p></div>`;
-                    }
-
-                    // Plus de signature à gérer ici
-                    const modal = new bootstrap.Modal(document.getElementById('dossierModal'));
-                    modal.show();
-                }
-            </script>
-
-            <!-- Déjà validés -->
-            <div class="card">
-                <div class="card-header d-flex align-items-center gap-2">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--success-green)" stroke-width="2" style="width:20px; height:20px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    <h5 class="mb-0 fw-bold" style="color: var(--success-green);">Établissements Certifiés</h5>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead>
-                            <tr>
-                                <th>Établissement</th>
-                                <th>Localisation</th>
-                                <th>Statut</th>
-                                <th class="text-end">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for h in valides %}
-                            <tr>
-                                <td class="fw-bold fs-6">{{ h.nom }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2 text-muted">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                        {{ h.ville }}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="badge-status valide">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                        Actif
-                                    </div>
-                                </td>
-                                <td class="text-end">
-                                    <a href="{% url 'administration:action_validation' h.pk 'suspendre' %}" class="btn-action btn-suspendre text-decoration-none">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
-                                        Suspendre
-                                    </a>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center py-5 text-muted fw-medium">Aucun établissement certifié.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </main>
-    </div>
+    </main>
 </div>
-</body>
-</html>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function openDossierModal(nom, pdfUrl) {
+        document.getElementById('modalHopitalNom').innerText = "Dossier : " + nom;
+        
+        const pdfViewer = document.getElementById('pdfViewer');
+        if (pdfUrl && pdfUrl.trim() !== '') {
+            pdfViewer.innerHTML = `
+                <div class="d-flex flex-column h-100">
+                    <div class="flex-grow-1">
+                        <object data="${pdfUrl}" type="application/pdf" width="100%" height="500px">
+                            <iframe src="${pdfUrl}" width="100%" height="500px" style="border:none;">
+                                <p>Navigateur incompatible.</p>
+                            </iframe>
+                        </object>
+                    </div>
+                    <div class="p-3 bg-light border-top text-center">
+                        <a href="${pdfUrl}" target="_blank" class="btn btn-outline-danger rounded-pill px-4 fw-bold" style="font-size: 0.85rem;">
+                            <i class="bi bi-box-arrow-up-right me-2"></i> Ouvrir le PDF dans un nouvel onglet
+                        </a>
+                    </div>
+                </div>`;
+        } else {
+            pdfViewer.innerHTML = `<div class="d-flex flex-column align-items-center justify-content-center h-100 p-5"><i class="bi bi-file-earmark-x fs-1 text-muted mb-3"></i><p class="text-muted fw-bold">Aucun PDF trouvé pour cet établissement.</p></div>`;
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('dossierModal'));
+        modal.show();
+    }
+</script>
+{% endblock %}

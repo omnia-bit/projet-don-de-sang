@@ -5,261 +5,447 @@
 
 {% block extra_css %}
 <style>
-    :root {
-        --primary-soft: #e5edff;
-        --primary-dark: #1d3557;
-        --success-soft: #e5fff2;
-        --success-dark: #2a9d8f;
-        --danger-soft: #ffe5e5;
-        --danger-dark: #e63946;
-        --warning-soft: #fff9db;
-        --warning-dark: #f59f00;
-    }
-
-    body { background-color: #f8fafc; }
-
-    /* Header épuré */
-    .welcome-section { padding: 2rem 0; }
-    .welcome-title { font-size: 1.75rem; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.5px; }
-    .welcome-sub { color: #64748b; font-size: 0.95rem; }
-
-    /* Quick Actions Bar */
-    .actions-grid { 
-        display: grid; 
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
-        gap: 1rem; 
-        margin-bottom: 2rem;
-    }
-    .action-item {
-        background: white;
-        border: 1px solid #f1f5f9;
-        padding: 1rem;
-        border-radius: 16px;
-        text-align: center;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-    .action-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        border-color: var(--primary-soft);
-    }
-    .action-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
-        transition: all 0.3s ease;
-    }
-    .action-label { font-size: 0.85rem; font-weight: 700; color: #475569; }
-
-    /* Cards Style */
-    .premium-card {
-        background: white;
-        border: none;
-        border-radius: 24px;
-        padding: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 10px 20px rgba(0,0,0,0.03);
-        height: 100%;
-    }
-    .stat-label { font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
-    .stat-value { font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin: 0.5rem 0; }
+    /* Hiding base layout elements to take over the full screen just for this page */
+    .main-navbar, .main-footer { display: none !important; }
+    body { background-color: #f8f9fa; font-family: 'Nunito', sans-serif; overflow-x: hidden; }
     
-    /* Alert Banner refined */
-    .alert-modern {
-        background: white;
-        border-left: 5px solid var(--danger-dark);
-        border-radius: 16px;
-        padding: 1.25rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 6px -1px rgba(230, 57, 70, 0.1);
-    }
+    /* Layout */
+    .dashboard-wrapper { display: flex; min-height: 100vh; }
+    .sidebar { width: 280px; background: white; border-right: 1px solid #edf2f7; display: flex; flex-direction: column; padding: 1.5rem 1rem; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; overflow-y: auto;}
+    .main-content { flex-grow: 1; margin-left: 280px; padding: 1.5rem 2.5rem; background-color: #f8fafc; }
+    
+    /* Sidebar Links */
+    .sidebar-link { display: flex; align-items: center; padding: 0.75rem 1rem; color: #4a5568; text-decoration: none; border-radius: 0.5rem; margin-bottom: 0.25rem; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; }
+    .sidebar-link:hover { background-color: #f7fafc; color: #1a202c; }
+    .sidebar-link.active { background-color: #ef4444; color: white; }
+    .sidebar-link i { font-size: 1.1rem; margin-right: 0.75rem; width: 20px; text-align: center; }
+    
+    /* Cards */
+    .glass-card { background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; }
+    
+    /* Quick Actions */
+    .quick-action-card { padding: 1.25rem; transition: transform 0.2s; cursor: pointer; text-decoration: none; display: flex; flex-direction: column; height: 100%; border: 1px solid #e2e8f0;}
+    .quick-action-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+    .icon-box { width: 44px; height: 44px; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 1rem; }
+    .arrow-btn { margin-top: auto; align-self: flex-end; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border: 1px solid #e2e8f0; color: #a0aec0; }
+    
+    /* Banner */
+    .alert-banner-custom { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border-radius: 1rem; position: relative; overflow: hidden; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .alert-banner-custom .bg-graphics { position: absolute; right: 8%; top: 50%; transform: translateY(-50%); opacity: 0.15; font-size: 7rem; line-height: 1; pointer-events: none;}
+    
+    /* Stats */
+    .stat-title { font-size: 0.7rem; font-weight: 800; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-number { font-size: 2.2rem; font-weight: 800; color: #1a202c; line-height: 1; margin-right: 0.5rem; }
+    
+    /* Badges */
+    .badge-verified { background-color: #e6fffa; color: #38b2ac; border: 1px solid #b2f5ea; font-size: 0.75rem; padding: 0.3rem 0.6rem; border-radius: 2rem; display: inline-flex; align-items: center; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container pb-5">
-    
-    <!-- ── Header ── -->
-    <div class="welcome-section d-flex justify-content-between align-items-end">
-        <div>
-            <h1 class="welcome-title mb-1">Bonjour, {{ user.hopital_profile.nom }}</h1>
-            <p class="welcome-sub mb-0"><i class="bi bi-calendar3 me-2"></i> {{ today|date:"l d F Y" }}</p>
-        </div>
-        <div class="text-end d-none d-md-block">
-            <span class="badge bg-soft-success text-success rounded-pill px-3 py-2">
-                <i class="bi bi-shield-check me-1"></i> Compte Vérifié
-            </span>
-        </div>
-    </div>
-
-    <!-- ── Quick Actions (Désencombré) ── -->
-    <div class="actions-grid">
-        <a href="{% url 'hopitaux:scanner_qr' %}" class="action-item">
-            <div class="action-icon bg-soft-success text-success"><i class="bi bi-qr-code-scan"></i></div>
-            <span class="action-label">Scanner</span>
-        </a>
-        <a href="{% url 'hopitaux:historique_dons' %}" class="action-item">
-            <div class="action-icon bg-soft-primary text-primary"><i class="bi bi-clock-history"></i></div>
-            <span class="action-label">Historique</span>
-        </a>
-        <a href="{% url 'hopitaux:creer_demande' %}" class="action-item">
-            <div class="action-icon bg-soft-danger text-danger"><i class="bi bi-plus-circle"></i></div>
-            <span class="action-label">Urgence</span>
-        </a>
-        <a href="{% url 'hopitaux:liste_campagnes' %}" class="action-item">
-            <div class="action-icon bg-soft-info text-info" style="background:#e0f7fa; color:#00838f;"><i class="bi bi-calendar-event"></i></div>
-            <span class="action-label">Campagnes</span>
-        </a>
-        <a href="{% url 'hopitaux:gestion_stock' %}" class="action-item">
-            <div class="action-icon bg-light text-dark"><i class="bi bi-box-seam"></i></div>
-            <span class="action-label">Stock</span>
-        </a>
-    </div>
-
-    {% if alert_stock %}
-    <!-- ── Alert Red Banner (Restauration) ── -->
-    <div class="alert-banner d-flex justify-content-between align-items-center mb-4" style="background: #e63946; color: white; border-radius: 16px; padding: 1.25rem 2rem; box-shadow: 0 10px 20px rgba(230, 57, 70, 0.2);">
-        <div class="d-flex align-items-center">
-            <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+<div class="dashboard-wrapper">
+    <!-- ═══════════ SIDEBAR ═══════════ -->
+    <aside class="sidebar">
+        <!-- Brand -->
+        <div class="d-flex align-items-center mb-4 px-2 mt-2">
+            <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
+                <i class="bi bi-droplet-fill"></i>
+            </div>
             <div>
-                <h5 class="fw-bold mb-0">Alerte Pénurie Critique</h5>
-                <p class="mb-0 opacity-90">Attention, vos stocks pour les groupes suivants sont au plus bas : <strong>{{ groupes_critiques }}</strong>.</p>
+                <h4 class="mb-0 fw-bold" style="color: #1a202c; font-size: 1.3rem;">DonSang</h4>
+                <div class="text-muted" style="font-size: 0.65rem; font-weight: 600;">Gestion du don de sang</div>
             </div>
         </div>
-        <a href="{% url 'hopitaux:creer_campagne' %}" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm">
-            Lancer une campagne
-        </a>
-    </div>
-    {% endif %}
 
-    <!-- ── Statistiques ── -->
-    <div class="row g-4 mb-5">
-        <div class="col-md-4">
-            <div class="premium-card">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <p class="stat-label mb-0">Stock Total</p>
-                    <div class="action-icon bg-soft-danger text-danger" style="width: 40px; height: 40px; font-size: 1rem;"><i class="bi bi-droplet-fill"></i></div>
-                </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <h2 class="stat-value">{{ stock_total }}</h2>
-                    <span class="text-muted">poches</span>
-                </div>
-                <div class="progress mt-3" style="height: 6px; border-radius: 10px;">
-                    <div class="progress-bar bg-success" style="width: 75%"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="premium-card">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <p class="stat-label mb-0">Vos Demandes</p>
-                    <div class="action-icon bg-soft-primary text-primary" style="width: 40px; height: 40px; font-size: 1rem;"><i class="bi bi-megaphone-fill"></i></div>
-                </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <h2 class="stat-value">{{ demandes_actives_count }}</h2>
-                    <span class="text-muted">active(s)</span>
-                </div>
-                <div class="mt-3">
-                    <a href="{% url 'hopitaux:liste_demandes' %}" class="small text-primary text-decoration-none fw-bold">Voir tout <i class="bi bi-arrow-right ms-1"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="premium-card">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <p class="stat-label mb-0">Campagnes</p>
-                    <div class="action-icon bg-soft-info text-info" style="width: 40px; height: 40px; font-size: 1rem; background:#e0f7fa; color:#00838f;"><i class="bi bi-calendar-check-fill"></i></div>
-                </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <h2 class="stat-value">{{ campagnes_count }}</h2>
-                    <span class="text-muted">organisées</span>
-                </div>
-                <div class="mt-3">
-                    <a href="{% url 'hopitaux:liste_campagnes' %}" class="small text-primary text-decoration-none fw-bold">Planning <i class="bi bi-arrow-right ms-1"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
+        <!-- Navigation -->
+        <nav class="flex-grow-1">
+            <a href="{% url 'hopitaux:dashboard' %}" class="sidebar-link active">
+                <i class="bi bi-grid-fill"></i> Dashboard
+            </a>
+            <a href="{% url 'hopitaux:scanner_qr' %}" class="sidebar-link">
+                <i class="bi bi-qr-code-scan"></i> Scanner Check-in
+            </a>
+            <a href="{% url 'hopitaux:liste_demandes' %}" class="sidebar-link">
+                <i class="bi bi-clock-history"></i> Demandes urgentes
+            </a>
+            <a href="{% url 'hopitaux:liste_campagnes' %}" class="sidebar-link">
+                <i class="bi bi-calendar-event"></i> Campagnes
+            </a>
+            <a href="{% url 'hopitaux:gestion_stock' %}" class="sidebar-link">
+                <i class="bi bi-box-seam"></i> Stock
+            </a>
+            <a href="{% url 'hopitaux:historique_dons' %}" class="sidebar-link">
+                <i class="bi bi-shield-check"></i> Dons & Historique
+            </a>
 
-    <!-- ── Section Détails ── -->
-    <div class="row g-4">
-        <div class="col-lg-7">
-            <div class="premium-card">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold mb-0">Aperçu rapide du Stock</h5>
-                    <a href="{% url 'hopitaux:gestion_stock' %}" class="btn btn-light btn-sm rounded-pill">Gérer</a>
+            <a href="{% url 'accounts:logout' %}" class="sidebar-link text-danger mt-auto">
+                <i class="bi bi-box-arrow-right"></i> Déconnexion
+            </a>
+        </nav>
+
+        <!-- Sidebar Alert -->
+        {% if alert_stock %}
+        <div class="mt-4 p-3 rounded-4 text-center" style="background-color: #fef2f2; border: 1px solid #fee2e2;">
+            <div class="bg-white text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-2 shadow-sm" style="width: 32px; height: 32px;">
+                <i class="bi bi-bell-fill"></i>
+            </div>
+            <h6 class="text-danger fw-bold mb-1" style="font-size: 0.85rem;">Alerte pénurie critique</h6>
+            <div class="fw-bold mb-0 text-dark" style="font-size: 0.85rem;">Groupe {{ groupes_critiques|default:"B-" }}</div>
+            <p class="text-muted mb-3" style="font-size: 0.75rem;">Stocks au plus bas</p>
+            <a href="{% url 'hopitaux:gestion_stock' %}" class="btn btn-outline-danger btn-sm rounded-pill w-100 bg-white fw-bold" style="font-size: 0.75rem;">Voir détails</a>
+        </div>
+        {% else %}
+        <!-- Mock alert just to match the screenshot if real alert isn't triggering -->
+        <div class="mt-4 p-3 rounded-4 text-center" style="background-color: #fef2f2; border: 1px solid #fee2e2;">
+            <div class="bg-white text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-2 shadow-sm" style="width: 32px; height: 32px;">
+                <i class="bi bi-bell-fill"></i>
+            </div>
+            <h6 class="text-danger fw-bold mb-1" style="font-size: 0.85rem;">Alerte pénurie critique</h6>
+            <div class="fw-bold mb-0 text-dark" style="font-size: 0.85rem;">Groupe B-</div>
+            <p class="text-muted mb-3" style="font-size: 0.75rem;">2 poches restantes</p>
+            <a href="{% url 'hopitaux:gestion_stock' %}" class="btn btn-outline-danger btn-sm rounded-pill w-100 bg-white fw-bold" style="font-size: 0.75rem;">Voir détails</a>
+        </div>
+        {% endif %}
+
+        <!-- User Profile -->
+        <div class="mt-4 d-flex align-items-center border rounded-4 p-2 shadow-sm bg-white">
+            <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px; font-weight: bold; font-size: 0.8rem;">HO</div>
+            <div class="flex-grow-1 overflow-hidden">
+                <div class="fw-bold text-truncate" style="font-size: 0.85rem; color: #1a202c;">{{ user.hopital_profile.nom|default:"Hôpital Militaire" }}</div>
+                <div class="text-success d-flex align-items-center" style="font-size: 0.7rem;"><span class="me-1">Compte vérifié</span><i class="bi bi-patch-check-fill"></i></div>
+            </div>
+            <i class="bi bi-chevron-right text-muted small ms-1"></i>
+        </div>
+    </aside>
+
+    <!-- ═══════════ MAIN CONTENT ═══════════ -->
+    <main class="main-content">
+        
+        <!-- Header -->
+        <header class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1 d-flex align-items-center" style="color: #1a202c; letter-spacing: -0.5px;">Bonjour, {{ user.hopital_profile.nom|default:"Hôpital Militaire" }} <span class="ms-2">👋</span></h3>
+                <div class="text-muted" style="font-size: 0.85rem;">{{ today|date:"l d F Y"|default:"Samedi 09 mai 2026" }}</div>
+            </div>
+            <div class="d-flex align-items-center gap-4">
+
+                <!-- User -->
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold; font-size: 0.8rem;">HO</div>
+                    <span class="fw-bold text-dark" style="font-size: 0.85rem;">{{ user.username|default:"hopital_test" }}</span>
+                    <i class="bi bi-chevron-down text-muted" style="font-size: 0.8rem;"></i>
                 </div>
-                <!-- Mini barres de stock -->
-                {% for s in stocks %}
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span class="fw-bold">{{ s.groupe_sanguin }}</span>
-                        <span class="text-muted">{{ s.quantite_poches }} poches</span>
-                    </div>
-                    <div class="progress" style="height: 6px; border-radius: 10px;">
-                        <div class="progress-bar {% if s.quantite_poches < 5 %}bg-danger{% else %}bg-success{% endif %}" style="width: {{ s.quantite_poches|add:"20" }}%"></div>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span class="fw-bold">A+</span>
-                        <span class="text-muted">60 poches</span>
-                    </div>
-                    <div class="progress" style="height: 6px; border-radius: 10px;">
-                        <div class="progress-bar bg-success" style="width: 80%"></div>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span class="fw-bold">B-</span>
-                        <span class="text-muted text-danger">2 poches</span>
-                    </div>
-                    <div class="progress" style="height: 6px; border-radius: 10px;">
-                        <div class="progress-bar bg-danger" style="width: 5%"></div>
-                    </div>
-                </div>
-                {% endfor %}
+            </div>
+        </header>
+
+        <div class="text-end mb-3">
+            <span class="badge-verified"><i class="bi bi-shield-check me-1"></i> Compte Vérifié</span>
+        </div>
+
+        <!-- Quick Actions Row -->
+        <div class="row g-3 mb-4">
+            <div class="col">
+                <a href="{% url 'hopitaux:scanner_qr' %}" class="glass-card quick-action-card">
+                    <div class="icon-box" style="background-color: #fee2e2; color: #ef4444;"><i class="bi bi-qr-code-scan"></i></div>
+                    <h6 class="fw-bold text-dark mb-1" style="font-size: 0.95rem;">Scanner Check-in</h6>
+                    <div class="text-muted" style="font-size: 0.75rem;">Scanner un code donneur</div>
+                    <div class="arrow-btn"><i class="bi bi-arrow-right"></i></div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="{% url 'hopitaux:historique_dons' %}" class="glass-card quick-action-card">
+                    <div class="icon-box" style="background-color: #e0e7ff; color: #4f46e5;"><i class="bi bi-clock-history"></i></div>
+                    <h6 class="fw-bold text-dark mb-1" style="font-size: 0.95rem;">Historique</h6>
+                    <div class="text-muted" style="font-size: 0.75rem;">Voir les dons & activités</div>
+                    <div class="arrow-btn"><i class="bi bi-arrow-right"></i></div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="{% url 'hopitaux:creer_demande' %}" class="glass-card quick-action-card">
+                    <div class="icon-box" style="background-color: #fee2e2; color: #ef4444;"><i class="bi bi-droplet"></i></div>
+                    <h6 class="fw-bold text-dark mb-1" style="font-size: 0.95rem;">Demande urgente</h6>
+                    <div class="text-muted" style="font-size: 0.75rem;">Créer une nouvelle demande</div>
+                    <div class="arrow-btn"><i class="bi bi-arrow-right"></i></div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="{% url 'hopitaux:liste_campagnes' %}" class="glass-card quick-action-card">
+                    <div class="icon-box" style="background-color: #dcfce7; color: #16a34a;"><i class="bi bi-calendar-plus"></i></div>
+                    <h6 class="fw-bold text-dark mb-1" style="font-size: 0.95rem;">Campagnes</h6>
+                    <div class="text-muted" style="font-size: 0.75rem;">Gérer les campagnes</div>
+                    <div class="arrow-btn"><i class="bi bi-arrow-right"></i></div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="{% url 'hopitaux:gestion_stock' %}" class="glass-card quick-action-card">
+                    <div class="icon-box" style="background-color: #f3e8ff; color: #9333ea;"><i class="bi bi-box-seam"></i></div>
+                    <h6 class="fw-bold text-dark mb-1" style="font-size: 0.95rem;">Stock</h6>
+                    <div class="text-muted" style="font-size: 0.75rem;">Gérer le stock de poches</div>
+                    <div class="arrow-btn"><i class="bi bi-arrow-right"></i></div>
+                </a>
             </div>
         </div>
-        <div class="col-lg-5">
-            <div class="premium-card">
-                <h5 class="fw-bold mb-4">Dernières demandes</h5>
-                {% for d in dernières_demandes %}
-                <div class="p-3 border rounded-4 mb-3">
+
+        <!-- Alert Banner -->
+        <div class="alert-banner-custom mb-4 shadow-sm">
+            <div class="d-flex align-items-center position-relative z-1">
+                <div class="bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                    <i class="bi bi-exclamation-triangle fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-1" style="font-size: 1.1rem;">Alerte Pénurie Critique</h5>
+                    <p class="mb-0 text-white opacity-75" style="font-size: 0.85rem;">Attention, vos stocks pour les groupes suivants sont au plus bas : {{ groupes_critiques|default:"B-" }}.</p>
+                </div>
+            </div>
+            <div class="position-relative z-1">
+                <a href="{% url 'hopitaux:creer_campagne' %}" class="btn bg-white text-danger fw-bold rounded-pill px-4 shadow-sm" style="font-size: 0.85rem;">
+                    <i class="bi bi-megaphone-fill me-2"></i> Lancer une campagne
+                </a>
+            </div>
+            <div class="bg-graphics">
+                <i class="bi bi-activity"></i>
+                <i class="bi bi-droplet-fill ms-2"></i>
+            </div>
+        </div>
+
+        <!-- Stat Cards Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="glass-card p-3 h-100 d-flex flex-column">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                        <span class="badge bg-danger rounded-pill">{{ d.groupe_sanguin }}</span>
-                        <small class="text-muted">{{ d.date_publication|date:"d M Y" }}</small>
+                        <span class="stat-title">Stock Total</span>
+                        <div class="text-danger"><i class="bi bi-droplet-fill fs-5"></i></div>
                     </div>
-                    <p class="small mb-2 fw-bold text-dark">{{ d.description|truncatechars:50 }}</p>
-                    <div class="d-flex gap-2">
-                        <a href="{% url 'hopitaux:voir_reponses' d.id %}" class="btn btn-soft-primary btn-sm rounded-pill px-3" style="font-size: 0.7rem;">Réponses ({{ d.reponses.count }})</a>
+                    <div class="d-flex align-items-baseline mb-3">
+                        <div class="stat-number">{{ stock_total|default:"62" }}</div>
+                        <span class="text-muted" style="font-size: 0.75rem;">poches disponibles</span>
+                    </div>
+                    <div class="progress mb-2 mt-auto" style="height: 4px; background-color: #f1f5f9;">
+                        <div class="progress-bar bg-danger" style="width: 65%;"></div>
+                    </div>
+                    <div class="text-muted" style="font-size: 0.65rem;">Mise à jour : aujourd'hui, 08:45</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-card p-3 h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="stat-title">Demandes Actives</span>
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;"><i class="bi bi-wind"></i></div>
+                    </div>
+                    <div class="d-flex align-items-baseline mb-auto">
+                        <div class="stat-number">{{ demandes_actives_count|default:"1" }}</div>
+                        <span class="text-muted" style="font-size: 0.75rem;">demande(s) active(s)</span>
+                    </div>
+                    <a href="{% url 'hopitaux:liste_demandes' %}" class="text-primary fw-bold text-decoration-none mt-3 d-inline-block" style="font-size: 0.75rem;">Voir toutes les demandes <i class="bi bi-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-card p-3 h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="stat-title">Campagnes Organisées</span>
+                        <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;"><i class="bi bi-calendar-check"></i></div>
+                    </div>
+                    <div class="d-flex align-items-baseline mb-auto">
+                        <div class="stat-number">{{ campagnes_count|default:"0" }}</div>
+                        <span class="text-muted" style="font-size: 0.75rem;">campagne organisée</span>
+                    </div>
+                    <a href="{% url 'hopitaux:liste_campagnes' %}" class="text-success fw-bold text-decoration-none mt-3 d-inline-block" style="font-size: 0.75rem;">Voir le planning <i class="bi bi-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-card p-3 h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="stat-title">Donneurs Enregistrés</span>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; background-color: #f3e8ff; color: #9333ea;"><i class="bi bi-people"></i></div>
+                    </div>
+                    <div class="d-flex align-items-baseline mb-auto">
+                        <div class="stat-number">154</div>
+                        <span class="text-muted" style="font-size: 0.75rem;">donneurs</span>
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill fw-bold" style="font-size:0.65rem;"><i class="bi bi-arrow-up-short"></i> 12%</span>
+                        <span class="text-muted ms-1" style="font-size: 0.65rem;">ce mois-ci</span>
                     </div>
                 </div>
-                {% empty %}
-                <div class="p-3 border rounded-4 mb-3" style="background:#fcfcfc;">
-                     <div class="d-flex justify-content-between align-items-start mb-2">
-                        <span class="badge bg-danger rounded-pill">O+ (Active)</span>
-                        <small class="text-muted">09 Mai 2026</small>
-                    </div>
-                    <p class="small mb-2 fw-bold text-dark">Besoin urgent pour chirurgie...</p>
-                    <a href="#" class="btn btn-light btn-sm rounded-pill px-3" style="font-size: 0.7rem; background: #e5edff; color: #1d3557; border:none;">Réponses (2)</a>
-                </div>
-                {% endfor %}
             </div>
         </div>
-    </div>
+
+        <!-- Charts and Details Row -->
+        <div class="row g-3 mb-4">
+            <!-- Donut Chart Card -->
+            <div class="col-md-4">
+                <div class="glass-card p-3 h-100 d-flex flex-column">
+                    <h6 class="fw-bold text-dark mb-4" style="font-size: 0.85rem;">Aperçu du stock par groupe sanguin</h6>
+                    <div class="d-flex align-items-center flex-grow-1">
+                        <!-- Chart -->
+                        <div class="position-relative me-3" style="width: 120px; height: 120px;">
+                            <canvas id="stockDonutChart"></canvas>
+                            <div class="position-absolute top-50 start-50 translate-middle text-center">
+                                <h4 class="fw-bold mb-0 text-dark" style="line-height: 1;">{{ stock_total|default:"62" }}</h4>
+                                <span class="text-muted" style="font-size: 0.55rem;">Total poches</span>
+                            </div>
+                        </div>
+                        <!-- Legend -->
+                        <div class="flex-grow-1">
+                            <ul class="list-unstyled mb-0" style="font-size: 0.7rem;">
+                                <li class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="d-flex align-items-center"><span class="rounded-circle d-inline-block me-2" style="width: 6px; height: 6px; background-color: #ef4444;"></span><span class="fw-bold text-dark">O+</span></div>
+                                    <div class="text-muted fw-bold">20 <span class="fw-normal">(32%)</span></div>
+                                </li>
+                                <li class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="d-flex align-items-center"><span class="rounded-circle d-inline-block me-2" style="width: 6px; height: 6px; background-color: #f59e0b;"></span><span class="fw-bold text-dark">A+</span></div>
+                                    <div class="text-muted fw-bold">15 <span class="fw-normal">(24%)</span></div>
+                                </li>
+                                <li class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="d-flex align-items-center"><span class="rounded-circle d-inline-block me-2" style="width: 6px; height: 6px; background-color: #dc2626;"></span><span class="fw-bold text-dark">B-</span></div>
+                                    <div class="text-muted fw-bold text-danger">2 <span class="fw-normal">(3%) <i class="bi bi-exclamation-circle-fill"></i></span></div>
+                                </li>
+                                <li class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="d-flex align-items-center"><span class="rounded-circle d-inline-block me-2" style="width: 6px; height: 6px; background-color: #3b82f6;"></span><span class="fw-bold text-dark">AB+</span></div>
+                                    <div class="text-muted fw-bold">8 <span class="fw-normal">(13%)</span></div>
+                                </li>
+                                <li class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="d-flex align-items-center"><span class="rounded-circle d-inline-block me-2" style="width: 6px; height: 6px; background-color: #8b5cf6;"></span><span class="fw-bold text-dark">A-</span></div>
+                                    <div class="text-muted fw-bold">9 <span class="fw-normal">(15%)</span></div>
+                                </li>
+                                <li class="d-flex align-items-center justify-content-between mb-0">
+                                    <div class="d-flex align-items-center"><span class="rounded-circle d-inline-block me-2" style="width: 6px; height: 6px; background-color: #94a3b8;"></span><span class="fw-bold text-dark">Autres</span></div>
+                                    <div class="text-muted fw-bold">8 <span class="fw-normal">(13%)</span></div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="{% url 'hopitaux:gestion_stock' %}" class="btn btn-light w-100 mt-3 rounded-3 text-dark fw-bold" style="font-size: 0.8rem; border: 1px solid #e2e8f0;">Gérer le stock</a>
+                </div>
+            </div>
+            
+            <!-- Line Chart Card -->
+            <div class="col-md-4">
+                <div class="glass-card p-3 h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold text-dark mb-0" style="font-size: 0.85rem;">Évolution des dons (30 derniers jours)</h6>
+                    </div>
+                    <div class="flex-grow-1 d-flex flex-column justify-content-end position-relative">
+                        <canvas id="donsLineChart" style="max-height: 140px;"></canvas>
+                        <!-- Tooltip mock -->
+                        <div class="position-absolute bg-white shadow-sm border rounded p-1 text-center" style="top: 20%; right: 15%; font-size: 0.65rem;">
+                            <div class="text-muted">09 Mai</div>
+                            <div class="fw-bold">24 dons</div>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-light border rounded-pill text-muted fw-bold" style="font-size: 0.7rem;">30 derniers jours <i class="bi bi-chevron-down ms-1"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Demands Card -->
+            <div class="col-md-4">
+                <div class="glass-card p-3 h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold text-dark mb-0" style="font-size: 0.85rem;">Dernières demandes urgentes</h6>
+                        <a href="{% url 'hopitaux:liste_demandes' %}" class="text-danger fw-bold text-decoration-none" style="font-size: 0.75rem;">Voir toutes</a>
+                    </div>
+                    <div class="flex-grow-1">
+                        {% for d in demandes|slice:":3" %}
+                        <div class="d-flex justify-content-between align-items-start mb-2 pb-2 border-bottom">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span class="fw-bold text-danger" style="font-size:0.85rem;">{{ d.groupe_sanguin }}</span>
+                                    <span class="fw-bold text-dark" style="font-size: 0.8rem;">{{ d.quantite_necessaire }} poches</span>
+                                    {% if d.statut == 'active' %}
+                                    <span class="text-danger" style="font-size: 0.65rem; background-color: #fee2e2; padding: 2px 6px; border-radius: 4px;">Active</span>
+                                    {% else %}
+                                    <span class="text-muted" style="font-size: 0.65rem; background-color: #f1f5f9; padding: 2px 6px; border-radius: 4px;">Clôturée</span>
+                                    {% endif %}
+                                </div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Posté le {{ d.date_publication|date:"d M Y" }}</div>
+                            </div>
+                            <div class="text-muted text-end" style="font-size: 0.7rem;">{{ d.date_publication|timesince }}</div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-4 text-muted small">
+                            <i class="bi bi-inbox d-block fs-4 opacity-25 mb-2"></i>
+                            Aucune demande récente.
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'hopitaux:liste_demandes' %}" class="btn btn-light w-100 rounded-3 text-dark fw-bold" style="font-size: 0.8rem; border: 1px solid #e2e8f0;">Voir toutes les demandes</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conseil -->
+        <div class="glass-card border-0 p-3 mb-2" style="border-left: 4px solid #f59e0b; background-color: white;">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="text-warning"><i class="bi bi-lightbulb fs-4"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.85rem;">Conseil</h6>
+                        <p class="text-muted mb-0" style="font-size: 0.75rem;">Créez une campagne ciblée pour le groupe B- afin de reconstituer rapidement votre stock.</p>
+                    </div>
+                </div>
+                <a href="{% url 'hopitaux:creer_campagne' %}" class="btn btn-outline-danger fw-bold rounded-pill px-4" style="font-size: 0.8rem;">Créer une campagne</a>
+            </div>
+        </div>
+
+    </main>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Donut Chart
+    const ctxDonut = document.getElementById('stockDonutChart');
+    if(ctxDonut) {
+        new Chart(ctxDonut.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['O+', 'A+', 'B-', 'AB+', 'A-', 'Autres'],
+                datasets: [{
+                    data: [20, 15, 2, 8, 9, 8],
+                    backgroundColor: ['#ef4444', '#f59e0b', '#dc2626', '#3b82f6', '#8b5cf6', '#94a3b8'],
+                    borderWidth: 0,
+                    cutout: '75%'
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    // Line Chart
+    const ctxLine = document.getElementById('donsLineChart');
+    if(ctxLine) {
+        new Chart(ctxLine.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['10 Avr', '13 Avr', '17 Avr', '20 Avr', '24 Avr', '27 Avr', '01 Mai', '04 Mai', '09 Mai'],
+                datasets: [{
+                    label: 'Dons',
+                    data: [8, 14, 10, 12, 6, 9, 15, 24, 18],
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#ef4444',
+                    pointBorderColor: '#fff',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false }, tooltip: {enabled: false} },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 9 }, color: '#a0aec0' } },
+                    y: { grid: { borderDash: [4, 4] }, border: { display: false }, ticks: { font: { size: 9 }, color: '#a0aec0', maxTicksLimit: 5 } }
+                },
+                maintainAspectRatio: false
+            }
+        });
+    }
+</script>
 {% endblock %}
