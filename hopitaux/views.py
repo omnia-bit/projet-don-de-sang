@@ -46,9 +46,14 @@ def dashboard_hopital(request):
         messages.error(request, "Accès réservé aux hôpitaux.")
         return redirect('accounts:login')
 
+    query = request.GET.get('q')
     demandes = DemandeSang.objects.filter(hopital=hopital).order_by('-date_publication')
     campagnes = CampagneCollecte.objects.filter(hopital=hopital).order_by('-date_debut')
     
+    if query:
+        demandes = demandes.filter(groupe_sanguin__icontains=query)
+        campagnes = campagnes.filter(titre__icontains=query)
+
     # Stock par groupe pour ce hôpital
     stocks = StockSang.objects.filter(hopital=hopital)
     stock_total = stocks.aggregate(Sum('quantite_poches'))['quantite_poches__sum'] or 0
@@ -57,6 +62,8 @@ def dashboard_hopital(request):
     alertes_penurie = stocks.filter(quantite_poches__lt=5)
     
     context = {
+        'demandes': demandes,
+        'campagnes': campagnes,
         'demandes_actives_count': demandes.filter(statut='active').count(),
         'campagnes_count': campagnes.count(),
         'stock_total': stock_total,
@@ -64,7 +71,8 @@ def dashboard_hopital(request):
         'alert_stock': alertes_penurie.exists(),
         'groupes_critiques': ", ".join([s.groupe_sanguin for s in alertes_penurie]),
         'today': timezone.now(),
-        'titre_page': "Tableau de Bord Hospitalier"
+        'titre_page': "Tableau de Bord Hospitalier",
+        'query': query
     }
     return render(request, 'hopitaux/dashboard.html', context)
 
