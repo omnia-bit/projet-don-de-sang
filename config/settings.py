@@ -149,3 +149,5 @@ EMAIL_HOST_USER = 'testocreo@gmail.com'
 EMAIL_HOST_PASSWORD = 'prku houj vnlo mbrr'
 
 DEFAULT_FROM_EMAIL = 'testocreo@gmail.com'
+
+COHERE_API_KEY = 'sLkUIbWK3cASESRA8QVo3qTpL7QvQAWrPkFifhzS' 

@@ -81,3 +81,29 @@ class InscriptionCampagne(models.Model):
 
     def __str__(self):
         return f"{self.donneur.user.username} - {self.campagne.titre} ({self.creneau_horaire})"
+
+class ConversationChatbot(models.Model):
+    donneur    = models.ForeignKey(DonneurProfile, on_delete=models.CASCADE, related_name='conversations')
+    date_debut = models.DateTimeField(auto_now_add=True)
+    titre      = models.CharField(max_length=200, blank=True)
+
+    class Meta:
+        ordering = ['-date_debut']
+        verbose_name = "Conversation chatbot"
+
+    def __str__(self):
+        return f"Conversation de {self.donneur.user.username} — {self.date_debut.strftime('%d/%m/%Y %H:%M')}"
+
+
+class MessageChatbot(models.Model):
+    ROLE_CHOICES = [('user', 'Utilisateur'), ('assistant', 'Assistant')]
+    conversation = models.ForeignKey(ConversationChatbot, on_delete=models.CASCADE, related_name='messages')
+    role         = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    contenu      = models.TextField()
+    date_envoi   = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['date_envoi']
+
+    def __str__(self):
+        return f"{self.role} — {self.date_envoi.strftime('%H:%M')}"

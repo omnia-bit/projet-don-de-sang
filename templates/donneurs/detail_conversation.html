@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Conversation — DonSang{% endblock %}
+{% block content %}
+<div style="max-width:700px;margin:2rem auto;padding:0 1rem;">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="fw-bold"><i class="bi bi-chat-text text-danger me-2"></i>{{ conversation.titre|truncatechars:50 }}</h5>
+    <a href="{% url 'donneurs:historique_conversations' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i>Retour
+    </a>
+  </div>
+
+  <div class="d-flex flex-column gap-3">
+    {% for msg in messages_list %}
+    <div class="d-flex {% if msg.role == 'user' %}justify-content-end{% endif %}">
+      <div style="max-width:80%;">
+        <div class="px-3 py-2 rounded-3 {% if msg.role == 'user' %}bg-danger text-white{% else %}bg-white border{% endif %}">
+          {{ msg.contenu|linebreaksbr }}
+        </div>
+        <small class="text-muted d-block {% if msg.role == 'user' %}text-end{% endif %} mt-1">
+          {% if msg.role == 'user' %}Vous{% else %}Assistant IA{% endif %}
+          — {{ msg.date_envoi|date:"H:i" }}
+        </small>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

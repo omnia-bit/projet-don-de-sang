@@ -12,4 +12,8 @@ urlpatterns = [
     path('campagnes/', views.liste_campagnes, name='liste_campagnes'),
     path('campagnes/inscription/<int:campagne_id>/', views.sinscrire_campagne, name='sinscrire_campagne'),
     path('profil/toggle-status/', views.toggle_disponibilite, name='toggle_status'),
+    path('assistant/', views.chatbot_ia, name='chatbot_ia'),
+    path('assistant/historique/', views.historique_conversations, name='historique_conversations'),
+    path('assistant/conversation/<int:conv_id>/', views.detail_conversation, name='detail_conversation'),
+    path('assistant/supprimer/<int:conv_id>/', views.supprimer_conversation, name='supprimer_conversation'),
 ]
