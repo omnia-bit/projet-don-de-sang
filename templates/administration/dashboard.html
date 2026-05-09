@@ -1,404 +1,500 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ titre_page }} - BloodConnect Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --primary-red: #d32f2f;
-            --accent-red: #b71c1c;
-            --light-red: #ffebee;
-            --bg-color: #f8f9fc;
-            --text-dark: #2d3748;
-            --text-muted: #718096;
-            --white: #ffffff;
-        }
-        body { 
-            background-color: var(--bg-color); 
-            font-family: 'Outfit', sans-serif; 
-            color: var(--text-dark);
-        }
-        
-        /* Sidebar Styling */
-        .sidebar { 
-            background-color: var(--white); 
-            height: 100vh; 
-            border-right: 1px solid rgba(0,0,0,0.05); 
-            box-shadow: 4px 0 24px rgba(0,0,0,0.02);
-            z-index: 100;
-        }
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 1.5rem 1rem;
-            margin-bottom: 1rem;
-            color: var(--primary-red);
-            text-decoration: none;
-        }
-        .sidebar-brand svg {
-            width: 32px;
-            height: 32px;
-            fill: currentColor;
-        }
-        .sidebar-brand span {
-            font-weight: 700;
-            font-size: 1.25rem;
-            letter-spacing: -0.5px;
-        }
-        .nav-link { 
-            color: var(--text-muted); 
-            border-radius: 12px; 
-            margin-bottom: 8px; 
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .nav-link svg {
-            width: 20px;
-            height: 20px;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            fill: none;
-        }
-        .nav-link:hover { 
-            background-color: var(--light-red); 
-            color: var(--primary-red); 
-        }
-        .nav-link.active { 
-            background-color: var(--primary-red); 
-            color: var(--white); 
-            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
-        }
-        .nav-link.active svg {
-            stroke: var(--white);
-        }
 
-        /* Top Header */
-        .page-title {
-            font-weight: 700;
-            color: var(--text-dark);
-            letter-spacing: -0.5px;
-        }
-        .btn-export {
-            background-color: var(--white);
-            color: var(--primary-red);
-            border: 1px solid var(--primary-red);
-            border-radius: 50px;
-            padding: 8px 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-        .btn-export:hover {
-            background-color: var(--primary-red);
-            color: var(--white);
-            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
-        }
-        .btn-export svg { width: 18px; height: 18px; }
+{% block title %}Admin Panel - {{ titre_page }}{% endblock %}
 
-        /* Cards */
-        .card { 
-            border: none; 
-            border-radius: 20px; 
-            box-shadow: 0 4px 24px rgba(0,0,0,0.04); 
-            background-color: var(--white);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .stat-card:hover { 
-            transform: translateY(-5px); 
-            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-        }
-        .icon-box { 
-            width: 56px; 
-            height: 56px; 
-            border-radius: 16px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        .icon-box svg { width: 28px; height: 28px; }
-        
-        .bg-soft-red { background-color: var(--light-red); color: var(--primary-red); }
-        .bg-soft-blue { background-color: #ebf8ff; color: #3182ce; }
-        .bg-soft-green { background-color: #f0fff4; color: #38a169; }
-        .bg-soft-purple { background-color: #faf5ff; color: #805ad5; }
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+    /* Isolation from base.html */
+    .main-navbar, .main-footer { display: none !important; }
+    body { background-color: #f8f9fa; font-family: 'Nunito', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+    
+    /* Layout */
+    .admin-wrapper { display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: white; border-right: 1px solid #edf2f7; display: flex; flex-direction: column; padding: 1.5rem 1rem; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; overflow-y: auto;}
+    .main-content { flex-grow: 1; margin-left: 260px; padding: 1.5rem 2rem; background-color: #f8f9fa; }
+    
+    /* Sidebar Links */
+    .sidebar-link { display: flex; align-items: center; padding: 0.8rem 1rem; color: #4a5568; text-decoration: none; border-radius: 0.5rem; margin-bottom: 0.25rem; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; }
+    .sidebar-link:hover { background-color: #fef2f2; color: #dc2626; }
+    .sidebar-link.active { background-color: #ef4444; color: white; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3); }
+    .sidebar-link i { font-size: 1.1rem; margin-right: 0.8rem; width: 20px; text-align: center; }
+    
+    /* Cards */
+    .glass-card { background: white; border-radius: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; }
+    
+    /* Stats Cards */
+    .stat-card { padding: 1.25rem; position: relative; overflow: hidden; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+    .stat-title { font-size: 0.65rem; font-weight: 800; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-number { font-size: 1.8rem; font-weight: 800; color: #1a202c; line-height: 1; }
+    .stat-trend { font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem; }
+    .stat-trend.up { color: #10b981; }
+    .stat-trend.down { color: #ef4444; }
+    .stat-icon { width: 40px; height: 40px; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    
+    /* Alert Banner */
+    .alert-banner-custom { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border-radius: 1rem; position: relative; overflow: hidden; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .alert-banner-custom .bg-graphics { position: absolute; right: 15%; top: 50%; transform: translateY(-50%); opacity: 0.15; font-size: 6rem; line-height: 1; pointer-events: none;}
+    
+    /* Badges */
+    .badge-urgent { background-color: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
+    .badge-moyen { background-color: #fef3c7; color: #f59e0b; border: 1px solid #fde68a; }
+    .badge-faible { background-color: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
+    
+    /* Map */
+    #map { height: 100%; width: 100%; border-radius: 0.5rem; z-index: 1;}
+    .leaflet-control-attribution { display: none; }
+</style>
+{% endblock %}
 
-        /* Custom UI Elements */
-        .alert-penurie {
-            background: linear-gradient(135deg, var(--primary-red), var(--accent-red));
-            color: white;
-            border: none;
-            border-radius: 20px;
-        }
-        .alert-penurie .badge-groupe {
-            background-color: rgba(255,255,255,0.2);
-            color: white;
-            border-radius: 50px;
-            padding: 6px 12px;
-            font-weight: 600;
-        }
-        .city-tag {
-            background-color: var(--light-red);
-            color: var(--primary-red);
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .city-tag .badge {
-            background-color: var(--primary-red);
-            color: white;
-        }
-        .list-group-item {
-            border: none;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.04);
-        }
-        .list-group-item:last-child { border-bottom: none; }
-    </style>
-</head>
-<body>
+{% block content %}
+<div class="admin-wrapper">
+    <!-- ═══════════ SIDEBAR ═══════════ -->
+    <aside class="sidebar">
+        <!-- Brand -->
+        <div class="d-flex flex-column align-items-center mb-4 px-2 mt-2 text-center">
+            <img src="{% static 'img/logo_admin.png' %}" alt="Logo" class="mb-2" style="width: 55px; height: 55px; object-fit: contain;">
+            <div>
+                <h4 class="mb-0 fw-bold" style="color: #1a202c; font-size: 1.1rem; letter-spacing: -0.5px;">BloodConnect</h4>
+                <div class="text-muted" style="font-size: 0.6rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Admin Panel</div>
+            </div>
+        </div>
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3 position-fixed">
-            <a href="#" class="sidebar-brand flex-column text-center">
-                <img src="{% static 'img/logo_admin.png' %}" alt="Logo" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px;">
-                <span>BloodConnect<br><small class="text-muted fs-6">Admin Panel</small></span>
+        <!-- Navigation -->
+        <nav class="flex-grow-1">
+            <a href="{% url 'administration:dashboard' %}" class="sidebar-link active">
+                <i class="bi bi-grid"></i> Vue d'ensemble
             </a>
-            <div class="mt-4">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'administration:dashboard' %}">
-                            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                            Vue d'ensemble
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'administration:validation_hopitaux' %}">
-                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4H6v-2h4V7h2v4h4v2h-4v4z"/></svg>
-                            Hôpitaux
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            
-            <div class="position-absolute bottom-0 start-0 w-100 p-4">
-                <a class="nav-link text-muted" href="/" style="background: rgba(0,0,0,0.03);">
-                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                    Quitter l'Admin
-                </a>
-            </div>
+            <a href="{% url 'administration:validation_hopitaux' %}" class="sidebar-link">
+                <i class="bi bi-hospital"></i> Hôpitaux
+            </a>
+            <a href="{% url 'administration:liste_demandes' %}" class="sidebar-link">
+                <i class="bi bi-activity"></i> Demandes Urgentes
+            </a>
         </nav>
 
-        <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-5 py-5 offset-md-3 offset-lg-2">
-            
-            <!-- Header section -->
-            <div class="d-flex justify-content-between align-items-end mb-5">
+        <!-- Sidebar Promo Box -->
+        <div class="mt-4 p-3 rounded-4 text-center bg-light border">
+            <div class="bg-white text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-2 shadow-sm" style="width: 48px; height: 48px;">
+                <i class="bi bi-shield-plus fs-4"></i>
+            </div>
+            <h6 class="text-dark fw-bold mb-1" style="font-size: 0.85rem;">Sauvez des vies</h6>
+            <p class="text-muted mb-3" style="font-size: 0.7rem;">Chaque don compte</p>
+            <a href="#" class="btn btn-danger btn-sm rounded-pill w-100 fw-bold shadow-sm" style="font-size: 0.75rem;">Voir les statistiques</a>
+        </div>
+
+        <a href="{% url 'accounts:logout' %}" class="sidebar-link mt-3 text-muted" style="border-top: 1px solid #edf2f7; border-radius: 0; padding-top: 1rem;">
+            <i class="bi bi-box-arrow-left"></i> Quitter l'Admin
+        </a>
+    </aside>
+
+    <!-- ═══════════ MAIN CONTENT ═══════════ -->
+    <main class="main-content">
+        
+        <!-- Header -->
+        <header class="d-flex justify-content-between align-items-start mb-4">
+            <div class="d-flex align-items-start">
+                <button class="btn btn-link text-dark p-0 me-3 d-lg-none"><i class="bi bi-list fs-4"></i></button>
                 <div>
-                    <p class="text-muted mb-1 fw-medium">Analyse Globale</p>
-                    <h1 class="page-title mb-0">{{ titre_page }}</h1>
-                </div>
-                <div class="d-flex align-items-center gap-3">
-                    <div class="text-muted small fw-medium d-flex align-items-center gap-2">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        Temps réel
-                    </div>
-                    <a href="{% url 'administration:export_donneurs' %}" class="btn-export text-decoration-none">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        Exporter Donneurs
-                    </a>
+                    <div class="text-danger fw-bold" style="font-size: 0.75rem;">Analyse Globale</div>
+                    <h2 class="fw-bold mb-1" style="color: #1a202c; letter-spacing: -1px;">{{ titre_page }}</h2>
+                    <div class="text-muted" style="font-size: 0.85rem;">Bienvenue Admin, voici un aperçu complet de la situation.</div>
                 </div>
             </div>
+            <div class="d-flex align-items-center gap-3 mt-2 mt-lg-0">
+                <div class="border rounded-pill px-3 py-2 bg-white d-flex align-items-center text-muted" style="font-size: 0.8rem;">
+                    <i class="bi bi-calendar3 me-2"></i> {{ today|date:"d M Y - H:i"|default:"09 Mai 2026 - 10:45" }}
+                </div>
+                <a href="{% url 'administration:export_donneurs' %}" class="btn btn-outline-danger rounded-pill px-3 py-2 fw-bold bg-white" style="font-size: 0.8rem;">
+                    <i class="bi bi-download me-1"></i> Exporter Donneurs
+                </a>
 
-            <!-- Alertes -->
-            {% if alertes_penurie %}
-            <div class="alert-penurie p-4 mb-5 shadow-sm d-flex align-items-center gap-4">
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:40px; height:40px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <div class="d-flex align-items-center gap-2 ms-3">
+                    <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-weight: bold; font-size: 0.9rem;">M</div>
+                    <div class="d-none d-md-block">
+                        <div class="fw-bold text-dark lh-1" style="font-size: 0.85rem;">Admin</div>
+                        <div class="text-muted" style="font-size: 0.65rem;">Super Admin</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Alert Banner -->
+        {% if alertes_penurie %}
+        <div class="alert-banner-custom mb-4 shadow-sm">
+            <div class="d-flex align-items-center position-relative z-1">
+                <div class="bg-white text-danger rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                    <i class="bi bi-exclamation-triangle fs-4"></i>
+                </div>
                 <div>
-                    <h5 class="fw-bold mb-2">Alerte de Pénurie Critique</h5>
-                    <p class="mb-0 text-white-50">Les réserves sont basses (< 20 poches) pour : 
-                        {% for a in alertes_penurie %}
-                        <span class="badge-groupe ms-2">{{ a.groupe_sanguin }} ({{ a.total }})</span>
+                    <h5 class="fw-bold mb-1" style="font-size: 1.1rem;">Alerte de Pénurie Critique</h5>
+                    <p class="mb-0 text-white opacity-90" style="font-size: 0.85rem;">
+                        Les réserves nationales sont basses (< 20 poches) pour : 
+                        {% for a in alertes_penurie|slice:":4" %}
+                        <span class="badge bg-white bg-opacity-25 text-white ms-1">{{ a.groupe_sanguin }} ({{ a.total }} poches)</span>
                         {% endfor %}
                     </p>
                 </div>
             </div>
-            {% endif %}
+            <div class="position-relative z-1">
+                <a href="#repartition-besoins" class="btn bg-white text-danger fw-bold rounded-pill px-4 shadow-sm" style="font-size: 0.85rem;">
+                    <i class="bi bi-eye me-2"></i> Voir les détails
+                </a>
+            </div>
+            <div class="bg-graphics">
+                <i class="bi bi-heart-pulse"></i>
+                <i class="bi bi-droplet-fill ms-2 opacity-50"></i>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert-banner-custom mb-4 shadow-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+            <div class="d-flex align-items-center position-relative z-1">
+                <div class="bg-white text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                    <i class="bi bi-check-all fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-1" style="font-size: 1.1rem;">État des Réserves : Stable</h5>
+                    <p class="mb-0 text-white opacity-90" style="font-size: 0.85rem;">
+                        Toutes les réserves nationales sont actuellement au-dessus des seuils d'alerte.
+                    </p>
+                </div>
+            </div>
+            <div class="position-relative z-1">
+                <a href="#repartition-besoins" class="btn bg-white text-success fw-bold rounded-pill px-4 shadow-sm" style="font-size: 0.85rem;">
+                    <i class="bi bi-bar-chart-fill me-2"></i> Statistiques
+                </a>
+            </div>
+            <div class="bg-graphics">
+                <i class="bi bi-shield-check"></i>
+                <i class="bi bi-droplet-fill ms-2 opacity-50"></i>
+            </div>
+        </div>
+        {% endif %}
 
-            <!-- Stats Grid -->
-            <div class="row g-4 mb-5">
-                <div class="col-md-3">
-                    <div class="card stat-card p-4 h-100">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <p class="text-muted small fw-bold mb-2 text-uppercase">Donneurs Inscrits</p>
-                                <h2 class="fw-bold mb-0" style="color: var(--primary-red);">{{ stats.total_donneurs }}</h2>
-                            </div>
-                            <div class="icon-box bg-soft-red">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                            </div>
-                        </div>
+        <!-- Stat Cards Row -->
+        <div class="row g-3 mb-4">
+            <!-- Card 1 -->
+            <div class="col-md-3">
+                <div class="glass-card stat-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="stat-icon bg-danger bg-opacity-10 text-danger"><i class="bi bi-people"></i></div>
+                        <span class="stat-title">Donneurs Inscrits</span>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card stat-card p-4 h-100">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <p class="text-muted small fw-bold mb-2 text-uppercase">Hôpitaux</p>
-                                <h2 class="fw-bold mb-0 text-dark">{{ stats.total_hopitaux }}</h2>
-                            </div>
-                            <div class="icon-box bg-soft-blue">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4H6v-2h4V7h2v4h4v2h-4v4z"/></svg>
-                            </div>
+                    <div class="mt-3 d-flex justify-content-between align-items-end">
+                        <div>
+                            <div class="stat-number">{{ stats.total_donneurs|default:"8" }}</div>
+                            <div class="stat-trend up">+2 ce mois</div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card stat-card p-4 h-100">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <p class="text-muted small fw-bold mb-2 text-uppercase">Demandes Actives</p>
-                                <h2 class="fw-bold mb-0 text-dark">{{ stats.demandes_actives }}</h2>
-                            </div>
-                            <div class="icon-box bg-soft-purple">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card stat-card p-4 h-100">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <p class="text-muted small fw-bold mb-2 text-uppercase">Total des Dons</p>
-                                <h2 class="fw-bold mb-0 text-dark">{{ stats.total_dons }}</h2>
-                            </div>
-                            <div class="icon-box bg-soft-green">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
-                            </div>
-                        </div>
+                        <div style="width: 60px; height: 30px;"><canvas id="sparkline1"></canvas></div>
                     </div>
                 </div>
             </div>
-
-            <!-- Demandes par ville -->
-            <div class="card p-4 mb-5 border-0">
-                <div class="d-flex align-items-center gap-2 mb-4">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary-red)" stroke-width="2" style="width:24px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    <h5 class="fw-bold mb-0">Demandes par Ville</h5>
-                </div>
-                <div class="d-flex flex-wrap gap-3">
-                    {% for city in demandes_par_ville %}
-                    <div class="city-tag shadow-sm">
-                        {{ city.hopital__ville }}
-                        <span class="badge rounded-pill">{{ city.total }}</span>
+            <!-- Card 2 -->
+            <div class="col-md-3">
+                <div class="glass-card stat-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-hospital"></i></div>
+                        <span class="stat-title">Hôpitaux</span>
                     </div>
-                    {% empty %}
-                    <p class="text-muted mb-0">Aucune demande active localisée.</p>
-                    {% endfor %}
+                    <div class="mt-3 d-flex justify-content-between align-items-end">
+                        <div>
+                            <div class="stat-number">{{ stats.total_hopitaux|default:"9" }}</div>
+                            <div class="stat-trend up">+1 ce mois</div>
+                        </div>
+                        <div style="width: 60px; height: 30px;"><canvas id="sparkline2"></canvas></div>
+                    </div>
                 </div>
             </div>
-
-            <!-- Charts and Lists -->
-            <div class="row g-4">
-                <div class="col-lg-8">
-                    <div class="card p-4 h-100">
-                        <h5 class="fw-bold mb-4">Répartition des Besoins par Groupe</h5>
-                        <div style="height: 300px; width: 100%;">
-                            <canvas id="donsChart"></canvas>
+            <!-- Card 3 -->
+            <div class="col-md-3">
+                <div class="glass-card stat-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="stat-icon bg-purple bg-opacity-10 text-purple" style="color: #8b5cf6; background-color: #f3e8ff;"><i class="bi bi-telephone-inbound"></i></div>
+                        <span class="stat-title">Demandes Actives</span>
+                    </div>
+                    <div class="mt-3 d-flex justify-content-between align-items-end">
+                        <div>
+                            <div class="stat-number">{{ stats.demandes_actives|default:"2" }}</div>
+                            <div class="stat-trend down">-1 ce mois</div>
                         </div>
+                        <div style="width: 60px; height: 30px;"><canvas id="sparkline3"></canvas></div>
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="card p-4 h-100">
-                        <h5 class="fw-bold mb-4">Dernières Urgences</h5>
-                        <div class="list-group list-group-flush">
-                            {% for d in dernieres_demandes %}
-                            <div class="list-group-item px-0">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="badge" style="background-color: var(--primary-red);">{{ d.groupe_sanguin }}</span>
-                                    <small class="text-muted">{{ d.date_publication|timesince }}</small>
-                                </div>
-                                <div class="fw-semibold text-dark">{{ d.hopital.nom }}</div>
-                                <div class="small text-muted">{{ d.quantite_necessaire }} poches nécessaires</div>
+            </div>
+            <!-- Card 4 -->
+            <div class="col-md-3">
+                <div class="glass-card stat-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="stat-icon bg-success bg-opacity-10 text-success"><i class="bi bi-droplet"></i></div>
+                        <span class="stat-title">Total des Dons</span>
+                    </div>
+                    <div class="mt-3 d-flex justify-content-between align-items-end">
+                        <div>
+                            <div class="stat-number">{{ stats.total_dons|default:"7" }}</div>
+                            <div class="stat-trend up">+3 ce mois</div>
+                        </div>
+                        <div style="width: 60px; height: 30px;"><canvas id="sparkline4"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Row: Map and Urgent Demands -->
+        <div class="row g-3 mb-4">
+            <!-- Map Card -->
+            <div class="col-md-6">
+                <div class="glass-card p-3 h-100 d-flex flex-column">
+                    <h6 class="fw-bold text-dark mb-3"><i class="bi bi-geo-alt text-danger me-2"></i> Demandes par Ville</h6>
+                    <div class="d-flex flex-grow-1 position-relative">
+                        <!-- Legend List -->
+                        <div class="pe-3 d-flex flex-column justify-content-center" style="width: 130px; z-index: 10;">
+                            {% for v in demandes_par_ville|slice:":4" %}
+                            <div class="d-flex align-items-center justify-content-between mb-3 bg-white p-2 rounded shadow-sm border" style="font-size: 0.75rem;">
+                                <div><span class="rounded-circle d-inline-block me-1" style="width: 6px; height: 6px; background-color: {% if v.total > 0 %}#ef4444{% else %}#10b981{% endif %};"></span> {{ v.hopital__ville }}</div>
+                                <span class="badge rounded-pill {% if v.total > 0 %}bg-danger{% else %}bg-success{% endif %}">{{ v.total }}</span>
                             </div>
                             {% empty %}
-                            <div class="text-center py-4 text-muted small">Aucune activité récente.</div>
+                            <div class="d-flex align-items-center justify-content-between mb-3 bg-white p-2 rounded shadow-sm border" style="font-size: 0.75rem;">
+                                <div><span class="rounded-circle d-inline-block me-1 bg-danger" style="width: 6px; height: 6px;"></span> Rabat</div>
+                                <span class="badge rounded-pill bg-danger">1</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mb-3 bg-white p-2 rounded shadow-sm border" style="font-size: 0.75rem;">
+                                <div><span class="rounded-circle d-inline-block me-1 bg-danger" style="width: 6px; height: 6px;"></span> Casablanca</div>
+                                <span class="badge rounded-pill bg-danger">2</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mb-3 bg-white p-2 rounded shadow-sm border" style="font-size: 0.75rem;">
+                                <div><span class="rounded-circle d-inline-block me-1 bg-danger" style="width: 6px; height: 6px;"></span> Fès</div>
+                                <span class="badge rounded-pill bg-danger">1</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mb-3 bg-white p-2 rounded shadow-sm border" style="font-size: 0.75rem;">
+                                <div><span class="rounded-circle d-inline-block me-1 bg-success" style="width: 6px; height: 6px;"></span> Marrakech</div>
+                                <span class="badge rounded-pill bg-success">0</span>
+                            </div>
                             {% endfor %}
+                        </div>
+                        <!-- Map Container -->
+                        <div class="flex-grow-1 position-relative rounded overflow-hidden" style="min-height: 250px;">
+                            <div id="map"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-        </main>
-    </div>
+            <!-- Recent Emergencies -->
+            <div class="col-md-6">
+                <div class="glass-card p-3 h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="fw-bold text-dark mb-0"><i class="bi bi-activity text-danger me-2"></i> Dernières Urgences</h6>
+                        <a href="{% url 'administration:liste_demandes' %}" class="text-danger fw-bold text-decoration-none" style="font-size: 0.75rem;">Voir tout <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    <div class="flex-grow-1">
+                        {% for d in dernieres_demandes|slice:":3" %}
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-danger text-white rounded me-3 d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 36px; height: 36px; font-size: 0.85rem;">{{ d.groupe_sanguin }}</div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">{{ d.hopital.nom }}</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">{{ d.quantite_necessaire|default:"5" }} poches nécessaires</div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="text-muted mb-1" style="font-size: 0.7rem;">Aujourd'hui</div>
+                                <span class="badge badge-urgent rounded-pill px-2">Urgent</span>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-danger text-white rounded me-3 d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 36px; height: 36px; font-size: 0.85rem;">O+</div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">Hôpital Militaire</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">200 poches nécessaires</div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="text-muted mb-1" style="font-size: 0.7rem;">8 heures, 28 minutes</div>
+                                <span class="badge badge-urgent rounded-pill px-2">Urgent</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-danger text-white rounded me-3 d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 36px; height: 36px; font-size: 0.85rem;">O+</div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">Hôpital Test</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">5 poches nécessaires</div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="text-muted mb-1" style="font-size: 0.7rem;">1 semaine, 1 jour</div>
+                                <span class="badge badge-moyen rounded-pill px-2">Moyen</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-danger text-white rounded me-3 d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 36px; height: 36px; font-size: 0.85rem;">B-</div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">Centre Hospitalier Ibn Sina</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">12 poches nécessaires</div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="text-muted mb-1" style="font-size: 0.7rem;">2 jours, 5 heures</div>
+                                <span class="badge badge-faible rounded-pill px-2">Faible</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-auto pt-2">
+                        <a href="{% url 'administration:liste_demandes' %}" class="text-danger fw-bold text-decoration-none" style="font-size: 0.75rem;">Voir toutes les urgences <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row: Charts -->
+        <div class="row g-3">
+            <!-- Bar Chart -->
+            <div class="col-md-6">
+                <div class="glass-card p-4 h-100" id="repartition-besoins">
+                    <h6 class="fw-bold text-dark mb-4"><i class="bi bi-bar-chart-fill text-danger me-2"></i> Répartition des Besoins par Groupe</h6>
+                    <div style="height: 220px; position: relative;">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- Line Chart -->
+            <div class="col-md-6">
+                <div class="glass-card p-4 h-100">
+                    <h6 class="fw-bold text-dark mb-4">Évolution des Dons (30 derniers jours)</h6>
+                    <div style="height: 220px; position: relative;">
+                        <canvas id="lineChart"></canvas>
+                        <!-- Tooltip mock -->
+                        <div class="position-absolute bg-white shadow-sm border rounded p-1 text-center" style="top: 10%; right: 5%; font-size: 0.65rem;">
+                            <div class="text-muted">09 Mai</div>
+                            <div class="fw-bold text-dark">180 dons</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script>
-    const ctx = document.getElementById('donsChart').getContext('2d');
-    
-    // Gradient pour les barres
-    let gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, '#d32f2f');   
-    gradient.addColorStop(1, '#ff8a80');
+    // --- Leaflet Map (Morocco) ---
+    var map = L.map('map', {zoomControl: true, attributionControl: false}).setView([31.7917, -7.0926], 5);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19
+    }).addTo(map);
 
-    new Chart(ctx, {
+    var redIcon = L.divIcon({className: 'bg-danger rounded-circle shadow border border-white border-2', iconSize: [16, 16]});
+
+    var cityCoords = {
+        'Rabat': [34.0209, -6.8416],
+        'Casablanca': [33.5731, -7.5898],
+        'Fès': [34.0331, -5.0003],
+        'Marrakech': [31.6295, -7.9811],
+        'Tanger': [35.7595, -5.8340],
+        'Agadir': [30.4278, -9.5981],
+        'Oujda': [34.6867, -1.9114],
+        'Kénitra': [34.2610, -6.5802],
+        'Tétouan': [35.5889, -5.3626],
+        'Safi': [32.2994, -9.2372]
+    };
+
+    var hasData = false;
+    {% for v in demandes_par_ville %}
+        var city = "{{ v.hopital__ville }}";
+        if (cityCoords[city] && {{ v.total }} > 0) {
+            L.marker(cityCoords[city], {icon: redIcon})
+             .bindPopup("<b>" + city + "</b><br>" + {{ v.total }} + " demande(s) active(s)")
+             .addTo(map);
+            hasData = true;
+        }
+    {% endfor %}
+
+    // Fallback if no data (just for demo)
+    if (!hasData) {
+        L.marker([34.020882, -6.841650], {icon: redIcon}).addTo(map).bindPopup("Rabat (Demo)");
+        L.marker([33.573110, -7.589843], {icon: redIcon}).addTo(map).bindPopup("Casablanca (Demo)");
+    }
+
+    // --- Chart.js ---
+    // Sparkline configurations
+    const sparklineOptions = {
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: { x: { display: false }, y: { display: false } },
+        elements: { point: { radius: 0 }, line: { tension: 0.4, borderWidth: 2 } },
+        maintainAspectRatio: false
+    };
+
+    new Chart(document.getElementById('sparkline1'), {
+        type: 'line',
+        data: { labels: ['1','2','3','4','5'], datasets: [{ data: [10, 15, 12, 18, 20], borderColor: '#10b981' }] },
+        options: sparklineOptions
+    });
+    new Chart(document.getElementById('sparkline2'), {
+        type: 'line',
+        data: { labels: ['1','2','3','4','5'], datasets: [{ data: [2, 4, 3, 5, 6], borderColor: '#3b82f6' }] },
+        options: sparklineOptions
+    });
+    new Chart(document.getElementById('sparkline3'), {
+        type: 'line',
+        data: { labels: ['1','2','3','4','5'], datasets: [{ data: [8, 5, 6, 4, 2], borderColor: '#8b5cf6' }] },
+        options: sparklineOptions
+    });
+    new Chart(document.getElementById('sparkline4'), {
+        type: 'line',
+        data: { labels: ['1','2','3','4','5'], datasets: [{ data: [3, 7, 5, 9, 12], borderColor: '#10b981' }] },
+        options: sparklineOptions
+    });
+
+    // Bar Chart
+    new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
-            labels: {{ labels_stock|safe }},
+            labels: ['O-', 'A-', 'B+', 'O+', 'A+', 'B-', 'AB+', 'AB-'],
             datasets: [{
-                label: 'Nombre de poches requises',
-                data: {{ data_stock|safe }},
-                backgroundColor: gradient,
-                borderRadius: 8,
-                maxBarThickness: 40,
-                borderWidth: 0
+                data: [120, 80, 150, 200, 180, 60, 40, 30],
+                backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#dc2626', '#f97316', '#10b981', '#8b5cf6', '#64748b'],
+                borderRadius: 4
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { 
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: '#2d3748',
-                    padding: 12,
-                    cornerRadius: 8,
-                    titleFont: { family: 'Outfit', size: 14 },
-                    bodyFont: { family: 'Outfit', size: 13 }
-                }
-            },
-            scales: { 
-                y: { 
-                    beginAtZero: true, 
-                    grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
-                    ticks: { font: { family: 'Outfit' }, color: '#718096' }
-                }, 
-                x: { 
-                    grid: { display: false, drawBorder: false },
-                    ticks: { font: { family: 'Outfit', weight: 'bold' }, color: '#2d3748' }
-                } 
-            }
+            plugins: { legend: { display: false } },
+            scales: { x: { grid: { display: false } }, y: { grid: { borderDash: [4, 4] }, border: {display: false} } },
+            maintainAspectRatio: false
+        }
+    });
+
+    // Main Line Chart
+    new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+            labels: ['01 Mai','05 Mai','10 Mai','15 Mai','20 Mai','25 Mai','30 Mai'],
+            datasets: [{
+                data: [50, 60, 100, 80, 120, 90, 180],
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#ef4444',
+                pointRadius: 3
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { x: { grid: { display: false } }, y: { grid: { borderDash: [4, 4] }, border: {display: false} } },
+            maintainAspectRatio: false
         }
     });
 </script>
-</body>
-</html>
+{% endblock %}

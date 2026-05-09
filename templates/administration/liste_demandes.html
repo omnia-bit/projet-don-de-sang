@@ -1,0 +1,120 @@
+{% extends 'administration/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-wrapper" style="background-color: #f8fafc; min-height: 100vh;">
+    <!-- ═══════════ SIDEBAR ═══════════ -->
+    <aside class="sidebar">
+        <!-- Brand -->
+        <div class="d-flex flex-column align-items-center mb-4 px-2 mt-2 text-center">
+            <img src="{% static 'img/logo_admin.png' %}" alt="Logo" class="mb-2" style="width: 55px; height: 55px; object-fit: contain;">
+            <div>
+                <h4 class="mb-0 fw-bold" style="color: #1a202c; font-size: 1.1rem; letter-spacing: -0.5px;">BloodConnect</h4>
+                <div class="text-muted" style="font-size: 0.6rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Admin Panel</div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-grow-1">
+            <a href="{% url 'administration:dashboard' %}" class="sidebar-link">
+                <i class="bi bi-grid"></i> Vue d'ensemble
+            </a>
+            <a href="{% url 'administration:validation_hopitaux' %}" class="sidebar-link">
+                <i class="bi bi-hospital"></i> Hôpitaux
+            </a>
+            <a href="{% url 'administration:liste_demandes' %}" class="sidebar-link active">
+                <i class="bi bi-activity"></i> Demandes Urgentes
+            </a>
+        </nav>
+
+        <!-- Logout -->
+        <a href="{% url 'accounts:logout' %}" class="sidebar-link text-danger mt-auto border-top pt-3">
+            <i class="bi bi-box-arrow-right"></i> Déconnexion
+        </a>
+    </aside>
+
+    <!-- ═══════════ MAIN CONTENT ═══════════ -->
+    <main class="main-content">
+        
+        <!-- Header -->
+        <header class="d-flex justify-content-between align-items-start mb-4">
+            <div class="d-flex align-items-start">
+                <button class="btn btn-link text-dark p-0 me-3 d-lg-none"><i class="bi bi-list fs-4"></i></button>
+                <div>
+                    <div class="text-muted fw-bold" style="font-size: 0.75rem;">Suivi National</div>
+                    <h2 class="fw-bold mb-1" style="color: #1a202c; letter-spacing: -1px;">Toutes les Demandes</h2>
+                    <div class="text-muted" style="font-size: 0.85rem;">Historique et état actuel des besoins en sang.</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-3 mt-2 mt-lg-0">
+                <form method="GET" class="position-relative">
+                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                    <input type="text" name="q" value="{{ query|default:'' }}" class="form-control rounded-pill bg-white shadow-sm border-0 ps-5" placeholder="Hôpital, groupe, ville..." style="width: 250px; font-size: 0.85rem; height: 38px;">
+                </form>
+            </div>
+        </header>
+
+        <!-- Table Card -->
+        <div class="glass-card overflow-hidden">
+            <div class="p-4 border-bottom bg-white d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"><i class="bi bi-list-check"></i></div>
+                    <h6 class="mb-0 fw-bold text-dark">Liste des demandes ({{ demandes.count }})</h6>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light bg-opacity-50">
+                        <tr>
+                            <th class="ps-4 border-0 text-muted fw-bold" style="font-size: 0.75rem; text-transform: uppercase;">Groupe</th>
+                            <th class="border-0 text-muted fw-bold" style="font-size: 0.75rem; text-transform: uppercase;">Établissement</th>
+                            <th class="border-0 text-muted fw-bold" style="font-size: 0.75rem; text-transform: uppercase;">Ville</th>
+                            <th class="border-0 text-muted fw-bold" style="font-size: 0.75rem; text-transform: uppercase;">Quantité</th>
+                            <th class="border-0 text-muted fw-bold" style="font-size: 0.75rem; text-transform: uppercase;">Statut</th>
+                            <th class="border-0 text-muted fw-bold" style="font-size: 0.75rem; text-transform: uppercase;">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in demandes %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="bg-danger text-white rounded d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                    {{ d.groupe_sanguin }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark" style="font-size: 0.85rem;">{{ d.hopital.nom }}</div>
+                                <div class="text-muted" style="font-size: 0.7rem;">Agrément: {{ d.hopital.agrement }}</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark fw-normal border px-2">{{ d.hopital.ville }}</span>
+                            </td>
+                            <td>
+                                <div class="fw-bold">{{ d.quantite_necessaire }} <span class="text-muted fw-normal">poches</span></div>
+                            </td>
+                            <td>
+                                {% if d.statut == 'active' %}
+                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2" style="font-size: 0.7rem;">Active</span>
+                                {% else %}
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2" style="font-size: 0.7rem;">Clôturée</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted" style="font-size: 0.8rem;">
+                                {{ d.date_publication|date:"d M Y" }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2 opacity-25"></i>
+                                Aucune demande trouvée.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
