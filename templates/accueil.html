@@ -13,12 +13,13 @@
       --red:       #E63946;
       --red-dark:  #c1121f;
       --red-light: #fff0f0;
+      --red-mid:   #ffd6d8;
       --surface:   #ffffff;
-      --bg:         #f8f9fb;
-      --text:       #1a1a2e;
-      --muted:      #6c757d;
-      --border:     #e5e7eb;
-      --radius:     16px;
+      --bg:        #f8f9fb;
+      --text:      #1a1a2e;
+      --muted:     #6c757d;
+      --border:    #e5e7eb;
+      --radius:    16px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -51,14 +52,14 @@
       gap: .5rem;
     }
     .navbar-brand .brand-dot {
-      width: 28px; height: 28px;
+      width: 32px; height: 32px;
       background: var(--red);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #fff;
-      font-size: .9rem;
+      font-size: 1rem;
     }
     .nav-link {
       font-size: .92rem;
@@ -68,7 +69,6 @@
     }
     .nav-link:hover { color: var(--red) !important; }
 
-    /* Boutons de la Nav */
     .btn-nav {
       background: var(--red);
       color: #fff !important;
@@ -84,17 +84,11 @@
     }
     .btn-nav:hover {
       background: var(--red-dark);
-      box-shadow: 0 4px 12px rgba(230, 57, 70, 0.2);
+      box-shadow: 0 4px 12px rgba(230, 57, 70, 0.25);
     }
-    
-    .btn-logout {
-      background: #1a1a2e; /* Couleur sombre pour différencier du bouton rouge */
-    }
-    .btn-logout:hover {
-      background: #000;
-    }
+    .btn-logout { background: #1a1a2e; }
+    .btn-logout:hover { background: #000; }
 
-    /* Style du bloc utilisateur */
     .user-info {
       display: flex;
       align-items: center;
@@ -102,28 +96,48 @@
       margin-right: 15px;
     }
     .user-avatar {
-      width: 35px;
-      height: 35px;
+      width: 35px; height: 35px;
       background: var(--red-light);
       border: 1px solid var(--red);
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       color: var(--red);
-      font-weight: 700;
-      font-size: .8rem;
+      font-weight: 700; font-size: .8rem;
     }
 
-    /* --- HERO SECTION --- */
+    /* --- HERO --- */
     .hero {
-      background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
       padding: 5.5rem 0 4.5rem;
       text-align: center;
       position: relative;
       overflow: hidden;
     }
+
+    /* Heartbeat SVG pulse behind hero */
+    .hero-ecg {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 80px;
+      opacity: 0.07;
+      pointer-events: none;
+    }
+    .ecg-line {
+      stroke: var(--red);
+      stroke-width: 2.5;
+      fill: none;
+      stroke-dasharray: 1200;
+      stroke-dashoffset: 1200;
+      animation: drawEcg 3s ease forwards infinite;
+    }
+    @keyframes drawEcg {
+      0%   { stroke-dashoffset: 1200; opacity: 1; }
+      70%  { stroke-dashoffset: 0;    opacity: 1; }
+      90%  { stroke-dashoffset: 0;    opacity: 0; }
+      100% { stroke-dashoffset: 0;    opacity: 0; }
+    }
+
     .hero-badge {
       display: inline-flex;
       align-items: center;
@@ -135,71 +149,195 @@
       font-size: .8rem;
       font-weight: 700;
       text-transform: uppercase;
+      letter-spacing: .5px;
       margin-bottom: 1.4rem;
     }
     .hero h1 {
       font-family: 'Nunito', sans-serif;
       font-weight: 800;
-      font-size: clamp(1.9rem, 4vw, 3rem);
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
       color: var(--text);
-      line-height: 1.2;
+      line-height: 1.15;
       margin-bottom: 1rem;
     }
     .hero h1 span { color: var(--red); }
     .hero p {
       color: var(--muted);
-      font-size: 1.05rem;
-      max-width: 500px;
+      font-size: 1.08rem;
+      max-width: 520px;
       margin: 0 auto 2rem;
+      line-height: 1.7;
     }
 
     /* Animations */
     @keyframes pulse-heart {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.15); }
+      14%  { transform: scale(1.2); }
+      28%  { transform: scale(1); }
+      42%  { transform: scale(1.15); }
+      70%  { transform: scale(1); }
     }
-    .pulse-icon { animation: pulse-heart 2s infinite; display: inline-block; }
-    .floating-el { animation: float 4s ease-in-out infinite; }
+    .pulse-icon { animation: pulse-heart 1.5s infinite; display: inline-block; }
+
     @keyframes float {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-8px); }
+      50%       { transform: translateY(-8px); }
+    }
+    .floating-el { animation: float 4s ease-in-out infinite; }
+
+    /* Stats */
+    .hero-stat-val {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--red);
+      display: block;
+    }
+    .hero-stat-label { font-size: .82rem; color: var(--muted); }
+    .hero-stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+      margin-top: 2.5rem;
+    }
+    .stat-divider {
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
     }
 
-    /* --- CARDS --- */
-    .cards-section { padding: 4rem 0 5rem; flex: 1; }
-    .section-label { font-size: .78rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--red); margin-bottom: .6rem; }
-    .section-title { font-family: 'Nunito', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--text); margin-bottom: 2.5rem; }
+    /* --- CARDS SECTION --- */
+    .cards-section { padding: 5rem 0 6rem; flex: 1; }
+    .section-label { font-size: .78rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: .5rem; }
+    .section-title { font-family: 'Nunito', sans-serif; font-size: 1.7rem; font-weight: 800; color: var(--text); }
+    .section-sub { color: var(--muted); font-size: .95rem; margin-top: .4rem; }
 
+    /* --- APP CARD --- */
     .app-card {
       background: var(--surface);
       border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem 1.7rem 1.7rem;
+      border-radius: 20px;
+      padding: 2rem 1.8rem 1.6rem;
       text-decoration: none !important;
       color: var(--text);
       display: flex;
       flex-direction: column;
       height: 100%;
-      transition: all 0.3s ease;
+      transition: transform 0.35s cubic-bezier(.22,.68,0,1.4), box-shadow 0.3s ease, border-color 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
+
+    /* Heartbeat line decorative top border */
+    .app-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s cubic-bezier(.22,.68,0,1.2);
+    }
+    .app-card:hover::before { transform: scaleX(1); }
+
     .app-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 16px 40px rgba(230,57,70,.1);
+      transform: translateY(-8px);
+      box-shadow: 0 20px 50px rgba(0,0,0,.08);
       border-color: var(--accent);
     }
-    .card-icon-wrap {
-      width: 56px; height: 56px; border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; margin-bottom: 1.2rem;
-    }
+
+    /* Heartbeat mini-animation inside card on hover */
+    .app-card:hover .card-icon-beat { animation: pulse-heart 1.5s infinite; }
+
+    /* Card variants */
     .card-hopital  { --accent: #E63946; --accent-bg: #fff0f0; }
-    .card-accounts { --accent: #3b82f6; --accent-bg: #eff6ff; }
     .card-donneurs { --accent: #10b981; --accent-bg: #ecfdf5; }
     .card-admin    { --accent: #f59e0b; --accent-bg: #fffbeb; }
-    .card-icon-wrap { background: var(--accent-bg); color: var(--accent); }
-    .card-title { font-family: 'Nunito', sans-serif; font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; }
-    .card-desc { font-size: .88rem; color: var(--muted); line-height: 1.6; flex: 1; }
-    .card-link { font-weight: 600; color: var(--accent); font-size: .85rem; margin-top: 1rem; }
+
+    .card-icon-wrap {
+      width: 60px; height: 60px;
+      border-radius: 16px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 1.3rem;
+    }
+
+    .card-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    .card-desc { font-size: .88rem; color: var(--muted); line-height: 1.65; flex: 1; }
+
+    /* Card tags */
+    .card-tags { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1.1rem; }
+    .card-tag {
+      font-size: .72rem;
+      font-weight: 700;
+      padding: .25rem .65rem;
+      border-radius: 100px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      letter-spacing: .3px;
+    }
+
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      font-weight: 700;
+      color: var(--accent);
+      font-size: .88rem;
+      margin-top: 1.3rem;
+      transition: gap 0.2s;
+    }
+    .app-card:hover .card-link { gap: .6rem; }
+
+    /* Heartbeat mini SVG inside card */
+    .card-ecg {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 80px; height: 40px;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .app-card:hover .card-ecg { opacity: .12; }
+    .card-ecg path {
+      stroke: var(--accent);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* --- CTA BAND --- */
+    .cta-band {
+      background: var(--red);
+      color: #fff;
+      padding: 3rem 0;
+      text-align: center;
+    }
+    .cta-band h3 { font-family: 'Nunito', sans-serif; font-size: 1.5rem; font-weight: 800; margin-bottom: .5rem; }
+    .cta-band p { opacity: .85; margin-bottom: 1.5rem; }
+    .btn-cta-white {
+      background: #fff;
+      color: var(--red);
+      border-radius: 12px;
+      padding: .65rem 1.8rem;
+      font-weight: 700;
+      border: none;
+      font-size: .95rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      transition: all .25s;
+    }
+    .btn-cta-white:hover { background: var(--red-light); box-shadow: 0 4px 15px rgba(0,0,0,.15); }
 
     /* FOOTER */
     footer { background: var(--text); color: rgba(255,255,255,.45); padding: 2.5rem 0; font-size: .85rem; }
@@ -211,6 +349,8 @@
       .navbar-nav { padding-top: 1rem; border-top: 1px solid var(--border); margin-top: 1rem; }
       .auth-container { flex-direction: column; align-items: flex-start !important; gap: 1rem; margin-top: 1rem; }
       .user-info { margin-right: 0; }
+      .stat-divider { display: none; }
+      .hero-stats-row { gap: 1.5rem; }
     }
   </style>
 </head>
@@ -222,27 +362,21 @@
         <span class="brand-dot"><i class="bi bi-droplet-fill"></i></span>
         DonSang
       </a>
-      
       <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
         <i class="bi bi-list" style="font-size:1.5rem;"></i>
       </button>
-
       <div class="collapse navbar-collapse" id="navMenu">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
           <li class="nav-item"><a class="nav-link" href="/hopitaux/">Hôpitaux</a></li>
           <li class="nav-item"><a class="nav-link" href="/donneurs/">Donneurs</a></li>
           <li class="nav-item"><a class="nav-link" href="/administration/">Administration</a></li>
         </ul>
-        
         <div class="d-flex align-items-center auth-container">
           {% if user.is_authenticated %}
             <div class="user-info">
-              <div class="user-avatar">
-                {{ user.username|slice:":2"|upper }}
-              </div>
-              <span style="font-weight:700; font-size:.9rem; color: var(--text);">{{ user.username }}</span>
+              <div class="user-avatar">{{ user.username|slice:":2"|upper }}</div>
+              <span style="font-weight:700;font-size:.9rem;color:var(--text);">{{ user.username }}</span>
             </div>
-
             <a href="{% url 'accounts:logout' %}" class="btn-nav btn-logout">
               <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
             </a>
@@ -256,87 +390,147 @@
     </div>
   </nav>
 
+  <!-- HERO -->
   <section class="hero">
-    <div class="container position-relative" style="z-index: 2;">
+    <!-- ECG decorative line -->
+    <svg class="hero-ecg" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true">
+      <path class="ecg-line" d="M0,50 L120,50 L150,50 L165,15 L180,70 L195,30 L210,50 L330,50 L360,50 L375,15 L390,70 L405,30 L420,50 L540,50 L570,50 L585,15 L600,70 L615,30 L630,50 L750,50 L780,50 L795,15 L810,70 L825,30 L840,50 L960,50 L990,50 L1005,15 L1020,70 L1035,30 L1050,50 L1200,50"/>
+    </svg>
+
+    <div class="container position-relative" style="z-index:2;">
       <div class="hero-badge" data-aos="fade-down">
         <i class="bi bi-heart-pulse-fill pulse-icon"></i>
         Plateforme nationale de don de sang
       </div>
-      <h1 data-aos="fade-up" data-aos-delay="100">Chaque don compte.<br><span>Sauvez des vies.</span></h1>
-      <p data-aos="fade-up" data-aos-delay="200">Mettez en relation donneurs volontaires et établissements hospitaliers pour répondre aux besoins urgents en sang.</p>
-      
+      <h1 data-aos="fade-up" data-aos-delay="100">
+        Chaque don compte.<br><span>Sauvez des vies.</span>
+      </h1>
+      <p data-aos="fade-up" data-aos-delay="200">
+        Mettez en relation donneurs volontaires et établissements hospitaliers pour répondre aux besoins urgents en sang.
+      </p>
+
       <div class="d-flex justify-content-center gap-3 flex-wrap" data-aos="fade-up" data-aos-delay="300">
-        <a href="{% url 'accounts:register' %}" class="btn btn-danger px-4 py-2 fw-bold floating-el" style="border-radius:12px; box-shadow: 0 4px 15px rgba(230,57,70,0.3);">
+        <a href="{% url 'accounts:register' %}" class="btn btn-danger px-4 py-2 fw-bold floating-el"
+           style="border-radius:12px;box-shadow:0 6px 20px rgba(230,57,70,0.35);font-size:.95rem;">
           <i class="bi bi-person-plus-fill me-2"></i>Devenir donneur
         </a>
-        <a href="{% url 'accounts:dashboard_hopital' %}" class="btn btn-outline-danger px-4 py-2 fw-bold" style="border-radius:12px;">
+        <a href="{% url 'accounts:dashboard_hopital' %}" class="btn btn-outline-danger px-4 py-2 fw-bold"
+           style="border-radius:12px;font-size:.95rem;">
           <i class="bi bi-hospital me-2"></i>Espace hôpital
         </a>
       </div>
 
-      <div class="row justify-content-center mt-5 g-4" data-aos="fade-up" data-aos-delay="400">
-        <div class="col-6 col-md-auto px-lg-4 text-center">
-          <span class="d-block h3 fw-bold mb-0 text-danger" style="font-family:'Nunito';">4 500+</span>
-          <small class="text-muted">Donneurs</small>
+      <!-- Stats -->
+      <div class="hero-stats-row" data-aos="fade-up" data-aos-delay="400">
+        <div class="text-center">
+          <span class="hero-stat-val">4 500+</span>
+          <span class="hero-stat-label">Donneurs actifs</span>
         </div>
-        <div class="col-6 col-md-auto px-lg-4 text-center">
-          <span class="d-block h3 fw-bold mb-0 text-danger" style="font-family:'Nunito';">120</span>
-          <small class="text-muted">Hôpitaux</small>
+        <div class="stat-divider"></div>
+        <div class="text-center">
+          <span class="hero-stat-val">120</span>
+          <span class="hero-stat-label">Hôpitaux partenaires</span>
         </div>
-        <div class="col-12 col-md-auto px-lg-4 text-center">
-          <span class="d-block h3 fw-bold mb-0 text-danger" style="font-family:'Nunito';">8 Groupes</span>
-          <small class="text-muted">Sanguins</small>
+        <div class="stat-divider"></div>
+        <div class="text-center">
+          <span class="hero-stat-val">8</span>
+          <span class="hero-stat-label">Groupes sanguins</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="text-center">
+          <span class="hero-stat-val">3 min</span>
+          <span class="hero-stat-label">Durée d'inscription</span>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- CARDS -->
   <section class="cards-section">
     <div class="container">
       <div class="text-center mb-5" data-aos="fade-up">
-        <p class="section-label">Applications</p>
+        <p class="section-label">Espaces</p>
         <h2 class="section-title">Accéder à une section</h2>
+        <p class="section-sub">Choisissez votre espace selon votre profil</p>
       </div>
 
       <div class="row g-4 justify-content-center">
-        <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+
+        <!-- Hôpitaux -->
+        <div class="col-sm-10 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
           <a href="/hopitaux/" class="app-card card-hopital">
-            <div class="card-icon-wrap"><i class="bi bi-hospital-fill"></i></div>
-            <div class="card-title">Hôpitaux</div>
-            <p class="card-desc">Publiez des demandes urgentes et gérez vos campagnes de collecte.</p>
-            <span class="card-link">Accéder <i class="bi bi-arrow-right"></i></span>
+            <div class="card-icon-wrap">
+              <i class="bi bi-hospital-fill card-icon-beat"></i>
+            </div>
+            <div class="card-title">Espace Hôpitaux</div>
+            <p class="card-desc">Publiez des demandes urgentes de sang, gérez vos campagnes de collecte et suivez les réponses des donneurs en temps réel.</p>
+            <div class="card-tags">
+              <span class="card-tag">Demandes urgentes</span>
+              <span class="card-tag">Campagnes</span>
+              <span class="card-tag">Suivi</span>
+            </div>
+            <span class="card-link">Accéder à l'espace <i class="bi bi-arrow-right"></i></span>
+            <!-- Decorative heartbeat -->
+            <svg class="card-ecg" viewBox="0 0 80 40" aria-hidden="true">
+              <path d="M0,25 L15,25 L20,10 L25,35 L30,15 L35,25 L80,25"/>
+            </svg>
           </a>
         </div>
 
-        <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
-          <a href="/accounts/" class="app-card card-accounts">
-            <div class="card-icon-wrap"><i class="bi bi-people-fill"></i></div>
-            <div class="card-title">Comptes</div>
-            <p class="card-desc">Inscription, connexion et gestion des profils utilisateurs.</p>
-            <span class="card-link">Accéder <i class="bi bi-arrow-right"></i></span>
-          </a>
-        </div>
-
-        <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+        <!-- Don de Sang -->
+        <div class="col-sm-10 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
           <a href="/donneurs/" class="app-card card-donneurs">
-            <div class="card-icon-wrap"><i class="bi bi-droplet-half"></i></div>
-            <div class="card-title">Don de Sang</div>
-            <p class="card-desc">Consultez les appels urgents et répondez aux demandes.</p>
-            <span class="card-link">Accéder <i class="bi bi-arrow-right"></i></span>
+            <div class="card-icon-wrap">
+              <i class="bi bi-droplet-half card-icon-beat"></i>
+            </div>
+            <div class="card-title">Espace Donneurs</div>
+            <p class="card-desc">Consultez les appels urgents près de chez vous, répondez aux demandes et suivez votre historique de dons.</p>
+            <div class="card-tags">
+              <span class="card-tag">Appels urgents</span>
+              <span class="card-tag">Historique</span>
+              <span class="card-tag">Carte</span>
+            </div>
+            <span class="card-link">Accéder à l'espace <i class="bi bi-arrow-right"></i></span>
+            <svg class="card-ecg" viewBox="0 0 80 40" aria-hidden="true">
+              <path d="M0,25 L15,25 L20,10 L25,35 L30,15 L35,25 L80,25"/>
+            </svg>
           </a>
         </div>
 
-        <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
+        <!-- Administration -->
+        <div class="col-sm-10 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
           <a href="/administration/" class="app-card card-admin">
-            <div class="card-icon-wrap"><i class="bi bi-shield-check"></i></div>
+            <div class="card-icon-wrap">
+              <i class="bi bi-shield-check card-icon-beat"></i>
+            </div>
             <div class="card-title">Administration</div>
-            <p class="card-desc">Validez les comptes et consultez les statistiques globales.</p>
-            <span class="card-link">Accéder <i class="bi bi-arrow-right"></i></span>
+            <p class="card-desc">Validez les comptes, gérez les utilisateurs et consultez les statistiques globales de la plateforme.</p>
+            <div class="card-tags">
+              <span class="card-tag">Validation</span>
+              <span class="card-tag">Statistiques</span>
+              <span class="card-tag">Gestion</span>
+            </div>
+            <span class="card-link">Accéder à l'espace <i class="bi bi-arrow-right"></i></span>
+            <svg class="card-ecg" viewBox="0 0 80 40" aria-hidden="true">
+              <path d="M0,25 L15,25 L20,10 L25,35 L30,15 L35,25 L80,25"/>
+            </svg>
           </a>
         </div>
+
       </div>
     </div>
   </section>
+
+  <!-- CTA BAND -->
+  <div class="cta-band" data-aos="fade-up">
+    <div class="container">
+      <h3><i class="bi bi-heart-fill me-2 pulse-icon"></i>Vous êtes donneur potentiel ?</h3>
+      <p>Rejoignez des milliers de volontaires et contribuez à sauver des vies chaque jour.</p>
+      <a href="{% url 'accounts:register' %}" class="btn-cta-white">
+        <i class="bi bi-person-plus-fill"></i> Créer mon compte donneur
+      </a>
+    </div>
+  </div>
 
   <footer>
     <div class="container">
@@ -346,20 +540,18 @@
           <p class="mt-2 mb-0 opacity-75">Plateforme de gestion du don de sang — Projet Django 2026</p>
         </div>
         <div class="col-md-6 text-md-end">
-          <a href="#" class="me-3">Hôpitaux</a>
-          <a href="#" class="me-3">Donneurs</a>
-          <a href="#">Admin</a>
+          <a href="/hopitaux/" class="me-3">Hôpitaux</a>
+          <a href="/donneurs/" class="me-3">Donneurs</a>
+          <a href="/administration/">Admin</a>
         </div>
       </div>
-      <hr style="border-color: rgba(255,255,255,0.1); margin: 2rem 0;">
+      <hr style="border-color:rgba(255,255,255,0.1);margin:2rem 0;">
       <p class="text-center mb-0 opacity-50">&copy; 2026 DonSang — Tous droits réservés</p>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    AOS.init({ duration: 800, once: true });
-  </script>
+  <script>AOS.init({ duration: 800, once: true });</script>
 </body>
 </html>
