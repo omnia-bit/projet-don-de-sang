@@ -4,6 +4,7 @@
 {% block title %}Inscription — DonSang{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   :root {
     --red:        #E63946;
@@ -96,7 +97,6 @@
     z-index: 2;
   }
 
-  /* ── Champ texte / email / password ── */
   .auth-control {
     width: 100%;
     padding: .72rem 1rem .72rem 2.6rem;
@@ -116,7 +116,16 @@
     background: #fff;
   }
 
-  /* ── Select ── */
+  /* Style pour le conteneur de la carte */
+  #map-picker {
+    height: 250px;
+    width: 100%;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    margin-bottom: 1rem;
+    z-index: 1;
+  }
+
   .select-wrap { position: relative; }
   .auth-select {
     width: 100%;
@@ -131,7 +140,6 @@
     outline: none;
     box-sizing: border-box;
     cursor: pointer;
-    /* Supprime la flèche native du navigateur */
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -152,7 +160,6 @@
     z-index: 2;
   }
 
-  /* ── Role cards (sélecteur visuel) ── */
   .role-cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -192,10 +199,8 @@
     transition: color .2s;
   }
   .role-card.selected span, .role-card:hover span { color: var(--red); }
-  /* input caché qui envoie la valeur réelle */
   #id_role { display: none; }
 
-  /* ── Password toggle ── */
   .pw-toggle {
     position: absolute;
     right: .9rem; top: 50%;
@@ -211,7 +216,6 @@
   }
   .pw-toggle:hover { color: var(--text); }
 
-  /* ── Password strength ── */
   .pw-strength-bar {
     height: 4px;
     border-radius: 4px;
@@ -231,7 +235,6 @@
     margin-top: .3rem;
   }
 
-  /* ── Button ── */
   .btn-auth {
     width: 100%;
     padding: .78rem;
@@ -326,21 +329,18 @@
 <div class="auth-wrapper">
   <div class="auth-panel">
 
-    <!-- Brand -->
     <div class="auth-brand">
       <div class="brand-icon"><i class="bi bi-person-plus-fill"></i></div>
       <h1>Créer un compte</h1>
       <p>Rejoignez la communauté des donneurs et sauvez des vies</p>
     </div>
 
-    <!-- Benefits -->
     <div class="benefits-strip">
       <div class="benefit-item"><i class="bi bi-check-circle-fill"></i> Gratuit</div>
       <div class="benefit-item"><i class="bi bi-bell-fill"></i> Alertes urgentes</div>
       <div class="benefit-item"><i class="bi bi-journal-medical"></i> Suivi des dons</div>
     </div>
 
-    <!-- Card -->
     <div class="auth-card">
 
       {% if form.errors %}
@@ -353,53 +353,39 @@
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <!-- ── Informations du compte ── -->
         <p class="form-section-title"><i class="bi bi-person-circle"></i> Informations du compte</p>
 
-        <!-- Username -->
         <div class="form-group">
           <label class="form-label" for="id_username">Nom d'utilisateur</label>
           <div class="input-wrap">
             <i class="bi bi-at input-icon"></i>
-            <input type="text" name="username" id="id_username"
-              class="auth-control"
-              value="{{ form.username.value|default:'' }}"
-              autocomplete="username" />
+            <input type="text" name="username" id="id_username" class="auth-control" value="{{ form.username.value|default:'' }}" autocomplete="username" />
           </div>
           {{ form.username.errors }}
         </div>
 
-        <!-- Email -->
         <div class="form-group">
           <label class="form-label" for="id_email">Adresse email</label>
           <div class="input-wrap">
             <i class="bi bi-envelope input-icon"></i>
-            <input type="email" name="email" id="id_email"
-              class="auth-control"
-              value="{{ form.email.value|default:'' }}"
-              autocomplete="email" />
+            <input type="email" name="email" id="id_email" class="auth-control" value="{{ form.email.value|default:'' }}" autocomplete="email" />
           </div>
           {{ form.email.errors }}
         </div>
 
-        <!-- Rôle — sélecteur visuel par cartes -->
         <div class="form-group">
           <label class="form-label">Rôle</label>
-          <!-- Input caché envoyé au serveur -->
           <input type="hidden" name="role" id="id_role" value="{{ form.role.value|default:'donneur' }}" />
           <div class="role-cards">
-            <div class="role-card {% if form.role.value == 'donneur' or not form.role.value %}selected{% endif %}"
-                 onclick="selectRole('donneur', this)">
+            <div class="role-card {% if form.role.value == 'donneur' or not form.role.value %}selected{% endif %}" onclick="selectRole('donneur', this)">
               <i class="bi bi-droplet-fill"></i>
               <span>Donneur</span>
             </div>
-            <div class="role-card {% if form.role.value == 'hopital' %}selected{% endif %}"
-                 onclick="selectRole('hopital', this)">
+            <div class="role-card {% if form.role.value == 'hopital' %}selected{% endif %}" onclick="selectRole('hopital', this)">
               <i class="bi bi-hospital-fill"></i>
               <span>Hôpital</span>
             </div>
-            <div class="role-card {% if form.role.value == 'admin' %}selected{% endif %}"
-                 onclick="selectRole('admin', this)">
+            <div class="role-card {% if form.role.value == 'admin' %}selected{% endif %}" onclick="selectRole('admin', this)">
               <i class="bi bi-shield-check"></i>
               <span>Admin</span>
             </div>
@@ -407,7 +393,6 @@
           {{ form.role.errors }}
         </div>
 
-        <!-- ── Champs spécifiques au Donneur (masqués si hôpital) ── -->
         <div id="donneur_fields" style="{% if form.role.value == 'hopital' or form.role.value == 'admin' %}display:none;{% endif %}">
           <p class="form-section-title" style="margin-top:1.5rem;"><i class="bi bi-heart-fill"></i> Détails médicaux</p>
           
@@ -428,8 +413,7 @@
             <label class="form-label" for="id_ville">Ville de résidence</label>
             <div class="input-wrap">
               <i class="bi bi-geo-alt input-icon"></i>
-              <input type="text" name="ville" id="id_ville" class="auth-control" 
-                placeholder="Ex: Casablanca" value="{{ form.ville.value|default:'' }}">
+              <input type="text" name="ville" id="id_ville" class="auth-control" placeholder="Ex: Sfax" value="{{ form.ville.value|default:'' }}">
             </div>
           </div>
 
@@ -447,7 +431,6 @@
           </div>
         </div>
         
-        <!-- ── Champs spécifiques à l'Hôpital (masqués si donneur/admin) ── -->
         <div id="hopital_fields" style="{% if form.role.value != 'hopital' %}display:none;{% endif %}">
           <p class="form-section-title" style="margin-top:1.5rem;"><i class="bi bi-building"></i> Informations Hospitalières</p>
           
@@ -455,8 +438,7 @@
             <label class="form-label" for="id_nom_hopital">Nom de l'hôpital</label>
             <div class="input-wrap">
               <i class="bi bi-hospital input-icon"></i>
-              <input type="text" name="nom_hopital" id="id_nom_hopital" class="auth-control" 
-                placeholder="Ex: Hôpital Ibn Sina" value="{{ form.nom_hopital.value|default:'' }}">
+              <input type="text" name="nom_hopital" id="id_nom_hopital" class="auth-control" placeholder="Ex: Hôpital Ibn Sina" value="{{ form.nom_hopital.value|default:'' }}">
             </div>
           </div>
 
@@ -464,17 +446,20 @@
             <label class="form-label" for="id_ville_hopital">Ville</label>
             <div class="input-wrap">
               <i class="bi bi-geo-alt input-icon"></i>
-              <input type="text" name="ville_hopital" id="id_ville_hopital" class="auth-control" 
-                placeholder="Ex: Casablanca" value="{{ form.ville_hopital.value|default:'' }}">
+              <input type="text" name="ville_hopital" id="id_ville_hopital" class="auth-control" placeholder="Ex: Sfax" value="{{ form.ville_hopital.value|default:'' }}">
             </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="id_adresse_hopital">Adresse complète</label>
+            <label class="form-label">Position précise sur la carte</label>
+            <div id="map-picker"></div>
+            
+            <input type="hidden" name="latitude" id="id_lat">
+            <input type="hidden" name="longitude" id="id_lng">
+
             <div class="input-wrap">
               <i class="bi bi-map input-icon"></i>
-              <input type="text" name="adresse_hopital" id="id_adresse_hopital" class="auth-control" 
-                placeholder="Ex: 123 Rue de la Santé" value="{{ form.adresse_hopital.value|default:'' }}">
+              <input type="text" name="adresse_hopital" id="id_adresse_hopital" class="auth-control" placeholder="Cliquez sur la carte" value="{{ form.adresse_hopital.value|default:'' }}" readonly required>
             </div>
           </div>
 
@@ -482,8 +467,7 @@
             <label class="form-label" for="id_agrement">Numéro d'agrément</label>
             <div class="input-wrap">
               <i class="bi bi-card-checklist input-icon"></i>
-              <input type="text" name="agrement" id="id_agrement" class="auth-control" 
-                placeholder="Ex: AGR-2024-001" value="{{ form.agrement.value|default:'' }}">
+              <input type="text" name="agrement" id="id_agrement" class="auth-control" placeholder="Ex: AGR-2024-001" value="{{ form.agrement.value|default:'' }}">
             </div>
           </div>
           
@@ -496,19 +480,13 @@
           </div>
         </div>
 
-        <!-- ── Sécurité ── -->
         <p class="form-section-title" style="margin-top:1.5rem;"><i class="bi bi-shield-lock"></i> Sécurité</p>
 
-        <!-- Password 1 -->
         <div class="form-group">
           <label class="form-label" for="id_password1">Mot de passe</label>
           <div class="input-wrap">
             <i class="bi bi-lock input-icon"></i>
-            <input type="password" name="password1" id="id_password1"
-              class="auth-control"
-              autocomplete="new-password"
-              style="padding-right:2.6rem;"
-              oninput="checkStrength(this.value)" />
+            <input type="password" name="password1" id="id_password1" class="auth-control" autocomplete="new-password" style="padding-right:2.6rem;" oninput="checkStrength(this.value)" />
             <button type="button" class="pw-toggle" onclick="togglePw('id_password1','icon1')">
               <i class="bi bi-eye" id="icon1"></i>
             </button>
@@ -518,15 +496,11 @@
           {{ form.password1.errors }}
         </div>
 
-        <!-- Password 2 -->
         <div class="form-group">
           <label class="form-label" for="id_password2">Confirmer le mot de passe</label>
           <div class="input-wrap">
             <i class="bi bi-lock-fill input-icon"></i>
-            <input type="password" name="password2" id="id_password2"
-              class="auth-control"
-              autocomplete="new-password"
-              style="padding-right:2.6rem;" />
+            <input type="password" name="password2" id="id_password2" class="auth-control" autocomplete="new-password" style="padding-right:2.6rem;" />
             <button type="button" class="pw-toggle" onclick="togglePw('id_password2','icon2')">
               <i class="bi bi-eye" id="icon2"></i>
             </button>
@@ -543,11 +517,10 @@
       <div class="auth-divider">ou</div>
 
       <div class="auth-footer">
-        Déjà un compte ?
-        <a href="{% url 'accounts:login' %}">Se connecter</a>
+        Déjà un compte ? <a href="{% url 'accounts:login' %}">Se connecter</a>
       </div>
 
-    </div><!-- /auth-card -->
+    </div>
 
     <div class="auth-footer" style="margin-top:1.4rem;">
       En vous inscrivant, vous contribuez à sauver des vies. <i class="bi bi-heart-fill text-danger"></i>
@@ -558,19 +531,54 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  document.querySelector('form').addEventListener('submit', function(e) {
-    // Plus besoin de gérer la signature à l'inscription
-  });
+  let map, marker;
 
-  /* ── Sélecteur de rôle ── */
+  function initMap() {
+    if (map) {
+      map.invalidateSize();
+      return;
+    }
+    // Centré sur Sfax par défaut
+    map = L.map('map-picker').setView([34.7625, 10.7441], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    map.on('click', function(e) {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
+      if (marker) marker.setLatLng(e.latlng);
+      else marker = L.marker(e.latlng).addTo(map);
+
+      document.getElementById('id_lat').value = lat;
+      document.getElementById('id_lng').value = lng;
+
+      // Adresse provisoire pendant le géocodage
+      const adresseInput = document.getElementById('id_adresse_hopital');
+      adresseInput.value = 'Chargement adresse...';
+
+      // Géocodage inverse Nominatim — récupère la vraie ville/adresse du clic
+      fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lng + '&format=json&accept-language=fr')
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          const a = data.address || {};
+          const ville = a.city || a.town || a.village || a.county || '';
+          const rue   = a.road || a.neighbourhood || '';
+          const pays  = a.country || '';
+          const label = [rue, ville, pays].filter(Boolean).join(', ');
+          adresseInput.value = label || (lat.toFixed(4) + ', ' + lng.toFixed(4));
+        })
+        .catch(function(){
+          adresseInput.value = lat.toFixed(4) + ', ' + lng.toFixed(4);
+        });
+    });
+  }
+
   function selectRole(value, el) {
     document.getElementById('id_role').value = value;
     document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
 
-    // Afficher/Masquer les champs médicaux
     const donorFields = document.getElementById('donneur_fields');
     const hospitalFields = document.getElementById('hopital_fields');
     
@@ -580,19 +588,14 @@
     } else if (value === 'hopital') {
       donorFields.style.display = 'none';
       hospitalFields.style.display = 'block';
-      // Ajuster le canvas si nécessaire
-      resizeCanvas();
+      // On lance la carte quand le rôle hôpital est sélectionné
+      setTimeout(initMap, 200);
     } else {
       donorFields.style.display = 'none';
       hospitalFields.style.display = 'none';
     }
   }
 
-  function resizeCanvas() {
-    // Fonction désactivée car le canvas de signature a été retiré de cette page
-  }
-
-  /* ── Toggle password ── */
   function togglePw(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon  = document.getElementById(iconId);
@@ -600,7 +603,6 @@
     icon.className = input.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
   }
 
-  /* ── Force du mot de passe ── */
   function checkStrength(val) {
     const fill  = document.getElementById('strengthFill');
     const label = document.getElementById('strengthLabel');

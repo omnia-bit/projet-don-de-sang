@@ -65,6 +65,8 @@ class HopitalProfile(models.Model):
     ville = models.CharField(max_length=100)
     agrement = models.CharField(max_length=100)
     valide = models.BooleanField(default=False)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
     
     # Nouveaux champs pour la vérification moderne
     licence_doc = models.FileField(upload_to='licences/', null=True, blank=True)

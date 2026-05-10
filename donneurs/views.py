@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
+from django.urls import reverse
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse, JsonResponse
 
 from accounts.models import DonneurProfile, HopitalProfile
@@ -51,7 +53,9 @@ def _get_appels(donneur):
     ).select_related('hopital').order_by('-date_publication')
 
 
-# TABLEAU DE BORD
+# ───────────────────────────────────────────────────────────────
+# TABLEAU DE BORD DONNEUR
+# ───────────────────────────────────────────────────────────────
 @login_required
 def dashboard(request):
     donneur = _get_donneur(request)
@@ -60,9 +64,43 @@ def dashboard(request):
         return redirect('accueil')
 
     est_eligible, prochaine_date = _calcul_eligibilite(donneur)
-    dons_recents  = Don.objects.filter(donneur=donneur).order_by('-date_don')[:5]
-    total_dons    = Don.objects.filter(donneur=donneur).count()
-    appels_compat = list(_get_appels(donneur))[:3]
+    dons_recents = Don.objects.filter(donneur=donneur).order_by('-date_don')[:5]
+    total_dons   = Don.objects.filter(donneur=donneur).count()
+
+    # Liste texte : 3 premiers appels compatibles
+    appels_complets = _get_appels(donneur)
+    appels_compat   = list(appels_complets)[:3]
+
+    # ── CARTE : TOUS les hôpitaux validés avec coordonnées GPS réelles ──────────
+    # On prend HopitalProfile directement (coordonnées saisies via register.html).
+    # On n'exige PAS un appel actif — l'hôpital doit juste être validé et avoir lat/lng.
+    hopitaux_valides = HopitalProfile.objects.filter(
+        valide=True,
+        latitude__isnull=False,
+        longitude__isnull=False,
+    ).select_related('user')
+
+    map_data = []
+    for h in hopitaux_valides:
+        # Cherche si cet hôpital a un appel actif compatible (optionnel, pour info)
+        appel = DemandeSang.objects.filter(
+            hopital=h,
+            statut='active'
+        ).order_by('-date_publication').first()
+
+        map_data.append({
+            'nom':     h.nom,
+            'ville':   h.ville,
+            'adresse': h.adresse or h.ville,
+            'lat':     float(h.latitude),   # ← coordonnée réelle saisie à l'inscription
+            'lng':     float(h.longitude),  # ← coordonnée réelle saisie à l'inscription
+            'poches':  appel.quantite_necessaire if appel else 0,
+            'groupe':  appel.groupe_sanguin if appel else '—',
+            'has_appel': appel is not None,
+        })
+
+    # Position du donneur (Sfax par défaut — remplace par géocodage si besoin)
+    donneur_pos = {'lat': 34.7625, 'lng': 10.7441}
 
     prochaines_campagnes = InscriptionCampagne.objects.filter(
         donneur=donneur,
@@ -72,22 +110,24 @@ def dashboard(request):
     progression    = 100
     jours_restants = 0
     if not est_eligible and prochaine_date:
-        dernier      = Don.objects.filter(donneur=donneur).order_by('-date_don').first()
-        delai        = 84 if getattr(donneur, 'sexe', 'M') == 'F' else 56
+        dernier    = Don.objects.filter(donneur=donneur).order_by('-date_don').first()
+        delai      = 84 if getattr(donneur, 'sexe', 'M') == 'F' else 56
         jours_passes = (timezone.now().date() - dernier.date_don).days
-        progression  = min(int((jours_passes / delai) * 100), 99)
+        progression    = min(int((jours_passes / delai) * 100), 99)
         jours_restants = max((prochaine_date - timezone.now().date()).days, 0)
 
     return render(request, 'donneurs/dashboard.html', {
-        'donneur':        donneur,
-        'est_eligible':   est_eligible,
-        'prochaine_date': prochaine_date,
-        'progression':    progression,
-        'jours_restants': jours_restants,
-        'dons_recents':   dons_recents,
-        'total_dons':     total_dons,
-        'appels_compatibles': appels_compat,
+        'donneur':              donneur,
+        'est_eligible':         est_eligible,
+        'prochaine_date':       prochaine_date,
+        'progression':          progression,
+        'jours_restants':       jours_restants,
+        'dons_recents':         dons_recents,
+        'total_dons':           total_dons,
+        'appels_compatibles':   appels_compat,
         'prochaines_campagnes': prochaines_campagnes,
+        'map_data_json':        json.dumps(map_data, cls=DjangoJSONEncoder),
+        'donneur_pos':          donneur_pos,
     })
 
 
@@ -210,7 +250,7 @@ def repondre_appel(request, demande_id):
     })
 
 
-# GESTION DES CAMPAGNES
+# CAMPAGNES
 @login_required
 def liste_campagnes(request):
     donneur = _get_donneur(request)
@@ -245,11 +285,8 @@ def sinscrire_campagne(request, campagne_id):
         fin_creneau = current_time + timedelta(hours=intervalle)
         label       = f"{current_time.strftime('%H:%M')} - {fin_creneau.strftime('%H:%M')}"
         count       = InscriptionCampagne.objects.filter(campagne=campagne, creneau_horaire=label).count()
-        creneaux.append({
-            'label':           label,
-            'disponible':      count < capacite_par_creneau,
-            'places_restantes': capacite_par_creneau - count
-        })
+        if count < capacite_par_creneau:
+            creneaux.append(label)
         current_time = fin_creneau
 
     if request.method == 'POST':
@@ -257,11 +294,7 @@ def sinscrire_campagne(request, campagne_id):
         if choix:
             count = InscriptionCampagne.objects.filter(campagne=campagne, creneau_horaire=choix).count()
             if count < capacite_par_creneau:
-                InscriptionCampagne.objects.create(
-                    donneur=donneur,
-                    campagne=campagne,
-                    creneau_horaire=choix
-                )
+                InscriptionCampagne.objects.create(donneur=donneur, campagne=campagne, creneau_horaire=choix)
                 messages.success(request, f"✅ Inscription confirmée pour le créneau {choix} !")
                 return redirect('donneurs:dashboard')
             else:
@@ -280,16 +313,14 @@ def toggle_disponibilite(request):
     donneur = _get_donneur(request)
     if not donneur:
         return redirect('accueil')
-
     donneur.actif = not donneur.actif
     donneur.save()
-
     status = "activé" if donneur.actif else "désactivé (indisponible)"
     messages.info(request, f"Votre statut a été mis à jour : compte {status}.")
     return redirect('donneurs:dashboard')
 
 
-# CHATBOT IA — Hugging Face
+# CHATBOT IA — Cohere
 @login_required
 def chatbot_ia(request):
     donneur = _get_donneur(request)
@@ -301,10 +332,9 @@ def chatbot_ia(request):
 
     if request.method == 'POST':
         try:
-            body           = json.loads(request.body)
-            historique     = body.get('historique', [])
-            question       = body.get('message', '').strip()
-            conv_id        = body.get('conv_id')
+            body       = json.loads(request.body)
+            question   = body.get('message', '').strip()
+            conv_id    = body.get('conv_id')
             if not question:
                 return JsonResponse({'erreur': 'Message vide.'}, status=400)
 
@@ -315,7 +345,7 @@ Profil: {donneur.user.first_name or donneur.user.username}, groupe {donneur.grou
 
             payload = json.dumps({
                 "message": question,
-                "model": "command-a-03-2025",
+                "model":   "command-a-03-2025",
                 "preamble": system_prompt,
                 "max_tokens": 200,
                 "temperature": 0.7
@@ -325,7 +355,7 @@ Profil: {donneur.user.first_name or donneur.user.username}, groupe {donneur.grou
                 'https://api.cohere.com/v1/chat',
                 data=payload,
                 headers={
-                    'Content-Type': 'application/json',
+                    'Content-Type':  'application/json',
                     'Authorization': f'Bearer {settings.COHERE_API_KEY}'
                 },
                 method='POST'
@@ -338,7 +368,6 @@ Profil: {donneur.user.first_name or donneur.user.username}, groupe {donneur.grou
             if not reponse_ia:
                 reponse_ia = "Je n'ai pas pu générer une réponse, veuillez réessayer."
 
-            # Sauvegarde conversation
             from .models import ConversationChatbot, MessageChatbot
             if conv_id:
                 try:
@@ -385,8 +414,8 @@ def detail_conversation(request, conv_id):
     from .models import ConversationChatbot
     conversation = get_object_or_404(ConversationChatbot, id=conv_id, donneur=donneur)
     return render(request, 'donneurs/detail_conversation.html', {
-        'donneur':      donneur,
-        'conversation': conversation,
+        'donneur':       donneur,
+        'conversation':  conversation,
         'messages_list': conversation.messages.all(),
     })
 

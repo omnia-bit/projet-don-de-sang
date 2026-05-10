@@ -1,0 +1,560 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Carte Urgences — DonSang{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+
+<style>
+  :root {
+    --red:       #E63946;
+    --red-dark:  #c1121f;
+    --red-light: #fff0f0;
+    --surface:   #ffffff;
+    --bg:        #f8f9fb;
+    --text:      #1a1a2e;
+    --muted:     #6c757d;
+    --border:    #e5e7eb;
+    --radius:    16px;
+    --green:     #10b981;
+    --blue:      #3b82f6;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── NAVBAR (identique accueil) ── */
+  .navbar {
+    background: var(--surface) !important;
+    border-bottom: 1px solid var(--border);
+    padding: 0.7rem 0;
+    position: sticky; top: 0; z-index: 1000;
+  }
+  .navbar-brand {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800; font-size: 1.3rem;
+    color: var(--text) !important;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .brand-dot {
+    width: 28px; height: 28px; background: var(--red);
+    border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; color: #fff; font-size: .9rem;
+  }
+  .nav-link { font-size: .92rem; font-weight: 600; color: var(--muted) !important; transition: color .2s; }
+  .nav-link:hover { color: var(--red) !important; }
+  .btn-nav {
+    background: var(--red); color: #fff !important;
+    border-radius: 10px; padding: 0.5rem 1.2rem;
+    font-size: .88rem; font-weight: 600;
+    transition: all 0.3s ease; display: inline-flex;
+    align-items: center; text-decoration: none; border: none;
+  }
+  .btn-nav:hover { background: var(--red-dark); box-shadow: 0 4px 12px rgba(230,57,70,0.2); }
+  .btn-logout { background: #1a1a2e; }
+  .btn-logout:hover { background: #000; }
+  .user-info { display: flex; align-items: center; gap: 10px; margin-right: 15px; }
+  .user-avatar {
+    width: 35px; height: 35px; background: var(--red-light);
+    border: 1px solid var(--red); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--red); font-weight: 700; font-size: .8rem;
+  }
+
+  /* ── PAGE HEADER (style hero simplifié) ── */
+  .page-header {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2.2rem 0 1.8rem;
+    text-align: center;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: var(--red-light); color: var(--red);
+    border-radius: 100px; padding: .35rem 1rem;
+    font-size: .8rem; font-weight: 700; text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+  .page-header h1 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800; font-size: 1.8rem;
+    color: var(--text); line-height: 1.25; margin-bottom: 0.4rem;
+  }
+  .page-header h1 span { color: var(--red); }
+  .page-header p { color: var(--muted); font-size: .95rem; margin: 0; }
+
+  /* Chips info */
+  .info-chips { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 50px; padding: 0.35rem 0.9rem;
+    font-size: .8rem; font-weight: 600; color: var(--text);
+  }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .chip-blue  .dot { background: var(--blue); }
+  .chip-red   .dot { background: var(--red); animation: blink 1s infinite; }
+  .chip-green .dot { background: var(--green); }
+
+  /* ── MAIN LAYOUT ── */
+  .map-section { flex: 1; padding: 1.5rem 0 2rem; }
+
+  .map-container {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    position: relative;
+  }
+  #map { width: 100%; height: 62vh; min-height: 420px; }
+
+  /* ── STATUS BAR (sous la carte) ── */
+  .status-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.85rem 1.2rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    font-size: .83rem;
+  }
+  .status-left { display: flex; align-items: center; gap: 0.5rem; color: var(--muted); font-weight: 500; }
+  .scan-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--blue); animation: blink 1s infinite; flex-shrink: 0;
+  }
+  .scan-dot.found { background: var(--green); animation: none; }
+
+  /* ── URGENCE CARD (côté droit) ── */
+  .side-card {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: var(--radius); padding: 1.4rem;
+    height: 100%;
+  }
+  .side-card h2 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800; font-size: 1rem; color: var(--text);
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .urgence-item {
+    border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 1rem; margin-bottom: 0.75rem;
+    transition: all 0.25s;
+    cursor: pointer;
+  }
+  .urgence-item:hover { border-color: var(--red); box-shadow: 0 4px 14px rgba(230,57,70,0.08); transform: translateY(-2px); }
+  .urgence-item.active-urgence { border-color: var(--red); background: var(--red-light); }
+  .urgence-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; }
+  .groupe-badge {
+    background: var(--red); color: #fff;
+    border-radius: 8px; padding: 0.25rem 0.55rem;
+    font-size: .78rem; font-weight: 800; font-family: 'Nunito', sans-serif;
+  }
+  .urgence-nom { font-weight: 700; font-size: .88rem; color: var(--text); }
+  .urgence-meta { font-size: .75rem; color: var(--muted); display: flex; align-items: center; gap: 0.3rem; }
+  .urgence-poches { font-size: .8rem; font-weight: 600; color: var(--red); margin-top: 0.4rem; }
+
+  /* ── Animations ── */
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+  @keyframes pulse-heart { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+  .pulse-icon { animation: pulse-heart 2s infinite; display: inline-block; }
+
+  /* ── LEAFLET MARKERS ── */
+  .donneur-dot {
+    width: 16px; height: 16px; background: var(--blue);
+    border-radius: 50%; border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(59,130,246,0.55);
+  }
+  .pulse-wrapper { position: relative; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; }
+  .pulse-ring {
+    position: absolute; width: 46px; height: 46px; border-radius: 50%;
+    border: 2px solid var(--red); animation: ring-out 1.8s ease-out infinite; opacity: 0;
+  }
+  .pulse-ring:nth-child(2) { animation-delay: 0.6s; }
+  .pulse-ring:nth-child(3) { animation-delay: 1.2s; }
+  @keyframes ring-out { 0% { transform: scale(0.5); opacity: 0.85; } 100% { transform: scale(2.3); opacity: 0; } }
+  .hospital-core {
+    width: 38px; height: 38px; background: var(--red); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 1.15rem; font-weight: 900; z-index: 2; position: relative;
+    box-shadow: 0 0 0 4px rgba(230,57,70,0.2);
+    animation: core-beat 1.4s ease-in-out infinite;
+  }
+  @keyframes core-beat {
+    0%,100% { transform: scale(1);    box-shadow: 0 0 0 4px rgba(230,57,70,0.2); }
+    20%     { transform: scale(1.22); box-shadow: 0 0 0 9px rgba(230,57,70,0.1); }
+    40%     { transform: scale(1.05); }
+    60%     { transform: scale(1.14); }
+  }
+
+  /* ── CUSTOM POPUP ── */
+  .leaflet-popup-content-wrapper {
+    background: var(--surface) !important; border-radius: 16px !important;
+    padding: 0 !important; box-shadow: 0 16px 50px rgba(0,0,0,0.15) !important;
+    border: 1.5px solid var(--border) !important; overflow: hidden; min-width: 270px;
+  }
+  .leaflet-popup-tip-container { display: none !important; }
+  .leaflet-popup-close-button { color: var(--muted) !important; font-size: 1.1rem !important; right: 10px !important; top: 8px !important; z-index: 10; }
+  .leaflet-popup-content { margin: 0 !important; }
+
+  .pu-head {
+    background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+    padding: 1rem 1.25rem 0.85rem; position: relative; overflow: hidden;
+  }
+  .pu-head::after { content: '🏥'; position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%); font-size: 2.6rem; opacity: 0.15; }
+  .pu-badge {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    background: rgba(255,255,255,0.2); border-radius: 50px;
+    padding: 0.18rem 0.65rem; font-size: .65rem; font-weight: 700;
+    color: #fff; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;
+  }
+  .blink-dot { width: 6px; height: 6px; background: #fbbf24; border-radius: 50%; animation: blink 0.8s infinite; display: inline-block; }
+  .pu-head h3 { font-family: 'Nunito', sans-serif; font-size: .95rem; font-weight: 800; color: #fff; margin: 0 0 0.15rem; }
+  .pu-head p  { font-size: .72rem; color: rgba(255,255,255,0.82); margin: 0; }
+
+  .pu-body { padding: 0.9rem 1.25rem 1rem; }
+  .pu-row  { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.6rem; }
+  .pu-ic   { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; }
+  .pu-ic.r { background: var(--red-light); }
+  .pu-ic.b { background: #eff6ff; }
+  .pu-ic.g { background: #f0fdf4; }
+  .pu-lbl  { font-size: .65rem; color: var(--muted); font-weight: 500; margin: 0; }
+  .pu-val  { font-size: .83rem; color: var(--text); font-weight: 700; margin: 0; }
+  .pu-sep  { border: none; border-top: 1px solid var(--border); margin: 0.65rem 0; }
+
+  .btn-gps {
+    display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+    width: 100%; padding: 0.65rem;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--green) 100%);
+    color: #fff; border: none; border-radius: 12px;
+    font-family: 'Nunito', sans-serif; font-size: .85rem; font-weight: 700;
+    cursor: pointer; text-decoration: none;
+    box-shadow: 0 4px 14px rgba(59,130,246,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-gps:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(59,130,246,0.4); color: #fff; }
+  .arrow-anim { animation: arr 1.2s ease-in-out infinite; display: inline-block; }
+  @keyframes arr { 0%,100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
+  .dist-note { text-align: center; font-size: .67rem; color: var(--muted); padding: 0.28rem 0 0; }
+  .dist-note span { color: var(--green); font-weight: 700; }
+
+  /* ── FOOTER ── */
+  footer { background: var(--text); color: rgba(255,255,255,.45); padding: 2rem 0; font-size: .85rem; }
+  footer .footer-brand { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.1rem; color: #fff; }
+  footer a { color: rgba(255,255,255,.55); text-decoration: none; transition: 0.2s; }
+  footer a:hover { color: #fff; }
+
+  @media (max-width: 991px) {
+    .navbar-nav { padding-top: 1rem; border-top: 1px solid var(--border); margin-top: 1rem; }
+    .auth-container { flex-direction: column; align-items: flex-start !important; gap: 1rem; margin-top: 1rem; }
+    .user-info { margin-right: 0; }
+    #map { height: 50vh; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════ NAVBAR ══════════════ -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <span class="brand-dot"><i class="bi bi-droplet-fill"></i></span>
+      DonSang
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <i class="bi bi-list" style="font-size:1.5rem;"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+        <li class="nav-item"><a class="nav-link" href="{% url 'donneurs:dashboard' %}">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'donneurs:appels_urgents' %}">Appels urgents</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'donneurs:historique_dons' %}">Historique</a></li>
+      </ul>
+      <div class="d-flex align-items-center auth-container">
+        <div class="user-info">
+          <div class="user-avatar">{{ donneur.user.username|slice:":2"|upper }}</div>
+          <span style="font-weight:700; font-size:.9rem; color:var(--text);">{{ donneur.user.get_full_name|default:donneur.user.username }}</span>
+        </div>
+        <a href="{% url 'accounts:logout' %}" class="btn-nav btn-logout">
+          <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════ PAGE HEADER ══════════════ -->
+<section class="page-header">
+  <div class="container">
+    <div class="hero-badge">
+      <i class="bi bi-heart-pulse-fill pulse-icon"></i>
+      Urgences compatibles près de vous
+    </div>
+    <h1>Bonjour <span>{{ donneur.user.first_name|default:donneur.user.username }}</span>,<br>vous pouvez sauver une vie aujourd'hui !</h1>
+    <p>Votre groupe sanguin <strong>{{ donneur.groupe_sanguin|default:"A+" }}</strong> est recherché. Un hôpital proche a besoin de vous.</p>
+
+    <div class="info-chips">
+      <div class="chip chip-blue"><div class="dot"></div> Votre rayon : 5 km</div>
+      <div class="chip chip-red"><div class="dot"></div> Scan en cours…</div>
+      <div class="chip chip-green"><div class="dot"></div> Groupe {{ donneur.groupe_sanguin|default:"A+" }}</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ MAP + SIDE CARD ══════════════ -->
+<section class="map-section">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+
+      <!-- Carte (col 8) -->
+      <div class="col-lg-8">
+        <div class="map-container">
+          <div id="map"></div>
+          <div class="status-bar">
+            <div class="status-left">
+              <div class="scan-dot" id="scanDot"></div>
+              <span id="scanTxt">Recherche d'urgences compatibles dans un rayon de 5 km…</span>
+            </div>
+            <span style="font-size:.75rem; color:var(--muted); font-weight:500;">
+              <i class="bi bi-geo-alt-fill me-1" style="color:var(--blue);"></i>
+              Sousse, Tunisie
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side urgences (col 4) -->
+      <div class="col-lg-4">
+        <div class="side-card">
+          <h2>
+            <i class="bi bi-exclamation-circle-fill" style="color:var(--red);"></i>
+            Urgences détectées
+          </h2>
+
+          <!-- Item 1 — l'hôpital principal -->
+          <div class="urgence-item active-urgence" id="cardHopital" onclick="zoomToHopital()">
+            <div class="urgence-head">
+              <div class="groupe-badge">{{ donneur.groupe_sanguin|default:"A+" }}</div>
+              <div class="urgence-nom">Hôpital Ibn Al Jazzar</div>
+            </div>
+            <div class="urgence-meta">
+              <i class="bi bi-geo-alt"></i> Sousse · 2.3 km
+            </div>
+            <div class="urgence-poches">
+              <i class="bi bi-droplet-fill me-1"></i>3 poches nécessaires · Urgent
+            </div>
+          </div>
+
+          <!-- Item 2 — exemple secondaire -->
+          <div class="urgence-item" onclick="">
+            <div class="urgence-head">
+              <div class="groupe-badge" style="background:var(--muted);">O+</div>
+              <div class="urgence-nom">Hôpital Sahloul</div>
+            </div>
+            <div class="urgence-meta">
+              <i class="bi bi-geo-alt"></i> Sousse · 4.1 km
+            </div>
+            <div class="urgence-poches" style="color:var(--muted);">
+              <i class="bi bi-droplet me-1"></i>5 poches · Compatible
+            </div>
+          </div>
+
+          <div class="mt-3 p-3 rounded-3" style="background:var(--red-light); border:1.5px solid #ffd6d6;">
+            <div class="d-flex align-items-start gap-2">
+              <i class="bi bi-lightbulb-fill text-danger mt-1" style="font-size:0.9rem;"></i>
+              <p style="font-size:.78rem; color:var(--red-dark); margin:0; line-height:1.5;">
+                <strong>Filtre intelligent actif :</strong> seuls les hôpitaux proches avec votre groupe sanguin sont affichés.
+              </p>
+            </div>
+          </div>
+
+          <a href="{% url 'donneurs:appels_urgents' %}" class="btn btn-outline-danger w-100 mt-3 rounded-3 fw-bold" style="font-size:.85rem;">
+            <i class="bi bi-list-ul me-2"></i>Voir tous les appels
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer>
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-3 mb-md-0">
+        <span class="footer-brand"><i class="bi bi-droplet-fill text-danger me-2"></i>DonSang</span>
+        <p class="mt-1 mb-0 opacity-75" style="font-size:.8rem;">Plateforme de gestion du don de sang — Projet Django 2026</p>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <a href="{% url 'donneurs:dashboard' %}" class="me-3">Dashboard</a>
+        <a href="{% url 'donneurs:appels_urgents' %}">Appels urgents</a>
+      </div>
+    </div>
+    <hr style="border-color:rgba(255,255,255,0.1); margin:1.5rem 0;">
+    <p class="text-center mb-0 opacity-50">&copy; 2026 DonSang — Tous droits réservés</p>
+  </div>
+</footer>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  /* ══════════════════════════════════════════════════
+     COORDONNÉES DE TEST
+     Départ  : Université de Sousse
+     Arrivée : Hôpital Ibn Al Jazzar, Sousse
+  ══════════════════════════════════════════════════ */
+  const DONNEUR_LAT = 35.8321;
+  const DONNEUR_LNG = 10.6388;
+  const GROUPE      = "{{ donneur.groupe_sanguin|default:'A+' }}";
+  const PRENOM      = "{{ donneur.user.first_name|default:donneur.user.username|escapejs }}";
+
+  const HOPITAL = {
+    lat:     35.8284,
+    lng:     10.6350,
+    nom:     "Hôpital Ibn Al Jazzar",
+    ville:   "Sousse",
+    poches:  3,
+    groupe:  GROUPE,
+    adresse: "Route de Kairouan, Sousse"
+  };
+
+  /* ── CARTE (tiles clair pour matcher le style light du site) ── */
+  const map = L.map('map', { zoomControl: false, attributionControl: false })
+               .setView([DONNEUR_LAT, DONNEUR_LNG], 14);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+  L.control.zoom({ position: 'topright' }).addTo(map);
+
+  /* ── MARQUEUR DONNEUR ── */
+  const donneurIcon = L.divIcon({
+    className: '', html: '<div class="donneur-dot"></div>',
+    iconSize: [16, 16], iconAnchor: [8, 8]
+  });
+  L.marker([DONNEUR_LAT, DONNEUR_LNG], { icon: donneurIcon })
+   .addTo(map)
+   .bindTooltip(`<strong style="font-family:Nunito,sans-serif">${PRENOM} — Vous êtes ici</strong>`, { permanent: false });
+
+  /* ── CERCLE RAYON D'ACTION ── */
+  const cercle = L.circle([DONNEUR_LAT, DONNEUR_LNG], {
+    radius: 5000,
+    color: '#3b82f6', fillColor: '#3b82f6',
+    fillOpacity: 0.06, weight: 1.5, dashArray: '6 5', opacity: 0.55
+  }).addTo(map);
+
+  /* Animation pulsation cercle */
+  let growing = true;
+  setInterval(() => {
+    const o = cercle.options.fillOpacity;
+    if (growing) { cercle.setStyle({ fillOpacity: Math.min(o + 0.007, 0.13) }); if (o >= 0.13) growing = false; }
+    else         { cercle.setStyle({ fillOpacity: Math.max(o - 0.007, 0.04) }); if (o <= 0.04) growing = true; }
+  }, 70);
+
+  /* ── CALCUL DISTANCE ── */
+  function calcDist(la1, lo1, la2, lo2) {
+    const R = 6371e3, f1 = la1*Math.PI/180, f2 = la2*Math.PI/180;
+    const df = (la2-la1)*Math.PI/180, dl = (lo2-lo1)*Math.PI/180;
+    const a = Math.sin(df/2)**2 + Math.cos(f1)*Math.cos(f2)*Math.sin(dl/2)**2;
+    return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) / 100) / 10;
+  }
+
+  /* ── POPUP ── */
+  function makePopup(h) {
+    const dist  = calcDist(DONNEUR_LAT, DONNEUR_LNG, h.lat, h.lng);
+    const gmUrl = `https://www.google.com/maps/dir/${DONNEUR_LAT},${DONNEUR_LNG}/${h.lat},${h.lng}`;
+    return `
+      <div>
+        <div class="pu-head">
+          <div class="pu-badge"><span class="blink-dot"></span> Urgence Critique</div>
+          <h3>${h.nom}</h3>
+          <p><i class="bi bi-geo-alt"></i> ${h.adresse}</p>
+        </div>
+        <div class="pu-body">
+          <div class="pu-row">
+            <div class="pu-ic r">🩸</div>
+            <div>
+              <p class="pu-lbl">Besoin urgent</p>
+              <p class="pu-val">${h.poches} poches <strong>${h.groupe}</strong> nécessaires</p>
+            </div>
+          </div>
+          <div class="pu-row">
+            <div class="pu-ic b"><i class="bi bi-geo-alt-fill" style="color:#3b82f6;font-size:.85rem;"></i></div>
+            <div>
+              <p class="pu-lbl">Ville</p>
+              <p class="pu-val">${h.ville}</p>
+            </div>
+          </div>
+          <div class="pu-row">
+            <div class="pu-ic g"><i class="bi bi-check-circle-fill" style="color:#10b981;font-size:.85rem;"></i></div>
+            <div>
+              <p class="pu-lbl">Compatibilité</p>
+              <p class="pu-val">Votre groupe ${GROUPE} correspond ✓</p>
+            </div>
+          </div>
+          <hr class="pu-sep"/>
+          <a class="btn-gps" href="${gmUrl}" target="_blank" rel="noopener">
+            <i class="bi bi-map-fill"></i> Y aller maintenant <span class="arrow-anim">→</span>
+          </a>
+          <p class="dist-note">à environ <span>${dist} km</span> de votre position</p>
+        </div>
+      </div>`;
+  }
+
+  /* ── MARQUEUR HÔPITAL (apparaît après 2.5s — effet scan) ── */
+  const hopIcon = L.divIcon({
+    className: '',
+    html: `<div class="pulse-wrapper">
+             <div class="pulse-ring"></div>
+             <div class="pulse-ring"></div>
+             <div class="pulse-ring"></div>
+             <div class="hospital-core"><i class="bi bi-plus-lg"></i></div>
+           </div>`,
+    iconSize: [46, 46], iconAnchor: [23, 23], popupAnchor: [0, -27]
+  });
+
+  let hopMarker = null;
+
+  setTimeout(() => {
+    /* Mise à jour du chip de scan */
+    document.getElementById('scanDot').classList.add('found');
+    document.getElementById('scanTxt').textContent = `✓ Urgence trouvée — ${HOPITAL.nom} (${HOPITAL.poches} poches ${HOPITAL.groupe})`;
+
+    /* Chip "Scan en cours" → "Urgence détectée" */
+    const chips = document.querySelectorAll('.chip-red .dot');
+    chips.forEach(d => d.style.animation = 'none');
+
+    /* Ajout du marker */
+    hopMarker = L.marker([HOPITAL.lat, HOPITAL.lng], { icon: hopIcon })
+      .addTo(map)
+      .bindPopup(makePopup(HOPITAL), { maxWidth: 300, closeButton: true });
+
+    /* Fly to puis popup auto */
+    setTimeout(() => {
+      map.flyTo([HOPITAL.lat + 0.004, HOPITAL.lng], 15, { duration: 1.4 });
+      setTimeout(() => hopMarker.openPopup(), 1500);
+    }, 400);
+
+  }, 2500);
+
+  /* Clic sur la card latérale → zoom + popup */
+  function zoomToHopital() {
+    if (hopMarker) {
+      map.flyTo([HOPITAL.lat + 0.004, HOPITAL.lng], 15, { duration: 1 });
+      setTimeout(() => hopMarker.openPopup(), 1100);
+    }
+  }
+</script>
+{% endblock %}
