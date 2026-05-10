@@ -11,6 +11,7 @@ from accounts.models import DonneurProfile, HopitalProfile
 from .models import Don, ReponseAppel, InscriptionCampagne
 from .forms import DonForm, ReponseAppelForm
 from hopitaux.models import DemandeSang, CampagneCollecte
+from .badges import get_badges_donneur, get_classement_ville
 
 import json
 import urllib.request
@@ -116,6 +117,9 @@ def dashboard(request):
         progression    = min(int((jours_passes / delai) * 100), 99)
         jours_restants = max((prochaine_date - timezone.now().date()).days, 0)
 
+    badges_obtenus, _ = get_badges_donneur(donneur)
+    vies_sauvees = total_dons * 3
+
     return render(request, 'donneurs/dashboard.html', {
         'donneur':              donneur,
         'est_eligible':         est_eligible,
@@ -128,6 +132,8 @@ def dashboard(request):
         'prochaines_campagnes': prochaines_campagnes,
         'map_data_json':        json.dumps(map_data, cls=DjangoJSONEncoder),
         'donneur_pos':          donneur_pos,
+        'badges_obtenus': badges_obtenus,
+        'vies_sauvees':   vies_sauvees,
     })
 
 
@@ -430,6 +436,43 @@ def supprimer_conversation(request, conv_id):
     conversation.delete()
     messages.success(request, "Conversation supprimée.")
     return redirect('donneurs:historique_conversations')
+
+
+@login_required
+def badges(request):
+    donneur = _get_donneur(request)
+    if donneur is None:
+        messages.error(request, "Profil donneur introuvable.")
+        return redirect('accueil')
+
+    from .badges import get_badges_donneur, get_classement_ville
+    from .models import Don
+
+    badges_obtenus, badges_a_venir = get_badges_donneur(donneur)
+    total_dons  = Don.objects.filter(donneur=donneur).count()
+    vies_sauvees = total_dons * 3
+
+    ville = donneur.ville or ''
+    classement = get_classement_ville(ville, limit=10) if ville else []
+
+    # Rang du donneur courant dans le classement
+    rang_ville = '—'
+    for item in classement:
+        nom_court = donneur.user.first_name or donneur.user.username
+        if item['nom'].lower().startswith(nom_court[:2].lower()):
+            rang_ville = item['rang']
+            break
+
+    return render(request, 'donneurs/badges.html', {
+        'donneur':        donneur,
+        'badges_obtenus': badges_obtenus,
+        'badges_a_venir': badges_a_venir,
+        'total_dons':     total_dons,
+        'vies_sauvees':   vies_sauvees,
+        'classement':     classement,
+        'rang_ville':     rang_ville,
+    })
+
 
 
 def index(request):

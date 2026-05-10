@@ -107,3 +107,31 @@ class MessageChatbot(models.Model):
 
     def __str__(self):
         return f"{self.role} — {self.date_envoi.strftime('%H:%M')}"
+
+
+class DonneurBadge(models.Model):
+    CODES = [
+        ('premier_don',      'Premier Pas'),
+        ('donneur_regulier', 'Donneur Régulier'),
+        ('heros_sang',       'Héros du Sang'),
+        ('repondeur_urgent', 'Répondeur Urgent'),
+        ('fidele',           'Donneur Fidèle'),
+        ('sauveur_vies',     'Sauveur de Vies'),
+    ]
+
+    donneur         = models.ForeignKey(
+        'accounts.DonneurProfile',
+        on_delete=models.CASCADE,
+        related_name='badges'
+    )
+    code            = models.CharField(max_length=50, choices=CODES)
+    date_obtention  = models.DateTimeField()
+
+    class Meta:
+        unique_together = [('donneur', 'code')]
+        ordering        = ['date_obtention']
+        verbose_name    = "Badge donneur"
+
+    def __str__(self):
+        return f"{self.donneur.user.username} — {self.code}"
+

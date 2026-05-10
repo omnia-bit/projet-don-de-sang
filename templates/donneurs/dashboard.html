@@ -8,9 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 
-/* ════════════════════════════════════════
-   RESET & ROOT
-════════════════════════════════════════ */
 :root {
   --red:        #E63946;
   --red-dark:   #b5111f;
@@ -23,328 +20,279 @@
   --muted:      #64748b;
   --border:     #e2e8f0;
   --green:      #10b981;
+  --green-light:#f0fdf4;
   --amber:      #f59e0b;
-  --radius:     18px;
+  --amber-light:#fffbeb;
+  --violet:     #8b5cf6;
+  --violet-light:#f5f3ff;
+  --radius:     16px;
   --shadow-sm:  0 1px 4px rgba(0,0,0,.06);
-  --shadow-md:  0 4px 20px rgba(0,0,0,.09);
-  --shadow-lg:  0 12px 48px rgba(0,0,0,.13);
+  --shadow-md:  0 4px 20px rgba(0,0,0,.08);
 }
 
-/* ════════════════════════════════════════
-   MARQUEURS CARTE — LIGHT MODE
-════════════════════════════════════════ */
-
-/* — Point donneur (bleu, cercle interrompu animé) — */
+/* ── Marqueurs carte ── */
 .donneur-marker { position:relative; width:22px; height:22px; }
 .donneur-core {
   width:14px; height:14px;
   background:var(--blue);
   border:3px solid #fff;
   border-radius:50%;
-  box-shadow: 0 0 0 0 rgba(37,99,235,0.5), 0 2px 8px rgba(37,99,235,0.4);
+  box-shadow: 0 0 0 0 rgba(37,99,235,0.5);
   animation: donneur-ping 2.4s ease-out infinite;
   position:absolute; top:4px; left:4px;
 }
 @keyframes donneur-ping {
-  0%  { box-shadow: 0 0 0 0 rgba(37,99,235,.55), 0 2px 8px rgba(37,99,235,.4); }
-  70% { box-shadow: 0 0 0 14px rgba(37,99,235,0), 0 2px 8px rgba(37,99,235,.4); }
-  100%{ box-shadow: 0 0 0 0 rgba(37,99,235,0), 0 2px 8px rgba(37,99,235,.4); }
+  0%  { box-shadow: 0 0 0 0 rgba(37,99,235,.55); }
+  70% { box-shadow: 0 0 0 14px rgba(37,99,235,0); }
+  100%{ box-shadow: 0 0 0 0 rgba(37,99,235,0); }
 }
 
-/* — Pin hôpital — bouton rouge battant comme un cœur — */
-.hop-pin {
-  position:relative; width:44px; height:44px;
-  display:flex; align-items:center; justify-content:center;
-}
-
-/* Cercles de battement */
+.hop-pin { position:relative; width:44px; height:44px; display:flex; align-items:center; justify-content:center; }
 .hop-beat-ring {
-  position:absolute; inset:0;
-  border-radius:50%;
+  position:absolute; inset:0; border-radius:50%;
   border:2.5px solid rgba(230,57,70,.7);
   animation:beat-ring 1.6s ease-out infinite;
   pointer-events:none;
 }
-.hop-beat-ring:nth-child(2){
-  animation-delay:.5s;
-  border-color:rgba(230,57,70,.4);
-}
-@keyframes beat-ring {
-  0%   { transform:scale(.55); opacity:.9; }
-  100% { transform:scale(1.9); opacity:0;  }
-}
-
-/* Bouton central rouge */
+.hop-beat-ring:nth-child(2){ animation-delay:.5s; border-color:rgba(230,57,70,.4); }
+@keyframes beat-ring { 0%{transform:scale(.55);opacity:.9;} 100%{transform:scale(1.9);opacity:0;} }
 .hop-body {
   position:relative; z-index:2;
   width:36px; height:36px;
   background:linear-gradient(145deg, #E63946, #b5111f);
   border-radius:50%;
   display:flex; align-items:center; justify-content:center;
-  box-shadow: 0 4px 16px rgba(230,57,70,.55), inset 0 1px 0 rgba(255,255,255,.2);
+  box-shadow: 0 4px 16px rgba(230,57,70,.55);
   animation: heartbeat 1.6s ease-in-out infinite;
   border:3px solid #fff;
 }
 @keyframes heartbeat {
-  0%,100% { transform:scale(1);    box-shadow:0 4px 16px rgba(230,57,70,.55); }
-  14%     { transform:scale(1.18); box-shadow:0 6px 24px rgba(230,57,70,.75); }
-  28%     { transform:scale(1);    box-shadow:0 4px 16px rgba(230,57,70,.55); }
-  42%     { transform:scale(1.1);  box-shadow:0 5px 20px rgba(230,57,70,.65); }
-  56%     { transform:scale(1);    box-shadow:0 4px 16px rgba(230,57,70,.55); }
+  0%,100%{transform:scale(1);} 14%{transform:scale(1.18);} 28%{transform:scale(1);} 42%{transform:scale(1.1);} 56%{transform:scale(1);}
 }
+.hop-body-inner { color:#fff; font-size:.9rem; display:flex; align-items:center; justify-content:center; }
+.hop-shadow,.hop-pulse { display:none; }
 
-.hop-body-inner {
-  color:#fff; font-size:.9rem;
-  display:flex; align-items:center; justify-content:center;
-}
-
-/* on supprime l'ancienne ombre */
-.hop-shadow { display:none; }
-
-/* Anciens rings — désactivés */
-.hop-pulse { display:none; }
-@keyframes hop-ring {}
-
-/* ════════════════════════════════════════
-   CARTE — MODE LIGHT, DESIGN RAFFINÉ
-════════════════════════════════════════ */
-.map-card {
-  border-radius:24px;
-  overflow:hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,.06), 0 16px 48px rgba(0,0,0,.1);
-  border:1.5px solid var(--border);
-  background:#fff;
-}
-
-/* Header blanc avec accents */
-.map-header {
-  background:#ffffff;
-  padding:16px 22px;
-  display:flex; align-items:center; justify-content:space-between;
-  border-bottom:1.5px solid var(--border);
-  position:relative;
-}
-.map-header::before {
-  content:'';
-  position:absolute; left:0; top:0; bottom:0;
-  width:4px;
-  background:linear-gradient(180deg, var(--red), var(--red-dark));
-  border-radius:0 2px 2px 0;
-}
-.map-header-left { display:flex; align-items:center; gap:12px; }
-.map-header-icon {
-  width:42px; height:42px;
-  background:var(--red-light);
-  border-radius:12px;
-  display:flex; align-items:center; justify-content:center;
-  color:var(--red); font-size:1.1rem;
-  flex-shrink:0;
-}
-.map-header-title {
-  font-family:'Sora',sans-serif;
-  font-size:.92rem; font-weight:700; color:var(--text);
-  margin:0 0 2px;
-}
-.map-header-sub {
-  font-size:.72rem; color:var(--muted); margin:0;
-}
-
-.scan-pill {
-  display:inline-flex; align-items:center; gap:7px;
-  background:var(--bg);
-  border:1.5px solid var(--border);
-  border-radius:50px; padding:5px 14px;
-  font-size:.73rem; color:var(--muted); font-weight:600;
-  font-family:'DM Sans',sans-serif;
-}
-.scan-dot {
-  width:8px; height:8px; border-radius:50%;
-  background:var(--blue); animation:blink-dot 1s infinite; flex-shrink:0;
-}
+/* ── Carte ── */
+.map-card { border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-md); border:1.5px solid var(--border); background:#fff; }
+.map-header { background:#ffffff; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1.5px solid var(--border); position:relative; }
+.map-header::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(180deg,var(--red),var(--red-dark)); border-radius:0 2px 2px 0; }
+.map-header-left { display:flex; align-items:center; gap:10px; }
+.map-header-icon { width:38px; height:38px; background:var(--red-light); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--red); font-size:1rem; flex-shrink:0; }
+.map-header-title { font-family:'Sora',sans-serif; font-size:.88rem; font-weight:700; color:var(--text); margin:0 0 1px; }
+.map-header-sub { font-size:.7rem; color:var(--muted); margin:0; }
+.scan-pill { display:inline-flex; align-items:center; gap:6px; background:var(--bg); border:1.5px solid var(--border); border-radius:50px; padding:4px 12px; font-size:.72rem; color:var(--muted); font-weight:600; font-family:'DM Sans',sans-serif; }
+.scan-dot { width:7px; height:7px; border-radius:50%; background:var(--blue); animation:blink-dot 1s infinite; flex-shrink:0; }
 .scan-dot.found { background:var(--green); animation:none; }
 .scan-dot.empty { background:var(--muted); animation:none; }
 @keyframes blink-dot{ 0%,100%{opacity:1;}50%{opacity:.2;} }
+#map { height:380px; width:100%; z-index:1; }
+.map-footer { background:#fff; padding:10px 20px; display:flex; align-items:center; gap:18px; flex-wrap:wrap; border-top:1.5px solid var(--border); }
+.leg { display:flex; align-items:center; gap:6px; font-size:.71rem; color:var(--muted); font-family:'DM Sans',sans-serif; font-weight:500; }
+.leg-dot-red { width:9px; height:9px; border-radius:50%; background:var(--red); }
+.leg-dot-blue { width:9px; height:9px; border-radius:50%; background:var(--blue); }
 
-#map { height:440px; width:100%; z-index:1; }
-
-/* Footer légende */
-.map-footer {
-  background:#fff;
-  padding:11px 22px;
-  display:flex; align-items:center; gap:20px; flex-wrap:wrap;
-  border-top:1.5px solid var(--border);
-}
-.leg { display:flex; align-items:center; gap:7px; font-size:.72rem; color:var(--muted); font-family:'DM Sans',sans-serif; font-weight:500; }
-.leg-dot-red  { width:10px; height:10px; border-radius:50%; background:var(--red); }
-.leg-dot-blue { width:10px; height:10px; border-radius:50%; background:var(--blue); }
-.leg-dash     { width:18px; height:2px; background:var(--blue); opacity:.5; border-radius:2px; border-top:2px dashed var(--blue); height:0; }
-
-/* ════════════════════════════════════════
-   POPUP — REDESIGN LIGHT
-════════════════════════════════════════ */
-.leaflet-popup-content-wrapper {
-  border-radius:20px !important; padding:0 !important;
-  box-shadow: 0 8px 32px rgba(0,0,0,.14), 0 2px 8px rgba(0,0,0,.08) !important;
-  border:1.5px solid var(--border) !important;
-  overflow:hidden; min-width:272px;
-  font-family:'DM Sans',sans-serif;
-}
+/* ── Popup ── */
+.leaflet-popup-content-wrapper { border-radius:16px !important; padding:0 !important; box-shadow:0 8px 32px rgba(0,0,0,.12) !important; border:1.5px solid var(--border) !important; overflow:hidden; min-width:260px; font-family:'DM Sans',sans-serif; }
 .leaflet-popup-tip-container { display:none !important; }
-.leaflet-popup-close-button {
-  color:rgba(255,255,255,.9) !important;
-  font-size:1.15rem !important;
-  right:10px !important; top:8px !important; z-index:10;
-  background:rgba(0,0,0,.15) !important;
-  border-radius:50% !important; width:24px !important; height:24px !important;
-  display:flex !important; align-items:center !important; justify-content:center !important;
-  line-height:1 !important;
-}
+.leaflet-popup-close-button { color:rgba(255,255,255,.9) !important; font-size:1.1rem !important; right:8px !important; top:7px !important; z-index:10; background:rgba(0,0,0,.15) !important; border-radius:50% !important; width:22px !important; height:22px !important; display:flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; }
 .leaflet-popup-content { margin:0 !important; }
-
-/* Header hôpital (rouge vif, moderne) */
-.pu-head {
-  background:linear-gradient(135deg, var(--red) 0%, #8b0d1a 100%);
-  padding:1.1rem 1.3rem 1rem;
-  position:relative; overflow:hidden;
-}
-.pu-head::after {
-  content:'🏥';
-  position:absolute; right:1rem; top:50%;
-  transform:translateY(-50%);
-  font-size:2.8rem; opacity:.1;
-}
-.pu-badge {
-  display:inline-flex; align-items:center; gap:5px;
-  background:rgba(255,255,255,.18); border-radius:50px;
-  padding:2px 11px; font-size:.6rem; font-weight:700; color:#fff;
-  text-transform:uppercase; letter-spacing:.7px; margin-bottom:6px;
-}
+.pu-head { background:linear-gradient(135deg,var(--red) 0%,#8b0d1a 100%); padding:1rem 1.2rem .9rem; position:relative; overflow:hidden; }
+.pu-head::after { content:''; position:absolute; right:1rem; top:50%; transform:translateY(-50%); font-size:2.5rem; opacity:.1; }
+.pu-badge { display:inline-flex; align-items:center; gap:4px; background:rgba(255,255,255,.18); border-radius:50px; padding:2px 10px; font-size:.6rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:.7px; margin-bottom:5px; }
 .pu-blink { width:5px; height:5px; border-radius:50%; background:#fbbf24; animation:blink-dot .8s infinite; display:inline-block; }
-.pu-head h3 { font-family:'Sora',sans-serif; font-size:.95rem; font-weight:800; color:#fff; margin:0 0 3px; line-height:1.3; }
-.pu-head p  { font-size:.72rem; color:rgba(255,255,255,.78); margin:0; }
-
-/* Header donneur (bleu) */
-.pu-head-blue {
-  background:linear-gradient(135deg, var(--blue) 0%, #1e3a8a 100%);
-  padding:1.1rem 1.3rem 1rem;
-  position:relative; overflow:hidden;
-}
-.pu-head-blue::after { content:'📍'; position:absolute; right:1rem; top:50%; transform:translateY(-50%); font-size:2.5rem; opacity:.15; }
-.pu-head-blue h3 { font-family:'Sora',sans-serif; font-size:.95rem; font-weight:800; color:#fff; margin:0 0 3px; }
-.pu-head-blue p  { font-size:.72rem; color:rgba(255,255,255,.78); margin:0; }
-
-/* Corps popup — clair et aéré */
-.pu-body { padding:.95rem 1.3rem 1.1rem; background:#fff; }
-.pu-row  { display:flex; align-items:center; gap:11px; margin-bottom:9px; }
-.pu-ic   { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:.85rem; flex-shrink:0; }
+.pu-head h3 { font-family:'Sora',sans-serif; font-size:.92rem; font-weight:800; color:#fff; margin:0 0 3px; line-height:1.3; }
+.pu-head p { font-size:.7rem; color:rgba(255,255,255,.78); margin:0; }
+.pu-head-blue { background:linear-gradient(135deg,var(--blue) 0%,#1e3a8a 100%); padding:1rem 1.2rem .9rem; position:relative; overflow:hidden; }
+.pu-head-blue h3 { font-family:'Sora',sans-serif; font-size:.92rem; font-weight:800; color:#fff; margin:0 0 3px; }
+.pu-head-blue p { font-size:.7rem; color:rgba(255,255,255,.78); margin:0; }
+.pu-body { padding:.9rem 1.2rem 1rem; background:#fff; }
+.pu-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.pu-ic { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.82rem; flex-shrink:0; }
 .pu-ic.r { background:var(--red-light); }
 .pu-ic.b { background:var(--blue-light); }
-.pu-ic.g { background:#f0fdf4; }
-.pu-lbl  { font-size:.6rem; color:var(--muted); font-weight:600; margin:0; text-transform:uppercase; letter-spacing:.5px; }
-.pu-val  { font-size:.84rem; color:var(--text); font-weight:700; margin:0; }
-.pu-sep  { border:none; border-top:1.5px solid #f1f5f9; margin:9px 0; }
-
-/* ═══════════════════════════════════════════
-   BOUTON GPS — STYLE AVANCÉ
-═══════════════════════════════════════════ */
-.btn-gps-nav {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 0;
-  border-radius: 14px;
-  text-decoration: none;
-  overflow: hidden;
-  box-shadow: 0 6px 24px rgba(230,57,70,.4), 0 2px 6px rgba(230,57,70,.25);
-  transition: transform .2s, box-shadow .2s;
-  color: #fff !important;
-}
-.btn-gps-nav:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 32px rgba(230,57,70,.55), 0 2px 8px rgba(230,57,70,.3);
-  color: #fff !important;
-}
-.btn-gps-nav:active { transform: translateY(0); }
-
-/* Bande gauche sombre avec icône SVG */
-.btn-gps-left {
-  background: rgba(0,0,0,.22);
-  width: 48px; height: 48px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.btn-gps-left svg {
-  width: 22px; height: 22px;
-  fill: none; stroke: #fff;
-  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-}
-
-/* Zone centrale avec gradient */
-.btn-gps-center {
-  flex: 1;
-  background: linear-gradient(135deg, #E63946 0%, #b5111f 100%);
-  padding: 11px 10px;
-  display: flex; flex-direction: column; align-items: flex-start;
-}
-.btn-gps-label {
-  font-family: 'Sora', sans-serif;
-  font-size: .82rem; font-weight: 800;
-  color: #fff; line-height: 1.2;
-  letter-spacing: .1px;
-}
-.btn-gps-sub {
-  font-size: .62rem; color: rgba(255,255,255,.72);
-  font-weight: 500; margin-top: 1px;
-}
-
-/* Flèche animée droite */
-.btn-gps-arrow {
-  background: rgba(0,0,0,.18);
-  width: 40px; height: 48px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.btn-gps-arrow svg {
-  width: 18px; height: 18px;
-  fill: none; stroke: #fff;
-  stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
-  animation: arr-slide 1.4s ease-in-out infinite;
-}
-@keyframes arr-slide {
-  0%,100% { transform: translateX(0); opacity:1; }
-  50%      { transform: translateX(4px); opacity:.7; }
-}
-
-.dist-tag {
-  display:flex; align-items:center; justify-content:center; gap:5px;
-  margin-top:8px; font-size:.71rem; color:var(--muted); font-weight:500;
-}
+.pu-lbl { font-size:.6rem; color:var(--muted); font-weight:600; margin:0; text-transform:uppercase; letter-spacing:.5px; }
+.pu-val { font-size:.82rem; color:var(--text); font-weight:700; margin:0; }
+.pu-sep { border:none; border-top:1.5px solid #f1f5f9; margin:8px 0; }
+.btn-gps-nav { position:relative; display:flex; align-items:center; width:100%; padding:0; border-radius:12px; text-decoration:none; overflow:hidden; box-shadow:0 4px 16px rgba(230,57,70,.35); transition:transform .2s,box-shadow .2s; color:#fff !important; }
+.btn-gps-nav:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(230,57,70,.5); color:#fff !important; }
+.btn-gps-left { background:rgba(0,0,0,.22); width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.btn-gps-left svg { width:20px; height:20px; fill:none; stroke:#fff; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.btn-gps-center { flex:1; background:linear-gradient(135deg,#E63946 0%,#b5111f 100%); padding:10px 9px; display:flex; flex-direction:column; align-items:flex-start; }
+.btn-gps-label { font-family:'Sora',sans-serif; font-size:.8rem; font-weight:800; color:#fff; line-height:1.2; }
+.btn-gps-sub { font-size:.6rem; color:rgba(255,255,255,.72); font-weight:500; margin-top:1px; }
+.btn-gps-arrow { background:rgba(0,0,0,.18); width:38px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.btn-gps-arrow svg { width:16px; height:16px; fill:none; stroke:#fff; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; animation:arr-slide 1.4s ease-in-out infinite; }
+@keyframes arr-slide { 0%,100%{transform:translateX(0);opacity:1;} 50%{transform:translateX(3px);opacity:.7;} }
+.dist-tag { display:flex; align-items:center; justify-content:center; gap:5px; margin-top:7px; font-size:.7rem; color:var(--muted); font-weight:500; }
 .dist-tag strong { color:var(--green); }
+.nearest-badge { display:inline-flex; align-items:center; gap:4px; background:linear-gradient(135deg,#fef3c7,#fde68a); color:#92400e; border-radius:50px; padding:2px 9px; font-size:.58rem; font-weight:700; margin-bottom:5px; text-transform:uppercase; letter-spacing:.5px; }
+@keyframes radar-rotate { from{stroke-dashoffset:0;} to{stroke-dashoffset:-200;} }
+.radar-dashed-circle { stroke-dasharray:12 8; animation:radar-rotate 18s linear infinite; transform-origin:center; }
 
-/* Badge "hôpital le plus proche" */
-.nearest-badge {
-  display:inline-flex; align-items:center; gap:4px;
-  background:linear-gradient(135deg,#fef3c7,#fde68a);
-  color:#92400e; border-radius:50px;
-  padding:2px 10px; font-size:.59rem; font-weight:700;
-  margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px;
+/* ══════════════════════════════════════════
+   DASHBOARD LAYOUT
+══════════════════════════════════════════ */
+
+/* Section card standard */
+.dash-card {
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  padding:1.3rem 1.5rem;
+  box-shadow:var(--shadow-sm);
 }
 
-/* ════════════════════════════════════════
-   CERCLE RADAR — INTERROMPU, BLEU
-════════════════════════════════════════ */
-@keyframes radar-rotate {
-  from { stroke-dashoffset: 0; }
-  to   { stroke-dashoffset: -200; }
-}
-.radar-dashed-circle {
-  /* Leaflet applique ce style SVG via className */
-  stroke-dasharray: 12 8;
-  animation: radar-rotate 18s linear infinite;
-  transform-origin: center;
-}
+/* Card éligibilité */
+.eligibilite-card { border-left:4px solid var(--border); }
+.eligibilite-card.eligible { border-left-color:var(--green); }
+.eligibilite-card.non-eligible { border-left-color:var(--red); }
 
+.card-icon-wrap { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+.icon-green { background:var(--green-light); color:var(--green); }
+.icon-red   { background:var(--red-light);   color:var(--red); }
+.icon-blue  { background:var(--blue-light);  color:var(--blue); }
+.icon-amber { background:var(--amber-light); color:var(--amber); }
+
+.card-label { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); }
+.card-value { font-family:'Sora',sans-serif; font-size:1.15rem; font-weight:800; }
+.card-desc  { font-size:.82rem; color:var(--muted); margin:0; line-height:1.55; }
+
+.prog-label { font-size:.7rem; color:var(--muted); font-weight:600; }
+
+.btn-success-custom {
+  display:inline-flex; align-items:center;
+  background:var(--green); color:#fff;
+  border:none; border-radius:10px;
+  padding:.45rem 1.1rem; font-size:.82rem; font-weight:700;
+  text-decoration:none; transition:.2s;
+}
+.btn-success-custom:hover { background:#0ea472; color:#fff; }
+
+/* Mini stat cards */
+.stat-mini-card {
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  padding:1.1rem 1.2rem;
+  display:flex; flex-direction:column; gap:.3rem;
+  box-shadow:var(--shadow-sm);
+  height:100%;
+}
+.stat-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:.95rem; margin-bottom:.2rem; }
+.stat-num { font-family:'Sora',sans-serif; font-size:1.35rem; font-weight:800; color:var(--text); line-height:1; }
+.stat-lbl { font-size:.7rem; color:var(--muted); font-weight:500; }
+
+/* Sections internes */
+.section-title-sm { font-family:'Sora',sans-serif; font-size:.95rem; font-weight:800; color:var(--text); margin:0; }
+.btn-link-red { font-size:.78rem; font-weight:700; color:var(--red); text-decoration:none; display:inline-flex; align-items:center; gap:.3rem; }
+.btn-link-red:hover { color:var(--red-dark); }
+
+/* Appels */
+.appel-row {
+  display:flex; align-items:center; gap:.9rem;
+  background:var(--bg);
+  border:1.5px solid var(--border);
+  border-left:4px solid var(--red);
+  border-radius:12px; padding:.75rem 1rem;
+}
+.appel-groupe { font-family:'Sora',sans-serif; font-size:.82rem; font-weight:800; background:var(--red); color:#fff; border-radius:8px; padding:.25rem .6rem; flex-shrink:0; }
+.appel-info { flex:1; min-width:0; }
+.appel-hopital { font-size:.84rem; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.appel-ville { font-size:.7rem; color:var(--muted); }
+.btn-appel-sm { background:var(--red); color:#fff; border:none; border-radius:8px; padding:.3rem .8rem; font-size:.75rem; font-weight:700; cursor:pointer; text-decoration:none; white-space:nowrap; transition:.2s; }
+.btn-appel-sm:hover { background:var(--red-dark); color:#fff; }
+
+/* Rendez-vous / don rows */
+.don-row { display:flex; align-items:center; gap:.8rem; padding:.55rem .8rem; background:var(--bg); border-radius:10px; }
+.don-date { font-size:.75rem; font-weight:700; color:var(--text); min-width:90px; }
+.don-lieu { flex:1; font-size:.78rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.don-qty  { font-size:.78rem; font-weight:700; color:var(--red); }
+
+/* Empty state */
+.empty-state { display:flex; flex-direction:column; align-items:center; gap:.5rem; padding:1.5rem; color:var(--muted); font-size:.83rem; text-align:center; }
+.empty-state i { font-size:1.8rem; opacity:.35; }
+
+/* Badge success light */
+.badge.bg-success-light { background:#dcfce7 !important; font-size:.72rem; font-weight:700; border-radius:50px; padding:.25rem .7rem; }
+.text-success { color:var(--green) !important; }
+
+/* ══════════════════════════════════════════
+   SECTION GAMIFICATION — STYLE CLAIR
+══════════════════════════════════════════ */
+.gamif-card {
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-left:4px solid var(--red);
+  border-radius:var(--radius);
+  padding:1.3rem 1.5rem;
+  box-shadow:var(--shadow-sm);
+}
+.gamif-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:1.1rem;
+}
+.gamif-title-wrap { display:flex; align-items:center; gap:.7rem; }
+.gamif-icon { width:38px; height:38px; background:var(--red-light); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.gamif-eyebrow { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--red-dark); margin:0; }
+.gamif-heading { font-family:'Sora',sans-serif; font-size:.95rem; font-weight:800; color:var(--text); margin:0; }
+.btn-link-violet { font-size:.78rem; font-weight:700; color:var(--red); text-decoration:none; display:inline-flex; align-items:center; gap:.3rem; }
+.btn-link-violet:hover { opacity:.8; }
+
+/* Vies counter dans gamif */
+.vies-strip {
+  display:flex; align-items:center; gap:.8rem;
+  background:var(--red-light);
+  border:1.5px solid #fecdd3;
+  border-radius:12px; padding:.75rem 1rem;
+  margin-bottom:1rem;
+}
+.vies-num-sm {
+  font-family:'Sora',sans-serif;
+  font-size:1.5rem; font-weight:900;
+  color:var(--red); line-height:1;
+}
+.vies-desc { font-size:.72rem; color:#9f1239; font-weight:500; }
+
+/* Badge pills dans gamif */
+.badge-pills { display:flex; flex-wrap:wrap; gap:.5rem; }
+.badge-pill-item {
+  display:flex; align-items:center; gap:.45rem;
+  background:var(--red-light);
+  border:1.5px solid #fecdd3;
+  border-radius:50px; padding:.3rem .9rem;
+}
+.badge-pill-item .bp-icon { color:var(--red-dark); display:flex; align-items:center; }
+.badge-pill-item .bp-name { font-size:.78rem; font-weight:700; color:var(--text); }
+
+/* Quick actions */
+.quick-action {
+  display:flex; flex-direction:column; align-items:center; gap:.5rem;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius); padding:1rem .75rem;
+  text-decoration:none; color:var(--text);
+  transition:border-color .2s, box-shadow .2s, transform .2s;
+  font-size:.75rem; font-weight:600; text-align:center;
+  box-shadow:var(--shadow-sm);
+}
+.quick-action i { font-size:1.35rem; color:var(--red); }
+.quick-action:hover { border-color:var(--red); box-shadow:var(--shadow-md); transform:translateY(-2px); color:var(--text); }
+.quick-action.disabled-action { opacity:.45; pointer-events:none; }
+.quick-action.bg-warning-light { background:var(--amber-light); border-color:#fcd34d; }
+.quick-action.bg-warning-light i { color:var(--amber); }
+
+/* Page header */
+.page-wrapper { background:var(--bg); min-height:100vh; }
+.page-header { background:var(--surface); border-bottom:1.5px solid var(--border); padding:1.2rem 0; }
+.page-header-sub { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--muted); }
+.page-header-title { font-family:'Sora',sans-serif; font-size:1.5rem; font-weight:800; color:var(--text); display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; }
+.avatar-circle { width:46px; height:46px; background:var(--red-light); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--red); font-size:1.2rem; flex-shrink:0; }
+.badge-groupe { font-family:'Sora',sans-serif; font-size:.8rem; font-weight:800; background:var(--red); color:#fff; border-radius:8px; padding:.2rem .65rem; vertical-align:middle; }
+
+@media (max-width:768px) {
+  .stat-num { font-size:1.1rem; }
+  .page-header-title { font-size:1.2rem; }
+}
 </style>
 {% endblock %}
 
@@ -361,7 +309,7 @@
             Bonjour, {{ donneur.user.first_name|default:donneur.user.username }}
             <span class="badge-groupe">{{ donneur.groupe_sanguin }}</span>
             {% if not donneur.actif %}
-              <span class="badge bg-warning text-dark fs-6 ms-2" style="border-radius:20px;vertical-align:middle;">
+              <span class="badge bg-warning text-dark fs-6 ms-1" style="border-radius:20px;vertical-align:middle;font-size:.75rem !important;">
                 <i class="bi bi-moon-stars-fill me-1"></i> Indisponible
               </span>
             {% endif %}
@@ -374,10 +322,12 @@
   <div class="container py-4">
     {% include 'includes/messages.html' %}
 
-    <!-- ── Stats & Éligibilité ── -->
-    <div class="row g-4 mb-4">
+    <!-- ══ ROW 1 : Éligibilité + Stats ══ -->
+    <div class="row g-3 mb-3">
+
+      <!-- Éligibilité -->
       <div class="col-lg-5">
-        <div class="dash-card eligibilite-card {% if est_eligible %}eligible{% else %}non-eligible{% endif %}">
+        <div class="dash-card eligibilite-card {% if est_eligible %}eligible{% else %}non-eligible{% endif %} h-100">
           <div class="d-flex align-items-center gap-3 mb-3">
             <div class="card-icon-wrap {% if est_eligible %}icon-green{% else %}icon-red{% endif %}">
               <i class="bi {% if est_eligible %}bi-heart-pulse-fill{% else %}bi-clock-history{% endif %}"></i>
@@ -391,25 +341,26 @@
             </div>
           </div>
           {% if not est_eligible %}
-            <p class="card-desc">Prochaine date : <strong>{{ prochaine_date }}</strong> ({{ jours_restants }} jour{{ jours_restants|pluralize }} restant{{ jours_restants|pluralize }})</p>
-            <div class="progress-wrap">
+            <p class="card-desc mb-2">Prochaine date : <strong>{{ prochaine_date }}</strong> ({{ jours_restants }} jour{{ jours_restants|pluralize }} restant{{ jours_restants|pluralize }})</p>
+            <div>
               <div class="d-flex justify-content-between mb-1">
-                <span class="prog-label">Progression vers éligibilité</span>
+                <span class="prog-label">Progression</span>
                 <span class="prog-label">{{ progression }}%</span>
               </div>
-              <div class="progress" style="height:8px;border-radius:8px;">
+              <div class="progress" style="height:7px;border-radius:8px;background:var(--border);">
                 <div class="progress-bar bg-danger" style="width:{{ progression }}%;border-radius:8px;"></div>
               </div>
             </div>
           {% else %}
-            <p class="card-desc">Vous pouvez donner dès aujourd'hui. Chaque don peut sauver jusqu'à 3 vies.</p>
-            <a href="{% url 'donneurs:enregistrer_don' %}" class="btn btn-success-custom mt-2">
+            <p class="card-desc mb-3">Vous pouvez donner dès aujourd'hui. Chaque don peut sauver jusqu'à 3 vies.</p>
+            <a href="{% url 'donneurs:enregistrer_don' %}" class="btn-success-custom">
               <i class="bi bi-plus-circle-fill me-2"></i>Enregistrer un don
             </a>
           {% endif %}
         </div>
       </div>
 
+      <!-- 4 mini stats -->
       <div class="col-lg-7">
         <div class="row g-3 h-100">
           <div class="col-6">
@@ -429,7 +380,7 @@
           <div class="col-6">
             <div class="stat-mini-card">
               <div class="stat-icon icon-amber"><i class="bi bi-calendar-check-fill"></i></div>
-              <span class="stat-num">{% if prochaine_date %}{{ prochaine_date|date:"d/m" }}{% else %}Dès maintenant{% endif %}</span>
+              <span class="stat-num">{% if prochaine_date %}{{ prochaine_date|date:"d/m" }}{% else %}Dès maint.{% endif %}</span>
               <span class="stat-lbl">Prochain don possible</span>
             </div>
           </div>
@@ -444,19 +395,13 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════
-         CARTE RADAR LIGHT — HÔPITAUX RÉELS
-    ══════════════════════════════════════ -->
-    <div class="row mb-4">
+    <!-- ══ ROW 2 : Carte ══ -->
+    <div class="row g-3 mb-3">
       <div class="col-12">
         <div class="map-card">
-
-          <!-- Header clair -->
           <div class="map-header">
             <div class="map-header-left">
-              <div class="map-header-icon">
-                <i class="bi bi-radar"></i>
-              </div>
+              <div class="map-header-icon"><i class="bi bi-radar"></i></div>
               <div>
                 <p class="map-header-title">Hôpitaux à proximité</p>
                 <p class="map-header-sub">Localisations réelles enregistrées · Cliquer → GPS</p>
@@ -467,41 +412,25 @@
               <span id="scan-text">Localisation…</span>
             </div>
           </div>
-
-          <!-- Carte Leaflet en mode LIGHT -->
           <div id="map"></div>
-
-          <!-- Légende -->
           <div class="map-footer">
+            <div class="leg"><div class="leg-dot-red"></div> Hôpital enregistré (→ GPS)</div>
+            <div class="leg"><div class="leg-dot-blue"></div> Votre position</div>
             <div class="leg">
-              <div class="leg-dot-red"></div>
-              Hôpital enregistré (→ GPS)
-            </div>
-            <div class="leg">
-              <div class="leg-dot-blue"></div>
-              Votre position
-            </div>
-            <div class="leg">
-              <svg width="22" height="8" style="flex-shrink:0">
-                <line x1="0" y1="4" x2="22" y2="4" stroke="#2563eb" stroke-width="2" stroke-dasharray="5 3" opacity=".6"/>
-              </svg>
+              <svg width="20" height="8" style="flex-shrink:0"><line x1="0" y1="4" x2="20" y2="4" stroke="#2563eb" stroke-width="2" stroke-dasharray="5 3" opacity=".6"/></svg>
               Rayon de recherche
             </div>
           </div>
-
         </div>
       </div>
     </div>
-    <!-- ══════════ FIN CARTE ══════════ -->
 
-    <!-- ── Appels + QR ── -->
-    <div class="row g-4 mb-4">
+    <!-- ══ ROW 3 : Appels + QR ══ -->
+    <div class="row g-3 mb-3">
       <div class="col-lg-7">
-        <div class="dash-card">
-          <div class="section-head d-flex justify-content-between align-items-center mb-3">
-            <h2 class="section-title-sm">
-              <i class="bi bi-exclamation-circle-fill text-danger me-2"></i>Liste des appels prioritaires
-            </h2>
+        <div class="dash-card h-100">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="section-title-sm"><i class="bi bi-exclamation-circle-fill text-danger me-2"></i>Appels prioritaires</h2>
             <a href="{% url 'donneurs:appels_urgents' %}" class="btn-link-red">Voir tout <i class="bi bi-arrow-right"></i></a>
           </div>
           {% if appels_compatibles %}
@@ -524,24 +453,23 @@
       </div>
 
       <div class="col-lg-5">
-        <div class="dash-card text-center p-4" style="border:2px solid #e5e7eb;border-radius:20px;">
+        <div class="dash-card h-100 text-center">
           <h2 class="section-title-sm mb-3"><i class="bi bi-qr-code text-primary me-2"></i>Mon Pass Donneur</h2>
-          <div class="qr-container mb-3 p-3 bg-light rounded-4 d-inline-block">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ donneur.qr_code_uuid }}"
-                 alt="Mon QR Code" class="img-fluid" style="mix-blend-mode:multiply;">
+          <div class="p-3 bg-light rounded-3 d-inline-block mb-2">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data={{ donneur.qr_code_uuid }}" alt="Mon QR Code" class="img-fluid" style="mix-blend-mode:multiply;">
           </div>
-          <p class="small text-muted mb-0">Présentez ce code à l'hôpital pour valider votre don instantanément.</p>
+          <p class="small text-muted mb-0" style="font-size:.75rem;">Présentez ce code à l'hôpital pour valider votre don instantanément.</p>
         </div>
       </div>
     </div>
 
-    <!-- ── Rendez-vous + Historique ── -->
-    <div class="row g-4 mb-4">
-      <div class="col-lg-6">
-        <div class="dash-card">
-          <div class="section-head d-flex justify-content-between align-items-center mb-3">
+    <!-- ══ ROW 4 : Rendez-vous + Historique + Gamif ══ -->
+    <div class="row g-3 mb-3">
+      <div class="col-lg-4">
+        <div class="dash-card h-100">
+          <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="section-title-sm"><i class="bi bi-calendar2-heart text-danger me-2"></i>Mes rendez-vous</h2>
-            <a href="{% url 'donneurs:liste_campagnes' %}" class="btn-link-red">Découvrir <i class="bi bi-arrow-right"></i></a>
+            <a href="{% url 'donneurs:liste_campagnes' %}" class="btn-link-red">Voir <i class="bi bi-arrow-right"></i></a>
           </div>
           {% if prochaines_campagnes %}
             <div class="d-flex flex-column gap-2">
@@ -551,19 +479,19 @@
                   <p class="appel-hopital mb-0">{{ insc.campagne.titre }}</p>
                   <p class="appel-ville mb-0"><i class="bi bi-clock me-1"></i>{{ insc.creneau_horaire }} · <i class="bi bi-geo-alt me-1"></i>{{ insc.campagne.lieu }}</p>
                 </div>
-                <div class="text-end"><span class="badge bg-success-light text-success">{{ insc.campagne.date_debut|date:"d M" }}</span></div>
+                <span class="badge bg-success-light text-success">{{ insc.campagne.date_debut|date:"d M" }}</span>
               </div>
               {% endfor %}
             </div>
           {% else %}
-            <div class="empty-state"><i class="bi bi-calendar2-x"></i><p>Aucune inscription enregistrée.</p></div>
+            <div class="empty-state"><i class="bi bi-calendar2-x"></i><p>Aucune inscription.</p></div>
           {% endif %}
         </div>
       </div>
 
-      <div class="col-lg-6">
-        <div class="dash-card">
-          <div class="section-head d-flex justify-content-between align-items-center mb-3">
+      <div class="col-lg-4">
+        <div class="dash-card h-100">
+          <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="section-title-sm"><i class="bi bi-clock-history text-muted me-2"></i>Historique récent</h2>
             <a href="{% url 'donneurs:historique_dons' %}" class="btn-link-red">Voir tout <i class="bi bi-arrow-right"></i></a>
           </div>
@@ -582,11 +510,66 @@
           {% endif %}
         </div>
       </div>
+
+      <!-- Gamification — style clair cohérent -->
+      <div class="col-lg-4">
+        <div class="gamif-card h-100">
+          <div class="gamif-header">
+            <div class="gamif-title-wrap">
+              <div class="gamif-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E63946" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+              <div>
+                <p class="gamif-eyebrow">Gamification</p>
+                <h2 class="gamif-heading">Badges &amp; Impact</h2>
+              </div>
+            </div>
+            <a href="{% url 'donneurs:badges' %}" class="btn-link-violet">Voir tout <i class="bi bi-arrow-right"></i></a>
+          </div>
+
+          <!-- Vies sauvées -->
+          <div class="vies-strip">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--red)" style="flex-shrink:0;animation:heartbeat 1.6s ease-in-out infinite;">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <div>
+              <div class="vies-num-sm">{{ vies_sauvees }}</div>
+              <div class="vies-desc">vies potentiellement sauvées ({{ total_dons }} don{{ total_dons|pluralize }} × 3)</div>
+            </div>
+          </div>
+
+          <!-- Badges obtenus -->
+          {% if badges_obtenus %}
+            <div class="badge-pills mb-2">
+              {% for b in badges_obtenus %}
+              <div class="badge-pill-item" title="{{ b.nom }} — {{ b.description }}">
+                <span class="bp-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+                  </svg>
+                </span>
+                <span class="bp-name">{{ b.nom }}</span>
+              </div>
+              {% endfor %}
+            </div>
+            <p style="font-size:.7rem;color:var(--muted);margin:0;">
+              {{ badges_obtenus|length }} badge{{ badges_obtenus|length|pluralize }} · <a href="{% url 'donneurs:badges' %}" style="color:var(--red);font-weight:700;">tous les objectifs →</a>
+            </p>
+          {% else %}
+            <div class="empty-state" style="padding:1rem 0;">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1.5"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+              <p style="font-size:.8rem;color:var(--muted);">Aucun badge encore — <a href="{% url 'donneurs:enregistrer_don' %}" style="color:var(--red);font-weight:700;">premier don !</a></p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
 
-    <!-- ── Actions rapides ── -->
+    <!-- ══ Actions rapides ══ -->
     <div class="dash-card">
-      <h2 class="section-title-sm mb-3"><i class="bi bi-lightning-fill text-amber me-2"></i>Actions rapides</h2>
+      <h2 class="section-title-sm mb-3"><i class="bi bi-lightning-fill text-warning me-2"></i>Actions rapides</h2>
       <div class="row g-3">
         <div class="col-6 col-md-4 col-lg">
           <a href="{% url 'donneurs:enregistrer_don' %}" class="quick-action {% if not est_eligible %}disabled-action{% endif %}">
@@ -625,235 +608,59 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-
-  /* ─────────────────────────────────────────
-     DONNÉES DJANGO
-     donneur_pos   → {lat, lng} du donneur
-     map_data_json → [{nom, ville, adresse, lat, lng, poches, groupe, has_appel}, ...]
-                     = TOUS les HopitalProfile valides avec latitude/longitude réelles
-                       saisies lors de l'inscription via la carte du register.html
-  ───────────────────────────────────────── */
   const LAT_D    = {{ donneur_pos.lat|safe }};
   const LNG_D    = {{ donneur_pos.lng|safe }};
   const HOPITAUX = {{ map_data_json|safe }};
   const PRENOM   = "{{ donneur.user.first_name|default:donneur.user.username|escapejs }}";
   const GROUPE   = "{{ donneur.groupe_sanguin|escapejs }}";
 
-  /* Debug console — à retirer en production */
-  console.log('📍 Donneur pos:', LAT_D, LNG_D);
-  console.log('🏥 Hôpitaux reçus:', HOPITAUX.length, HOPITAUX);
-
-  /* ── Carte tiles CLAIRS (CartoDB Positron — fond blanc propre) ── */
   const map = L.map('map', { zoomControl:false, attributionControl:false })
                .setView([LAT_D, LNG_D], 13);
-
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    maxZoom:19,
-    attribution:'© OpenStreetMap © CartoDB'
-  }).addTo(map);
-
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom:19 }).addTo(map);
   L.control.zoom({ position:'topright' }).addTo(map);
-  L.control.attribution({ position:'bottomright', prefix:false }).addTo(map);
 
-  /* ── Haversine distance (km) ── */
   function km(la1,lo1,la2,lo2){
-    const R=6371e3, f1=la1*Math.PI/180, f2=la2*Math.PI/180;
-    const df=(la2-la1)*Math.PI/180, dl=(lo2-lo1)*Math.PI/180;
+    const R=6371e3,f1=la1*Math.PI/180,f2=la2*Math.PI/180,df=(la2-la1)*Math.PI/180,dl=(lo2-lo1)*Math.PI/180;
     const a=Math.sin(df/2)**2+Math.cos(f1)*Math.cos(f2)*Math.sin(dl/2)**2;
     return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))/100)/10;
   }
 
-  /* ── Hôpital le plus proche ── */
-  let nearestIdx = -1, nearestDist = Infinity;
-  HOPITAUX.forEach((h, i) => {
-    const d = km(LAT_D, LNG_D, h.lat, h.lng);
-    if (d < nearestDist) { nearestDist = d; nearestIdx = i; }
-  });
+  let nearestIdx=-1,nearestDist=Infinity;
+  HOPITAUX.forEach((h,i)=>{const d=km(LAT_D,LNG_D,h.lat,h.lng);if(d<nearestDist){nearestDist=d;nearestIdx=i;}});
 
-  /* ── Marqueur DONNEUR (bleu pulsant) ── */
-  L.marker([LAT_D, LNG_D], {
-    icon: L.divIcon({
-      className:'',
-      html:`<div class="donneur-marker"><div class="donneur-core"></div></div>`,
-      iconSize:[22,22], iconAnchor:[11,11]
-    }),
-    zIndexOffset: 1000
-  }).addTo(map).bindPopup(`
-    <div>
-      <div class="pu-head-blue">
-        <h3>📍 ${PRENOM} — Vous êtes ici</h3>
-        <p>Groupe sanguin : <strong>${GROUPE}</strong></p>
-      </div>
-      <div class="pu-body">
-        <div class="pu-row">
-          <div class="pu-ic b"><i class="bi bi-crosshair" style="color:#2563eb;"></i></div>
-          <div>
-            <p class="pu-lbl">Coordonnées GPS</p>
-            <p class="pu-val">${LAT_D.toFixed(5)}, ${LNG_D.toFixed(5)}</p>
-          </div>
-        </div>
-        <hr class="pu-sep"/>
-        <a class="btn-gps-nav"
-           style="box-shadow:0 6px 20px rgba(37,99,235,.35);"
-           href="https://www.google.com/maps/search/?api=1&query=${LAT_D},${LNG_D}"
-           target="_blank" rel="noopener">
-          <span class="btn-gps-left" style="background:rgba(0,0,0,.18);">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg>
-          </span>
-          <span class="btn-gps-center" style="background:linear-gradient(135deg,#2563eb,#1e3a8a);">
-            <span class="btn-gps-label">Ma position exacte</span>
-            <span class="btn-gps-sub">Ouvrir dans Maps</span>
-          </span>
-          <span class="btn-gps-arrow">
-            <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </span>
-        </a>
-      </div>
-    </div>`, { maxWidth:285, closeButton:true });
+  L.marker([LAT_D,LNG_D],{icon:L.divIcon({className:'',html:`<div class="donneur-marker"><div class="donneur-core"></div></div>`,iconSize:[22,22],iconAnchor:[11,11]}),zIndexOffset:1000})
+   .addTo(map).bindPopup(`<div><div class="pu-head-blue"><h3>📍 ${PRENOM} — Vous êtes ici</h3><p>Groupe sanguin : <strong>${GROUPE}</strong></p></div><div class="pu-body"><div class="pu-row"><div class="pu-ic b"><i class="bi bi-crosshair" style="color:#2563eb;"></i></div><div><p class="pu-lbl">Coordonnées GPS</p><p class="pu-val">${LAT_D.toFixed(5)}, ${LNG_D.toFixed(5)}</p></div></div><hr class="pu-sep"/><a class="btn-gps-nav" style="box-shadow:0 4px 16px rgba(37,99,235,.35);" href="https://www.google.com/maps/search/?api=1&query=${LAT_D},${LNG_D}" target="_blank" rel="noopener"><span class="btn-gps-left" style="background:rgba(0,0,0,.18);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span><span class="btn-gps-center" style="background:linear-gradient(135deg,#2563eb,#1e3a8a);"><span class="btn-gps-label">Ma position exacte</span><span class="btn-gps-sub">Ouvrir dans Maps</span></span><span class="btn-gps-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div></div>`,{maxWidth:280,closeButton:true});
 
-  const scanDot  = document.getElementById('scanDot');
-  const scanText = document.getElementById('scan-text');
+  const scanDot=document.getElementById('scanDot');
+  const scanText=document.getElementById('scan-text');
+  let maxM=2000;
+  HOPITAUX.forEach(h=>{const d=km(LAT_D,LNG_D,h.lat,h.lng)*1000;if(d>maxM)maxM=d;});
+  const rayon=Math.max(maxM*1.18,1200);
+  L.circle([LAT_D,LNG_D],{radius:rayon,color:'#2563eb',fillColor:'#2563eb',fillOpacity:.04,weight:2,dashArray:'10 7',opacity:.4,className:'radar-dashed-circle'}).addTo(map);
 
-  /* ── Rayon radar ── */
-  let maxM = 2000;
-  if (HOPITAUX.length) {
-    HOPITAUX.forEach(h => {
-      const d = km(LAT_D,LNG_D,h.lat,h.lng)*1000;
-      if (d > maxM) maxM = d;
-    });
-  }
-  const rayon = Math.max(maxM * 1.18, 1200);
+  if(!HOPITAUX.length){scanDot.classList.add('empty');scanText.textContent='Aucun hôpital enregistré.';map.fitBounds([[LAT_D-.05,LNG_D-.05],[LAT_D+.05,LNG_D+.05]],{padding:[40,40]});map.invalidateSize();return;}
 
-  /* ── CERCLE INTERROMPU (bleu, dashArray, légèrement animé via CSS) ──
-     Le cercle entoure le donneur ET l'hôpital le plus proche (rayon = distance)
-     On ajoute aussi un 2e cercle plus petit = rayon vers l'hôpital le plus proche ── */
-  // Un seul cercle interrompu bleu autour du donneur
-  L.circle([LAT_D, LNG_D], {
-    radius: rayon,
-    color: '#2563eb',
-    fillColor: '#2563eb',
-    fillOpacity: .04,
-    weight: 2,
-    dashArray: '10 7',
-    opacity: .45,
-    className: 'radar-dashed-circle'
-  }).addTo(map);
+  const hopIcon=()=>L.divIcon({className:'',html:`<div class="hop-pin"><div class="hop-beat-ring"></div><div class="hop-beat-ring"></div><div class="hop-body"><span class="hop-body-inner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg></span></div></div>`,iconSize:[44,44],iconAnchor:[22,22],popupAnchor:[0,-24]});
 
-  if (!HOPITAUX.length) {
-    scanDot.classList.add('empty');
-    scanText.textContent = 'Aucun hôpital enregistré.';
-    const bounds2 = L.latLngBounds([[LAT_D-0.05,LNG_D-0.05],[LAT_D+0.05,LNG_D+0.05]]);
-    map.fitBounds(bounds2, {padding:[40,40]});
-    map.invalidateSize();
-    return;
-  }
-
-  const hopIcon = (isNearest) => L.divIcon({
-    className:'',
-    html:`<div class="hop-pin">
-            <div class="hop-beat-ring"></div>
-            <div class="hop-beat-ring"></div>
-            <div class="hop-body">
-              <span class="hop-body-inner">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/>
-                </svg>
-              </span>
-            </div>
-          </div>`,
-    iconSize:[44,44], iconAnchor:[22,22], popupAnchor:[0,-24]
-  });
-
-  /* ── Ajout des marqueurs hôpitaux (coordonnées réelles de HopitalProfile) ── */
-  let idx = 0;
-  function addNext() {
-    if (idx >= HOPITAUX.length) return;
-    const h = HOPITAUX[idx];
-    const isNearest = (idx === nearestIdx);
-    idx++;
-
-    /*
-      URL GPS — ouvre directement Google Maps (ou l'app Maps native sur mobile)
-      en mode itinéraire depuis la position du donneur vers l'hôpital réel.
-      Les coordonnées h.lat / h.lng viennent de HopitalProfile.latitude / .longitude
-      enregistrées lors de l'inscription via la carte Leaflet du register.html.
-    */
-    const gpsUrl = `https://www.google.com/maps/dir/?api=1`
-                 + `&origin=${LAT_D},${LNG_D}`
-                 + `&destination=${h.lat},${h.lng}`
-                 + `&travelmode=driving`;
-
-    const d = km(LAT_D, LNG_D, h.lat, h.lng);
-
-    const nearestBadge = isNearest
-      ? `<div class="nearest-badge"><i class="bi bi-star-fill me-1"></i> Hôpital le plus proche</div>`
-      : '';
-
-    const appel_info = h.has_appel
-      ? `<div class="pu-row">
-           <div class="pu-ic r">🩸</div>
-           <div>
-             <p class="pu-lbl">Besoin urgent</p>
-             <p class="pu-val">${h.poches} poches · <strong>${h.groupe}</strong></p>
-           </div>
-         </div>`
-      : `<div class="pu-row">
-           <div class="pu-ic b"><i class="bi bi-hospital" style="color:#2563eb;"></i></div>
-           <div>
-             <p class="pu-lbl">Statut</p>
-             <p class="pu-val">Hôpital partenaire enregistré</p>
-           </div>
-         </div>`;
-
-    const urgence_badge = h.has_appel
-      ? `<div class="pu-badge"><span class="pu-blink"></span> Urgence active</div>`
-      : `<div class="pu-badge" style="background:rgba(255,255,255,.12);">✓ Partenaire DonSang</div>`;
-
-    L.marker([h.lat, h.lng], { icon: hopIcon(isNearest) })
-     .addTo(map)
-     .bindPopup(`
-       <div>
-         <div class="pu-head">
-           ${nearestBadge}
-           ${urgence_badge}
-           <h3>${h.nom}</h3>
-           <p><i class="bi bi-geo-alt"></i> ${h.adresse || h.ville || ''}</p>
-         </div>
-         <div class="pu-body">
-           ${appel_info}
-           <hr class="pu-sep"/>
-           <a class="btn-gps-nav" href="${gpsUrl}" target="_blank" rel="noopener">
-             <span class="btn-gps-left">
-               <svg viewBox="0 0 24 24"><polygon points="3,11 22,2 13,21 11,13"/></svg>
-             </span>
-             <span class="btn-gps-center">
-               <span class="btn-gps-label">Y aller maintenant</span>
-               <span class="btn-gps-sub">Navigation GPS · Google Maps</span>
-             </span>
-             <span class="btn-gps-arrow">
-               <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-             </span>
-           </a>
-           <div class="dist-tag">
-             <i class="bi bi-signpost-2"></i>&nbsp;environ <strong>${d} km</strong> de vous
-           </div>
-         </div>
-       </div>`, { maxWidth:290, closeButton:true });
-
+  let idx=0;
+  function addNext(){
+    if(idx>=HOPITAUX.length)return;
+    const h=HOPITAUX[idx],isNearest=(idx===nearestIdx);idx++;
+    const gpsUrl=`https://www.google.com/maps/dir/?api=1&origin=${LAT_D},${LNG_D}&destination=${h.lat},${h.lng}&travelmode=driving`;
+    const d=km(LAT_D,LNG_D,h.lat,h.lng);
+    const nb=isNearest?`<div class="nearest-badge"><i class="bi bi-star-fill me-1"></i> Hôpital le plus proche</div>`:'';
+    const ub=h.has_appel?`<div class="pu-badge"><span class="pu-blink"></span> Urgence active</div>`:`<div class="pu-badge" style="background:rgba(255,255,255,.12);">✓ Partenaire DonSang</div>`;
+    const ai=h.has_appel?`<div class="pu-row"><div class="pu-ic r">🩸</div><div><p class="pu-lbl">Besoin urgent</p><p class="pu-val">${h.poches} poches · <strong>${h.groupe}</strong></p></div></div>`:`<div class="pu-row"><div class="pu-ic b"><i class="bi bi-hospital" style="color:#2563eb;"></i></div><div><p class="pu-lbl">Statut</p><p class="pu-val">Hôpital partenaire</p></div></div>`;
+    L.marker([h.lat,h.lng],{icon:hopIcon()}).addTo(map).bindPopup(`<div><div class="pu-head">${nb}${ub}<h3>${h.nom}</h3><p><i class="bi bi-geo-alt"></i> ${h.adresse||h.ville||''}</p></div><div class="pu-body">${ai}<hr class="pu-sep"/><a class="btn-gps-nav" href="${gpsUrl}" target="_blank" rel="noopener"><span class="btn-gps-left"><svg viewBox="0 0 24 24"><polygon points="3,11 22,2 13,21 11,13"/></svg></span><span class="btn-gps-center"><span class="btn-gps-label">Y aller maintenant</span><span class="btn-gps-sub">Navigation GPS</span></span><span class="btn-gps-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a><div class="dist-tag"><i class="bi bi-signpost-2"></i>&nbsp;environ <strong>${d} km</strong> de vous</div></div></div>`,{maxWidth:280,closeButton:true});
     requestAnimationFrame(addNext);
   }
   requestAnimationFrame(addNext);
-
-  /* ── Statut ── */
   scanDot.classList.add('found');
-  scanText.textContent = `✓ ${HOPITAUX.length} hôpital(aux) trouvé(s)`;
-
-  /* ── Zoom pour tout voir ── */
-  const bounds = L.latLngBounds([[LAT_D, LNG_D]]);
-  HOPITAUX.forEach(h => bounds.extend([h.lat, h.lng]));
-  map.fitBounds(bounds, { padding:[60,60], maxZoom:14 });
+  scanText.textContent=`✓ ${HOPITAUX.length} hôpital(aux) trouvé(s)`;
+  const bounds=L.latLngBounds([[LAT_D,LNG_D]]);
+  HOPITAUX.forEach(h=>bounds.extend([h.lat,h.lng]));
+  map.fitBounds(bounds,{padding:[60,60],maxZoom:14});
   map.invalidateSize();
-
 });
 </script>
 {% endblock %}

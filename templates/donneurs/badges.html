@@ -1,0 +1,475 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mes Badges & Classement — DonSang{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red:        #E63946;
+  --red-dark:   #b5111f;
+  --red-light:  #fff1f2;
+  --surface:    #ffffff;
+  --bg:         #f8f9fb;
+  --text:       #0f172a;
+  --muted:      #64748b;
+  --border:     #e2e8f0;
+  --green:      #10b981;
+  --green-light:#f0fdf4;
+  --amber:      #f59e0b;
+  --amber-light:#fffbeb;
+  --blue:       #2563eb;
+  --blue-light: #eff6ff;
+  --violet:     #8b5cf6;
+  --violet-light:#f5f3ff;
+  --radius:     16px;
+  --shadow-sm:  0 1px 4px rgba(0,0,0,.06);
+  --shadow-md:  0 4px 20px rgba(0,0,0,.08);
+}
+
+/* ── Page header ── */
+.page-wrapper { background:var(--bg); min-height:100vh; }
+.badges-page-header {
+  background:var(--surface);
+  border-bottom:1.5px solid var(--border);
+  padding:1.5rem 0;
+}
+.page-eyebrow { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--red); margin:0 0 .3rem; }
+.page-title { font-family:'Sora',sans-serif; font-size:1.6rem; font-weight:900; color:var(--text); margin:0 0 .4rem; }
+.page-desc { font-size:.85rem; color:var(--muted); margin:0; }
+
+/* ── Vies counter — style clair ── */
+.vies-counter {
+  display:inline-flex; align-items:center; gap:1.2rem;
+  background:var(--red-light);
+  border:1.5px solid #fecdd3;
+  border-radius:14px; padding:.9rem 1.5rem;
+  margin-top:1rem;
+}
+.vies-icon { flex-shrink:0; animation:heartbeat 1.6s ease-in-out infinite; }
+@keyframes heartbeat { 0%,100%{transform:scale(1);} 14%{transform:scale(1.2);} 28%{transform:scale(1);} 42%{transform:scale(1.12);} }
+.vies-num { font-family:'Sora',sans-serif; font-size:2rem; font-weight:900; color:var(--red); line-height:1; }
+.vies-label { font-size:.75rem; color:#be123c; font-weight:500; }
+.vies-divider { width:1px; background:#fecdd3; align-self:stretch; }
+
+/* ── Stats résumé ── */
+.resume-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:.9rem; margin-bottom:2rem; }
+.resume-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:1.1rem 1rem; text-align:center; box-shadow:var(--shadow-sm); }
+.resume-num { font-family:'Sora',sans-serif; font-size:1.7rem; font-weight:900; color:var(--red); display:block; line-height:1; }
+.resume-lbl { font-size:.72rem; color:var(--muted); margin-top:.3rem; display:block; }
+.resume-card.accent-green .resume-num { color:var(--green); }
+
+/* ── Section labels ── */
+.section-eyebrow { font-size:.68rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--red); margin-bottom:.25rem; }
+.section-heading { font-family:'Sora',sans-serif; font-size:1.2rem; font-weight:800; color:var(--text); margin-bottom:1rem; }
+
+/* ── Badge card — obtenu ── */
+.badge-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1rem; }
+
+.badge-card {
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  padding:1.5rem 1.4rem;
+  position:relative; overflow:hidden;
+  transition:transform .3s cubic-bezier(.22,.68,0,1.4),box-shadow .3s,border-color .3s;
+}
+.badge-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:var(--badge-color); border-radius:3px 3px 0 0;
+}
+.badge-card:hover { transform:translateY(-5px); box-shadow:0 16px 40px rgba(0,0,0,.09); border-color:var(--badge-color); }
+
+/* Niveau spécifique */
+.badge-card.niveau-platinum { background:linear-gradient(135deg,#fffbeb,#fef3c7); border-color:#fbbf24; }
+.badge-card.niveau-platinum::before { background:linear-gradient(90deg,#f59e0b,#d97706); }
+
+/* Icône badge */
+.badge-icon-wrap {
+  width:52px; height:52px;
+  border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:1rem;
+  background:var(--badge-bg, var(--bg));
+  border:1.5px solid var(--badge-border, var(--border));
+}
+.badge-icon-wrap svg { width:26px; height:26px; }
+
+.badge-nom { font-family:'Sora',sans-serif; font-size:1rem; font-weight:800; color:var(--text); margin-bottom:.3rem; }
+.badge-desc { font-size:.8rem; color:var(--muted); line-height:1.55; margin-bottom:.85rem; }
+.badge-date-pill {
+  display:inline-flex; align-items:center; gap:.4rem;
+  background:var(--bg); border:1.5px solid var(--border);
+  border-radius:100px; padding:.22rem .8rem;
+  font-size:.68rem; color:var(--muted); font-weight:600;
+}
+.badge-date-pill svg { width:12px; height:12px; }
+
+/* Niveau pill */
+.niveau-pill {
+  display:inline-flex; align-items:center; gap:.3rem;
+  font-size:.6rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.7px;
+  padding:.18rem .65rem; border-radius:100px;
+  margin-bottom:.65rem;
+}
+.niveau-bronze   { background:#fef3c7; color:#92400e; }
+.niveau-silver   { background:#f1f5f9; color:#475569; }
+.niveau-gold     { background:#fef9c3; color:#854d0e; }
+.niveau-platinum { background:linear-gradient(90deg,#fbbf24,#f59e0b); color:#431407; }
+
+/* ── Badge card — verrouillé ── */
+.badge-card-locked {
+  background:var(--bg);
+  border:1.5px dashed var(--border);
+  border-radius:var(--radius);
+  padding:1.5rem 1.4rem;
+  transition:opacity .25s;
+}
+.badge-card-locked:hover { opacity:1; }
+
+.badge-icon-locked {
+  width:52px; height:52px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:.9rem;
+  background:var(--border); opacity:.5;
+}
+.badge-icon-locked svg { width:26px; height:26px; color:var(--muted); }
+
+.locked-pill {
+  display:inline-flex; align-items:center; gap:.35rem;
+  background:var(--border); border-radius:100px;
+  padding:.2rem .7rem; font-size:.68rem; color:var(--muted); font-weight:700;
+  margin-bottom:.55rem;
+}
+.locked-pill svg { width:11px; height:11px; }
+
+.badge-nom-locked { font-family:'Sora',sans-serif; font-size:.95rem; font-weight:700; color:var(--muted); margin-bottom:.3rem; }
+.badge-critere { font-size:.78rem; color:var(--muted); line-height:1.5; margin-bottom:.85rem; }
+
+.prog-bar-wrap { margin-top:.6rem; }
+.prog-bar-label { display:flex; justify-content:space-between; font-size:.68rem; color:var(--muted); font-weight:600; margin-bottom:.3rem; }
+.prog-bar-bg { background:var(--border); border-radius:100px; height:6px; overflow:hidden; }
+.prog-bar-fill { height:100%; border-radius:100px; background:var(--badge-color,var(--red)); width:0; transition:width 1.2s cubic-bezier(.22,.68,0,1); }
+
+/* ── Leaderboard ── */
+.leaderboard-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-sm); }
+.lb-head { background:linear-gradient(135deg,#0f172a,#1e293b); padding:1.1rem 1.5rem; display:flex; align-items:center; gap:.9rem; }
+.lb-head-icon { width:40px; height:40px; background:rgba(230,57,70,.2); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.lb-head h3 { font-family:'Sora',sans-serif; font-size:.92rem; font-weight:800; color:#fff; margin:0 0 2px; }
+.lb-head p { font-size:.7rem; color:rgba(255,255,255,.45); margin:0; }
+
+.lb-row { display:flex; align-items:center; gap:.9rem; padding:.8rem 1.4rem; border-bottom:1px solid var(--border); transition:background .2s; }
+.lb-row:last-child { border-bottom:none; }
+.lb-row:hover { background:var(--bg); }
+.lb-row.is-me { background:var(--red-light); }
+.lb-rang { font-family:'Sora',sans-serif; font-size:1rem; font-weight:900; min-width:28px; text-align:center; }
+.lb-rang.rang-1 { color:#f59e0b; }
+.lb-rang.rang-2 { color:#94a3b8; }
+.lb-rang.rang-3 { color:#cd7f32; }
+.lb-rang.rang-other { color:var(--muted); font-size:.85rem; }
+.lb-medal { width:22px; text-align:center; font-size:.95rem; }
+.lb-info { flex:1; min-width:0; }
+.lb-nom { font-family:'Sora',sans-serif; font-size:.87rem; font-weight:700; color:var(--text); }
+.lb-groupe { font-size:.68rem; color:var(--muted); font-weight:600; }
+.lb-right { text-align:right; }
+.lb-dons { font-family:'Sora',sans-serif; font-size:.95rem; font-weight:800; color:var(--red); }
+.lb-vies { font-size:.66rem; color:var(--muted); }
+.you-badge { font-size:.62rem; background:var(--red-light); color:var(--red); padding:.08rem .5rem; border-radius:100px; font-weight:700; margin-left:.35rem; }
+.lb-empty { padding:2rem; text-align:center; color:var(--muted); font-size:.85rem; }
+
+/* ── Info card ── */
+.info-card {
+  background:var(--red-light);
+  border:1.5px solid #fecdd3;
+  border-radius:var(--radius); padding:1rem 1.2rem;
+  margin-top:1rem;
+}
+.info-card-title { font-size:.75rem; font-weight:700; color:#9f1239; margin:0 0 .3rem; display:flex; align-items:center; gap:.4rem; }
+.info-card-body  { font-size:.73rem; color:#be123c; margin:0; line-height:1.55; }
+
+/* ── Back link ── */
+.back-link { display:inline-flex; align-items:center; gap:.4rem; color:var(--muted); font-size:.82rem; font-weight:600; text-decoration:none; margin-top:1rem; transition:color .2s; }
+.back-link:hover { color:var(--text); }
+
+@media(max-width:576px){
+  .badge-grid { grid-template-columns:1fr 1fr; gap:.7rem; }
+  .badge-card,.badge-card-locked { padding:1.1rem .9rem; }
+  .badge-icon-wrap,.badge-icon-locked { width:42px; height:42px; }
+  .page-title { font-size:1.3rem; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+
+  <!-- ── Header ── -->
+  <div class="badges-page-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-7">
+          <p class="page-eyebrow">Système de gamification</p>
+          <h1 class="page-title">Mes Badges &amp; mon Impact</h1>
+          <p class="page-desc">Chaque don compte. Débloquez des badges, suivez votre progression et voyez combien de vies vous avez sauvées.</p>
+          <div class="vies-counter">
+            <div class="vies-icon">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="var(--red)">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="vies-num">{{ vies_sauvees }}</div>
+              <div class="vies-label">vies potentiellement sauvées</div>
+            </div>
+            <div class="vies-divider"></div>
+            <div>
+              <div class="vies-num" style="font-size:1.4rem;">{{ total_dons }}</div>
+              <div class="vies-label">don{{ total_dons|pluralize }} enregistré{{ total_dons|pluralize }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container py-4">
+
+    <!-- ── Résumé stats ── -->
+    <div class="resume-grid">
+      <div class="resume-card">
+        <span class="resume-num">{{ badges_obtenus|length }}</span>
+        <span class="resume-lbl">Badge{{ badges_obtenus|length|pluralize }} obtenu{{ badges_obtenus|length|pluralize }}</span>
+      </div>
+      <div class="resume-card">
+        <span class="resume-num">{{ badges_a_venir|length }}</span>
+        <span class="resume-lbl">Badge{{ badges_a_venir|length|pluralize }} à débloquer</span>
+      </div>
+      <div class="resume-card">
+        <span class="resume-num">{{ total_dons }}</span>
+        <span class="resume-lbl">Don{{ total_dons|pluralize }} total</span>
+      </div>
+      <div class="resume-card accent-green">
+        <span class="resume-num">{{ rang_ville }}</span>
+        <span class="resume-lbl">Classement à {{ donneur.ville|default:"votre ville" }}</span>
+      </div>
+    </div>
+
+    <div class="row g-4">
+
+      <!-- ── Colonne principale ── -->
+      <div class="col-lg-8">
+
+        <!-- Badges obtenus -->
+        {% if badges_obtenus %}
+        <div class="mb-5">
+          <p class="section-eyebrow">Débloqués</p>
+          <h2 class="section-heading">
+            Mes badges
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-left:.3rem;">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </h2>
+          <div class="badge-grid">
+            {% for b in badges_obtenus %}
+            <div class="badge-card niveau-{{ b.niveau }}" style="--badge-color:{{ b.couleur }};">
+              <div class="badge-icon-wrap" style="--badge-bg:{{ b.couleur }}18;--badge-border:{{ b.couleur }}30;">
+                <!-- Icône SVG selon le nom de badge -->
+                {% if "premier" in b.nom|lower or "1er" in b.nom|lower %}
+                <svg viewBox="0 0 24 24" fill="none" stroke="{{ b.couleur }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                {% elif "régul" in b.nom|lower or "fidèle" in b.nom|lower %}
+                <svg viewBox="0 0 24 24" fill="none" stroke="{{ b.couleur }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+                </svg>
+                {% elif "héros" in b.nom|lower or "champion" in b.nom|lower %}
+                <svg viewBox="0 0 24 24" fill="none" stroke="{{ b.couleur }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+                </svg>
+                {% elif "vie" in b.nom|lower or "sauveur" in b.nom|lower %}
+                <svg viewBox="0 0 24 24" fill="none" stroke="{{ b.couleur }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+                {% else %}
+                <svg viewBox="0 0 24 24" fill="none" stroke="{{ b.couleur }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                {% endif %}
+              </div>
+              <div class="niveau-pill niveau-{{ b.niveau }}">{{ b.niveau }}</div>
+              <div class="badge-nom">{{ b.nom }}</div>
+              <div class="badge-desc">{{ b.description }}</div>
+              {% if b.date_obtention %}
+              <div class="badge-date-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Obtenu le {{ b.date_obtention|date:"d/m/Y" }}
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% else %}
+        <div class="mb-5">
+          <p class="section-eyebrow">Débloqués</p>
+          <h2 class="section-heading">Mes badges</h2>
+          <div style="background:var(--bg);border:2px dashed var(--border);border-radius:var(--radius);padding:2.5rem;text-align:center;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:.8rem;">
+              <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+            </svg>
+            <p style="color:var(--muted);font-size:.88rem;margin:0 0 1rem;">Aucun badge encore. Enregistrez votre premier don pour commencer !</p>
+            <a href="{% url 'donneurs:enregistrer_don' %}" style="display:inline-flex;align-items:center;gap:.4rem;background:var(--red);color:#fff;border-radius:10px;padding:.5rem 1.2rem;font-size:.82rem;font-weight:700;text-decoration:none;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Enregistrer un don
+            </a>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Badges à venir -->
+        {% if badges_a_venir %}
+        <div class="mb-4">
+          <p class="section-eyebrow">À débloquer</p>
+          <h2 class="section-heading">
+            Prochains objectifs
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-left:.3rem;">
+              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+            </svg>
+          </h2>
+          <div class="badge-grid">
+            {% for b in badges_a_venir %}
+            <div class="badge-card-locked" style="--badge-color:{{ b.couleur }};">
+              <div class="badge-icon-locked">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </div>
+              <div class="locked-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                Non débloqué
+              </div>
+              <div class="badge-nom-locked">{{ b.nom }}</div>
+              <div class="badge-critere">{{ b.critere }}</div>
+              <div class="prog-bar-wrap">
+                <div class="prog-bar-label">
+                  <span>{{ b.prog_label }}</span>
+                  <span>{{ b.progression }}%</span>
+                </div>
+                <div class="prog-bar-bg">
+                  <div class="prog-bar-fill" data-width="{{ b.progression }}"></div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+
+      <!-- ── Sidebar : Classement ── -->
+      <div class="col-lg-4">
+        <div style="position:sticky;top:90px;">
+          <p class="section-eyebrow">Compétition</p>
+          <h2 class="section-heading">
+            Top donneurs
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-left:.3rem;">
+              <path d="M8 21H5a2 2 0 0 1-2-2v-1a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v1a2 2 0 0 1-2 2h-3"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </h2>
+
+          <div class="leaderboard-card mb-3">
+            <div class="lb-head">
+              <div class="lb-head-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M8 21H5a2 2 0 0 1-2-2v-1a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v1a2 2 0 0 1-2 2h-3"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <div>
+                <h3>Classement local</h3>
+                <p>{{ donneur.ville|default:"Ville non renseignée" }} · Anonymisé</p>
+              </div>
+            </div>
+
+            {% if classement %}
+              {% for item in classement %}
+              <div class="lb-row {% if item.rang == rang_ville %}is-me{% endif %}">
+                <div class="lb-rang rang-{% if item.rang <= 3 %}{{ item.rang }}{% else %}other{% endif %}">
+                  {% if item.rang == 1 %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+                  {% elif item.rang == 2 %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#94a3b8"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+                  {% elif item.rang == 3 %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#cd7f32"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+                  {% else %}#{{ item.rang }}{% endif %}
+                </div>
+                <div class="lb-info">
+                  <div class="lb-nom">
+                    {{ item.nom }}
+                    {% if item.rang == rang_ville %}<span class="you-badge">Vous</span>{% endif %}
+                  </div>
+                  <div class="lb-groupe">Groupe {{ item.groupe }}</div>
+                </div>
+                <div class="lb-right">
+                  <div class="lb-dons">{{ item.nb_dons }} don{{ item.nb_dons|pluralize }}</div>
+                  <div class="lb-vies">≈ {{ item.vies }} vie{{ item.vies|pluralize }}</div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="lb-empty">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1.5" style="display:block;margin:0 auto .5rem;"><circle cx="12" cy="8" r="4"/><path d="M2 20c0-4 4-7 10-7s10 3 10 7"/></svg>
+                Aucun donneur classé pour {{ donneur.ville|default:"cette ville" }} pour l'instant.
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Info OMS -->
+          <div class="info-card">
+            <p class="info-card-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              Le saviez-vous ?
+            </p>
+            <p class="info-card-body">
+              Selon l'OMS, <strong>1 don de sang peut sauver jusqu'à 3 personnes</strong>. Avec {{ total_dons }} don{{ total_dons|pluralize }}, vous avez potentiellement sauvé <strong>{{ vies_sauvees }} vie{{ vies_sauvees|pluralize }}</strong>.
+            </p>
+          </div>
+
+          <a href="{% url 'donneurs:dashboard' %}" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+            Retour au tableau de bord
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const fills = document.querySelectorAll('.prog-bar-fill');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      setTimeout(() => { el.style.width = el.dataset.width + '%'; }, 150);
+      obs.unobserve(el);
+    });
+  }, { threshold:.3 });
+  fills.forEach(f => obs.observe(f));
+});
+</script>
+{% endblock %}
