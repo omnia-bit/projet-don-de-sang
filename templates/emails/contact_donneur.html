@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ sujet }}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f5f9;">
+    <!-- Wrapper Table -->
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f1f5f9; padding: 40px 0;">
+        <tr>
+            <td align="center">
+                <!-- Main Container -->
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; width: 100%; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
+                    
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); padding: 50px 40px; text-align: center;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td align="center" style="padding-bottom: 20px;">
+                                        <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 50%; display: inline-block; line-height: 64px; text-align: center;">
+                                            <span style="font-size: 28px;">🩸</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <h1 style="margin: 0; font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">Urgence Transfusionnelle</h1>
+                                        <p style="margin: 10px 0 0; font-size: 14px; color: rgba(255,255,255,0.85); font-weight: 500;">Votre don peut sauver une vie aujourd'hui</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 45px 40px;">
+                            <p style="margin: 0 0 20px; font-size: 16px; color: #334155; line-height: 1.6;">Bonjour,</p>
+                            <p style="margin: 0 0 30px; font-size: 15px; color: #64748b; line-height: 1.7;">Nous vous contactons suite à votre réponse positive à notre demande de don de sang. Votre geste généreux est essentiel.</p>
+
+                            <!-- Hospital Info Card -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 30px;">
+                                <tr>
+                                    <td style="background: #fef2f2; padding: 22px 24px; border-radius: 14px; border-left: 5px solid #ef4444;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                                            <tr>
+                                                <td style="padding-right: 14px; vertical-align: top;">
+                                                    <span style="font-size: 22px;">🏥</span>
+                                                </td>
+                                                <td>
+                                                    <p style="margin: 0; font-size: 15px; font-weight: 700; color: #1e293b;">{{ hopital.nom }}</p>
+                                                    <p style="margin: 4px 0 0; font-size: 13px; color: #64748b; font-weight: 500;">📍 {{ hopital.ville }}</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Message Section -->
+                            <p style="margin: 0 0 12px; font-size: 13px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Message de l'équipe médicale</p>
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 35px;">
+                                <tr>
+                                    <td style="background: #f8fafc; padding: 28px; border-radius: 14px; border: 1px solid #e2e8f0;">
+                                        <p style="margin: 0; font-size: 15px; color: #475569; line-height: 1.8; font-style: italic;">
+                                            "{{ message }}"
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- CTA Button -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td align="center">
+                                        <a href="http://127.0.0.1:8000/donneurs/dashboard/" style="display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; text-decoration: none; border-radius: 50px; font-weight: 700; font-size: 15px; box-shadow: 0 6px 20px rgba(239,68,68,0.3);">
+                                            Consulter mon espace donneur →
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Divider -->
+                    <tr>
+                        <td style="padding: 0 40px;">
+                            <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 0;">
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 30px 40px; text-align: center;">
+                            <p style="margin: 0 0 6px; font-size: 12px; color: #94a3b8;">
+                                Vous recevez cet email car vous êtes inscrit sur <strong style="color: #ef4444;">BloodConnect</strong>.
+                            </p>
+                            <p style="margin: 0; font-size: 11px; color: #cbd5e1;">
+                                &copy; 2026 BloodConnect — Plateforme de Coordination du Don de Sang
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

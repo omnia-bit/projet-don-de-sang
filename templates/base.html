@@ -18,7 +18,7 @@
 </head>
 <body>
 
-<!-- ═══════════ NAVBAR ═══════════ -->
+<!-- Menu de navigation -->
 <nav class="main-navbar">
   <div class="container">
     <div class="navbar-inner">
@@ -29,12 +29,12 @@
         DonSang
       </a>
 
-      <!-- Navigation selon le rôle -->
+      <!-- Liens selon l'utilisateur -->
       <div class="nav-links-group" id="navLinks">
         {% if user.is_authenticated %}
 
           {% if user.is_superuser or user.groups.all.0.name == 'Admin' %}
-            <!-- ADMIN -->
+            <!-- Espace Admin -->
             <a href="/administration/" class="nav-link-item">
               <i class="bi bi-speedometer2 me-1"></i>Dashboard
             </a>
@@ -46,7 +46,7 @@
             </a>
 
           {% elif user.donneur_profile %}
-            <!-- DONNEUR -->
+            <!-- Espace Donneurs -->
             <a href="{% url 'donneurs:dashboard' %}" class="nav-link-item">
               <i class="bi bi-speedometer2 me-1"></i>Tableau de bord
             </a>
@@ -64,7 +64,7 @@
             </a>
 
           {% elif user.hopital_profile %}
-            <!-- HÔPITAL -->
+            <!-- Espace Hopitaux -->
             <a href="/hopitaux/dashboard/" class="nav-link-item">
               <i class="bi bi-speedometer2 me-1"></i>Dashboard
             </a>
@@ -74,13 +74,19 @@
             <a href="/hopitaux/campagnes/" class="nav-link-item">
               <i class="bi bi-calendar-event me-1"></i>Campagnes
             </a>
+            <a href="{% url 'hopitaux:gestion_stock' %}" class="nav-link-item">
+              <i class="bi bi-box-seam me-1"></i>Stock
+            </a>
+            <a href="{% url 'hopitaux:historique_dons' %}" class="nav-link-item">
+              <i class="bi bi-journal-medical me-1"></i>Historique
+            </a>
             <a href="{% url 'hopitaux:scanner_qr' %}" class="nav-link-item nav-link-accent text-white">
-              <i class="bi bi-qr-code-scan me-1"></i>Scanner Check-in
+              <i class="bi bi-qr-code-scan me-1"></i>Scanner
             </a>
           {% endif %}
 
         {% else %}
-          <!-- NON CONNECTÉ -->
+          <!-- Pas connecté -->
           <a href="/" class="nav-link-item">Accueil</a>
           <a href="{% url 'accounts:register' %}" class="nav-link-item">
             <i class="bi bi-person-plus me-1"></i>S'inscrire
@@ -88,7 +94,7 @@
         {% endif %}
       </div>
 
-      <!-- Actions droite -->
+      <!-- Profil et boutons -->
       <div class="nav-actions">
         {% if user.is_authenticated %}
           <div class="nav-user-info">
@@ -115,10 +121,10 @@
 </nav>
 
 
-<!-- ═══════════ CONTENU ═══════════ -->
+<!-- Contenu principal -->
 {% block content %}{% endblock %}
 
-<!-- ═══════════ FOOTER ═══════════ -->
+<!-- Pied de page -->
 <footer class="main-footer">
   <div class="container">
     <div class="row align-items-center">
