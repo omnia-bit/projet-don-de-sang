@@ -274,39 +274,92 @@ def liste_campagnes(request):
 
 @login_required
 def sinscrire_campagne(request, campagne_id):
-    donneur  = _get_donneur(request)
+    donneur = _get_donneur(request)
     campagne = get_object_or_404(CampagneCollecte, id=campagne_id)
 
-    if InscriptionCampagne.objects.filter(donneur=donneur, campagne=campagne).exists():
+    if InscriptionCampagne.objects.filter(
+        donneur=donneur,
+        campagne=campagne
+    ).exists():
         messages.warning(request, "Vous êtes déjà inscrit à cette campagne.")
         return redirect('donneurs:liste_campagnes')
 
-    creneaux             = []
-    duree_totale         = (campagne.date_fin - campagne.date_debut).total_seconds() / 3600
-    intervalle           = max(duree_totale / campagne.nb_creneaux, 0.5)
-    capacite_par_creneau = max(campagne.capacite_totale // campagne.nb_creneaux, 1)
-    current_time         = campagne.date_debut
+    creneaux = []
+
+    duree_totale = (
+        campagne.date_fin - campagne.date_debut
+    ).total_seconds() / 3600
+
+    intervalle = max(duree_totale / campagne.nb_creneaux, 0.5)
+
+    capacite_par_creneau = max(
+        campagne.capacite_totale // campagne.nb_creneaux,
+        1
+    )
+
+    current_time = campagne.date_debut
 
     for i in range(campagne.nb_creneaux):
+
         fin_creneau = current_time + timedelta(hours=intervalle)
-        label       = f"{current_time.strftime('%H:%M')} - {fin_creneau.strftime('%H:%M')}"
-        count       = InscriptionCampagne.objects.filter(campagne=campagne, creneau_horaire=label).count()
-        if count < capacite_par_creneau:
-            creneaux.append(label)
+
+        label = (
+            f"{current_time.strftime('%H:%M')} - "
+            f"{fin_creneau.strftime('%H:%M')}"
+        )
+
+        count = InscriptionCampagne.objects.filter(
+            campagne=campagne,
+            creneau_horaire=label
+        ).count()
+
+        places_restantes = max(capacite_par_creneau - count, 0)
+
+        creneaux.append({
+            'label': label,
+            'disponible': count < capacite_par_creneau,
+            'places_restantes': places_restantes
+        })
+
         current_time = fin_creneau
 
     if request.method == 'POST':
+
         choix = request.POST.get('creneau')
+
         if choix:
-            count = InscriptionCampagne.objects.filter(campagne=campagne, creneau_horaire=choix).count()
+
+            count = InscriptionCampagne.objects.filter(
+                campagne=campagne,
+                creneau_horaire=choix
+            ).count()
+
             if count < capacite_par_creneau:
-                InscriptionCampagne.objects.create(donneur=donneur, campagne=campagne, creneau_horaire=choix)
-                messages.success(request, f"✅ Inscription confirmée pour le créneau {choix} !")
+
+                InscriptionCampagne.objects.create(
+                    donneur=donneur,
+                    campagne=campagne,
+                    creneau_horaire=choix
+                )
+
+                messages.success(
+                    request,
+                    f"✅ Inscription confirmée pour le créneau {choix} !"
+                )
+
                 return redirect('donneurs:dashboard')
+
             else:
-                messages.error(request, "Désolé, ce créneau est désormais complet.")
+                messages.error(
+                    request,
+                    "Désolé, ce créneau est désormais complet."
+                )
+
         else:
-            messages.error(request, "Veuillez choisir un créneau horaire.")
+            messages.error(
+                request,
+                "Veuillez choisir un créneau horaire."
+            )
 
     return render(request, 'donneurs/sinscrire_campagne.html', {
         'campagne': campagne,
