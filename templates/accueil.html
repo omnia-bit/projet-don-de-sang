@@ -1,43 +1,48 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DonSang — Plateforme nationale de don de sang</title>
 
   <!-- SEO & Open Graph -->
-  <meta name="description" content="Mettez en relation donneurs volontaires et établissements hospitaliers. Rejoignez la plateforme nationale de don de sang."/>
-  <meta property="og:title" content="DonSang — Sauvez des vies"/>
-  <meta property="og:description" content="Plateforme nationale de don de sang — Rejoignez 4500 donneurs actifs."/>
-  <meta property="og:type" content="website"/>
-  <meta property="og:image" content="/static/og-image.png"/>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🩸</text></svg>"/>
+  <meta name="description"
+    content="Mettez en relation donneurs volontaires et établissements hospitaliers. Rejoignez la plateforme nationale de don de sang." />
+  <meta property="og:title" content="DonSang — Sauvez des vies" />
+  <meta property="og:description" content="Plateforme nationale de don de sang — Rejoignez 4500 donneurs actifs." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/static/og-image.png" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🩸</text></svg>" />
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap&font-display=swap" rel="stylesheet"/>
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap&font-display=swap"
+    rel="stylesheet" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
 
   <style>
     /* ===== DESIGN TOKENS ===== */
     :root {
-      --red:        #E63946;
-      --red-dark:   #c1121f;
-      --red-light:  #fff0f0;
-      --red-mid:    #ffd6d8;
-      --surface:    #ffffff;
-      --bg:         #f8f9fb;
-      --text:       #1a1a2e;
-      --muted:      #6c757d;
-      --border:     #e5e7eb;
-      --radius:     16px;
+      --red: #E63946;
+      --red-dark: #c1121f;
+      --red-light: #fff0f0;
+      --red-mid: #ffd6d8;
+      --surface: #ffffff;
+      --bg: #f8f9fb;
+      --text: #1a1a2e;
+      --muted: #6c757d;
+      --border: #e5e7eb;
+      --radius: 16px;
 
       /* Dark mode overrides */
-      --dm-bg:      #0f1117;
+      --dm-bg: #0f1117;
       --dm-surface: #1a1d27;
-      --dm-border:  #2e3245;
-      --dm-text:    #e8eaf0;
-      --dm-muted:   #8891aa;
+      --dm-border: #2e3245;
+      --dm-text: #e8eaf0;
+      --dm-muted: #8891aa;
     }
 
 
@@ -52,6 +57,7 @@
       z-index: 1000;
       transition: background .3s;
     }
+
     .navbar-brand {
       font-family: 'Nunito', sans-serif;
       font-weight: 800;
@@ -61,276 +67,689 @@
       align-items: center;
       gap: .5rem;
     }
+
     .navbar-brand .brand-dot {
-      width: 32px; height: 32px;
+      width: 32px;
+      height: 32px;
       background: var(--red);
       border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1rem;
     }
+
     .nav-link {
-      font-size: .92rem; font-weight: 600;
+      font-size: .92rem;
+      font-weight: 600;
       color: var(--muted) !important;
       transition: color .2s;
       padding: .4rem .7rem !important;
       border-radius: 8px;
     }
-    .nav-link:hover { color: var(--red) !important; background: var(--red-light); }
-    .nav-link:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+
+    .nav-link:hover {
+      color: var(--red) !important;
+      background: var(--red-light);
+    }
+
+    .nav-link:focus-visible {
+      outline: 2px solid var(--red);
+      outline-offset: 2px;
+    }
 
     .btn-nav {
-      background: var(--red); color: #fff !important;
-      border-radius: 10px; padding: .5rem 1.2rem;
-      font-size: .88rem; font-weight: 600;
-      transition: all .3s; display: inline-flex;
-      align-items: center; text-decoration: none; border: none;
+      background: var(--red);
+      color: #fff !important;
+      border-radius: 10px;
+      padding: .5rem 1.2rem;
+      font-size: .88rem;
+      font-weight: 600;
+      transition: all .3s;
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      border: none;
     }
-    .btn-nav:hover { background: var(--red-dark); box-shadow: 0 4px 12px rgba(230,57,70,.3); }
-    .btn-nav:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 
-    .btn-logout { background: #1a1a2e; }
-    .btn-logout:hover { background: #000; }
+    .btn-nav:hover {
+      background: var(--red-dark);
+      box-shadow: 0 4px 12px rgba(230, 57, 70, .3);
+    }
 
-    .user-info { display: flex; align-items: center; gap: 10px; margin-right: 15px; }
+    .btn-nav:focus-visible {
+      outline: 2px solid var(--red);
+      outline-offset: 3px;
+    }
+
+    .btn-logout {
+      background: #1a1a2e;
+    }
+
+    .btn-logout:hover {
+      background: #000;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-right: 15px;
+    }
+
     .user-avatar {
-      width: 35px; height: 35px;
-      background: var(--red-light); border: 1px solid var(--red);
+      width: 35px;
+      height: 35px;
+      background: var(--red-light);
+      border: 1px solid var(--red);
       border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--red); font-weight: 700; font-size: .8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--red);
+      font-weight: 700;
+      font-size: .8rem;
     }
 
     /* ===== HERO ===== */
     .hero {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 5.5rem 0 4.5rem;
-      text-align: center;
+      padding: 6rem 0 5rem;
+      text-align: left;
       position: relative;
       overflow: hidden;
     }
+
     .hero-ecg {
       position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 80px; opacity: .07;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      opacity: .08;
       pointer-events: none;
-    }
-    .ecg-line {
-      stroke: var(--red); stroke-width: 2.5; fill: none;
-      stroke-dasharray: 1200; stroke-dashoffset: 1200;
-      animation: drawEcg 4s ease-in-out infinite;
-    }
-    @keyframes drawEcg {
-      0%   { stroke-dashoffset: 1200; opacity: 1; }
-      75%  { stroke-dashoffset: 0;    opacity: 1; }
-      92%  { stroke-dashoffset: 0;    opacity: 0; }
-      100% { stroke-dashoffset: 0;    opacity: 0; }
+      z-index: 1;
     }
 
+    .ecg-line {
+      stroke: var(--red);
+      stroke-width: 2.5;
+      fill: none;
+      stroke-dasharray: 1200;
+      stroke-dashoffset: 1200;
+      animation: drawEcg 5s ease-in-out infinite;
+    }
+
+    @keyframes drawEcg {
+      0% { stroke-dashoffset: 1200; opacity: 0; }
+      10% { opacity: 1; }
+      80% { stroke-dashoffset: 0; opacity: 1; }
+      90% { stroke-dashoffset: 0; opacity: 0; }
+      100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+
+    /* Styles pour l'image circulaire du Hero */
+    .hero-image-wrap {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hero-circle-bg {
+      position: absolute;
+      width: 110%;
+      height: 110%;
+      background: radial-gradient(circle, var(--red-light) 0%, transparent 70%);
+      z-index: -1;
+      opacity: 0.7;
+    }
+
+    .hero-main-img {
+      width: 100%;
+      max-width: 500px;
+      height: auto;
+      border-radius: 50%;
+      border: 10px solid white;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+      z-index: 1;
+    }
+
+    /* Badges flottants - Design Professionnel */
+    .hero-float-badge {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 0.7rem 1.2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      z-index: 10;
+      animation: float 6s ease-in-out infinite;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hero-float-badge:hover {
+      transform: scale(1.05) translateY(-5px);
+      background: white;
+      box-shadow: 0 25px 50px rgba(230, 57, 70, 0.12);
+      border-color: var(--red-mid);
+    }
+
+    .badge-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+
+    .hero-float-badge:hover .badge-icon-box {
+      transform: rotate(10deg) scale(1.1);
+    }
+
+    .bg-red-soft { background: #fef2f2; color: #e11d48; }
+    .bg-blue-soft { background: #eff6ff; color: #2563eb; }
+
+    .badge-content-wrap b {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .badge-content-wrap span {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .badge-1 { top: 12%; right: -8%; }
+    .badge-2 { bottom: 15%; left: -8%; animation-delay: -3.2s; }
+
     .hero-badge {
-      display: inline-flex; align-items: center; gap: .4rem;
-      background: var(--red-light); color: var(--red);
-      border-radius: 100px; padding: .35rem 1rem;
-      font-size: .8rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .5px;
-      margin-bottom: 1.4rem;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: var(--red-light);
+      color: var(--red);
+      border-radius: 100px;
+      padding: .5rem 1.2rem;
+      font-size: .85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 2rem;
     }
+
     .hero h1 {
-      font-family: 'Nunito', sans-serif; font-weight: 800;
-      font-size: clamp(2rem, 4.5vw, 3.2rem);
-      color: var(--text); line-height: 1.15; margin-bottom: 1rem;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
     }
-    .hero h1 span { color: var(--red); }
-    .hero > .container > p {
-      color: var(--muted); font-size: 1.08rem;
-      max-width: 520px; margin: 0 auto 2rem; line-height: 1.7;
+
+    .hero h1 span {
+      color: var(--red);
+    }
+
+    .hero .hero-text-p {
+      color: var(--muted);
+      font-size: 1.15rem;
+      max-width: 580px;
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
     }
 
     /* Scroll hint */
     .scroll-hint {
-      display: flex; flex-direction: column;
-      align-items: center; gap: .3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .3rem;
       margin-top: 2rem;
-      color: var(--muted); font-size: .78rem; font-weight: 600;
-      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
       animation: fadeInHint 2s ease 1.5s both;
     }
+
     .scroll-hint .arrow-down {
-      width: 18px; height: 18px;
+      width: 18px;
+      height: 18px;
       border-right: 2px solid var(--muted);
       border-bottom: 2px solid var(--muted);
       transform: rotate(45deg);
       animation: bounceDown 1.5s ease-in-out infinite;
     }
+
     @keyframes bounceDown {
-      0%, 100% { transform: rotate(45deg) translateY(0); }
-      50%       { transform: rotate(45deg) translateY(5px); }
+
+      0%,
+      100% {
+        transform: rotate(45deg) translateY(0);
+      }
+
+      50% {
+        transform: rotate(45deg) translateY(5px);
+      }
     }
+
     @keyframes fadeInHint {
-      from { opacity: 0; transform: translateY(-8px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Animations */
     @keyframes pulse-heart {
-      0%, 100% { transform: scale(1); }
-      14%  { transform: scale(1.2); }
-      28%  { transform: scale(1); }
-      42%  { transform: scale(1.15); }
-      70%  { transform: scale(1); }
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      14% {
+        transform: scale(1.2);
+      }
+
+      28% {
+        transform: scale(1);
+      }
+
+      42% {
+        transform: scale(1.15);
+      }
+
+      70% {
+        transform: scale(1);
+      }
     }
-    .pulse-icon { animation: pulse-heart 1.5s infinite; display: inline-block; }
+
+    .pulse-icon {
+      animation: pulse-heart 1.5s infinite;
+      display: inline-block;
+    }
 
     @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(-8px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
     }
-    .floating-el { animation: float 4s ease-in-out infinite; }
+
+    .floating-el {
+      animation: float 4s ease-in-out infinite;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .floating-el:hover {
+      transform: scale(1.05) translateY(-10px) !important;
+      box-shadow: 0 30px 60px rgba(230, 57, 70, 0.25) !important;
+      cursor: pointer;
+    }
 
     /* Stats */
     .hero-stat-val {
       font-family: 'Nunito', sans-serif;
-      font-size: 1.8rem; font-weight: 800;
-      color: var(--red); display: block;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--red);
+      display: block;
     }
-    .hero-stat-label { font-size: .82rem; color: var(--muted); }
+
+    .hero-stat-label {
+      font-size: .82rem;
+      color: var(--muted);
+    }
+
     .hero-stats-row {
-      display: flex; justify-content: center;
-      gap: 3rem; flex-wrap: wrap; margin-top: 2.5rem;
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+      margin-top: 2.5rem;
     }
-    .stat-divider { width: 1px; background: var(--border); align-self: stretch; }
+
+    .stat-divider {
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+    }
 
     /* ===== CARDS SECTION ===== */
-    .cards-section { padding: 5rem 0 3rem; }
-    .section-label { font-size: .78rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: .5rem; }
-    .section-title { font-family: 'Nunito', sans-serif; font-size: 1.7rem; font-weight: 800; color: var(--text); }
-    .section-sub { color: var(--muted); font-size: .95rem; margin-top: .4rem; }
+    .cards-section {
+      padding: 5rem 0 3rem;
+    }
+
+    .section-label {
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: .5rem;
+    }
+
+    .section-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .section-sub {
+      color: var(--muted);
+      font-size: .95rem;
+      margin-top: .4rem;
+    }
 
     .app-card {
       background: var(--surface);
       border: 1.5px solid var(--border);
       border-radius: 20px;
       padding: 2rem 1.8rem 1.6rem;
-      text-decoration: none !important; color: var(--text);
-      display: flex; flex-direction: column; height: 100%;
-      transition: transform .35s cubic-bezier(.22,.68,0,1.4), box-shadow .3s, border-color .3s;
-      position: relative; overflow: hidden;
+      text-decoration: none !important;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: transform .35s cubic-bezier(.22, .68, 0, 1.4), box-shadow .3s, border-color .3s;
+      position: relative;
+      overflow: hidden;
     }
+
     .app-card::before {
-      content: ''; position: absolute;
-      top: 0; left: 0; right: 0; height: 4px;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
       background: var(--accent);
-      transform: scaleX(0); transform-origin: left;
-      transition: transform .4s cubic-bezier(.22,.68,0,1.2);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s cubic-bezier(.22, .68, 0, 1.2);
     }
-    .app-card:hover::before { transform: scaleX(1); }
+
+    .app-card:hover::before {
+      transform: scaleX(1);
+    }
+
     .app-card:hover {
       transform: translateY(-8px);
-      box-shadow: 0 20px 50px rgba(0,0,0,.08);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, .08);
       border-color: var(--accent);
     }
-    .app-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-    .app-card:hover .card-icon-beat { animation: pulse-heart 1.5s infinite; }
 
-    .card-hopital  { --accent: #E63946; --accent-bg: #fff0f0; }
-    .card-donneurs { --accent: #10b981; --accent-bg: #ecfdf5; }
-    .card-admin    { --accent: #f59e0b; --accent-bg: #fffbeb; }
+    .app-card:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .app-card:hover .card-icon-beat {
+      animation: pulse-heart 1.5s infinite;
+    }
+
+    .card-hopital {
+      --accent: #E63946;
+      --accent-bg: #fff0f0;
+    }
+
+    .card-donneurs {
+      --accent: #10b981;
+      --accent-bg: #ecfdf5;
+    }
+
+    .card-admin {
+      --accent: #f59e0b;
+      --accent-bg: #fffbeb;
+    }
 
     .card-icon-wrap {
-      width: 60px; height: 60px; border-radius: 16px;
-      background: var(--accent-bg); color: var(--accent);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.6rem; margin-bottom: 1.3rem;
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 1.3rem;
     }
-    .card-title { font-family: 'Nunito', sans-serif; font-size: 1.15rem; font-weight: 800; margin-bottom: .5rem; color: var(--text); }
-    .card-desc { font-size: .88rem; color: var(--muted); line-height: 1.65; flex: 1; }
-    .card-tags { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1.1rem; }
+
+    .card-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: .5rem;
+      color: var(--text);
+    }
+
+    .card-desc {
+      font-size: .88rem;
+      color: var(--muted);
+      line-height: 1.65;
+      flex: 1;
+    }
+
+    .card-tags {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      margin-top: 1.1rem;
+    }
+
     .card-tag {
-      font-size: .72rem; font-weight: 700;
-      padding: .25rem .65rem; border-radius: 100px;
-      background: var(--accent-bg); color: var(--accent); letter-spacing: .3px;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: .25rem .65rem;
+      border-radius: 100px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      letter-spacing: .3px;
     }
+
     .card-link {
-      display: inline-flex; align-items: center; gap: .35rem;
-      font-weight: 700; color: var(--accent); font-size: .88rem;
-      margin-top: 1.3rem; transition: gap .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      font-weight: 700;
+      color: var(--accent);
+      font-size: .88rem;
+      margin-top: 1.3rem;
+      transition: gap .2s;
     }
-    .app-card:hover .card-link { gap: .6rem; }
+
+    .app-card:hover .card-link {
+      gap: .6rem;
+    }
 
     .card-ecg {
-      position: absolute; bottom: 0; right: 0;
-      width: 80px; height: 40px;
-      opacity: 0; transition: opacity .3s;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 80px;
+      height: 40px;
+      opacity: 0;
+      transition: opacity .3s;
     }
-    .card-ecg path { stroke: var(--accent); stroke-width: 2; fill: none; }
-    .app-card:hover .card-ecg { opacity: .12; }
+
+    .card-ecg path {
+      stroke: var(--accent);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .app-card:hover .card-ecg {
+      opacity: .12;
+    }
 
     /* ===== HOW IT WORKS ===== */
-    .how-section { padding: 4rem 0; background: var(--bg); }
-    .steps-row { display: flex; gap: 0; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
+    .how-section {
+      padding: 4rem 0;
+      background: var(--bg);
+    }
+
+    .steps-row {
+      display: flex;
+      gap: 0;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
     .step-card {
       background: var(--surface);
       border: 1.5px solid var(--border);
       border-radius: 20px;
       padding: 2rem 1.5rem;
       text-align: center;
-      flex: 1; min-width: 200px; max-width: 260px;
+      flex: 1;
+      min-width: 200px;
+      max-width: 260px;
       position: relative;
     }
+
     .step-connector {
       flex: 0 0 40px;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding-top: 2.5rem;
-      color: var(--border); font-size: 1.5rem;
+      color: var(--border);
+      font-size: 1.5rem;
     }
+
     .step-num {
-      width: 48px; height: 48px;
-      background: var(--red-light); color: var(--red);
+      width: 48px;
+      height: 48px;
+      background: var(--red-light);
+      color: var(--red);
       border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
       margin: 0 auto 1rem;
     }
-    .step-icon { font-size: 1.8rem; color: var(--red); margin-bottom: .8rem; }
-    .step-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; margin-bottom: .5rem; }
-    .step-desc { font-size: .83rem; color: var(--muted); line-height: 1.6; }
+
+    .step-icon {
+      font-size: 1.8rem;
+      color: var(--red);
+      margin-bottom: .8rem;
+    }
+
+    .step-title {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: .5rem;
+    }
+
+    .step-desc {
+      font-size: .83rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
 
     /* ===== BLOOD GROUPS ===== */
-    .blood-section { padding: 4rem 0; }
+    .blood-section {
+      padding: 4rem 0;
+    }
+
     .blood-bar-section {
       background: var(--surface);
       border: 1.5px solid var(--border);
       border-radius: 20px;
       padding: 2.5rem;
     }
-    .blood-item { margin-bottom: 1rem; }
-    .blood-item:last-child { margin-bottom: 0; }
+
+    .blood-item {
+      margin-bottom: 1rem;
+    }
+
+    .blood-item:last-child {
+      margin-bottom: 0;
+    }
+
     .blood-label {
-      display: flex; justify-content: space-between;
-      font-size: .85rem; font-weight: 700; margin-bottom: .4rem;
+      display: flex;
+      justify-content: space-between;
+      font-size: .85rem;
+      font-weight: 700;
+      margin-bottom: .4rem;
     }
+
     .blood-label .badge-blood {
-      display: inline-flex; align-items: center;
-      gap: .3rem; color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      color: var(--text);
     }
+
     .blood-label .badge-blood .dot {
-      width: 8px; height: 8px; border-radius: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
       background: var(--bar-color);
     }
-    .blood-label .pct { color: var(--muted); font-weight: 600; }
+
+    .blood-label .pct {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
     .blood-bar-bg {
       background: var(--bg);
-      border-radius: 100px; height: 10px; overflow: hidden;
+      border-radius: 100px;
+      height: 10px;
+      overflow: hidden;
     }
+
     .blood-bar-fill {
-      height: 100%; border-radius: 100px;
+      height: 100%;
+      border-radius: 100px;
       background: var(--bar-color);
       width: 0;
-      transition: width 1.4s cubic-bezier(.22,.68,0,1);
+      transition: width 1.4s cubic-bezier(.22, .68, 0, 1);
     }
 
     /* ===== TESTIMONIALS ===== */
-    .testimonials-section { padding: 4rem 0; background: var(--bg); }
+    .testimonials-section {
+      padding: 4rem 0;
+      background: var(--bg);
+    }
+
     .testimonial-card {
       background: var(--surface);
       border: 1.5px solid var(--border);
@@ -338,85 +757,245 @@
       padding: 1.8rem;
       height: 100%;
     }
-    .testimonial-stars { color: #f59e0b; font-size: .85rem; margin-bottom: .8rem; }
-    .testimonial-text { font-size: .9rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.2rem; font-style: italic; }
-    .testimonial-author { display: flex; align-items: center; gap: .8rem; }
-    .testimonial-avatar {
-      width: 40px; height: 40px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: .85rem; color: #fff;
+
+    .testimonial-stars {
+      color: #f59e0b;
+      font-size: .85rem;
+      margin-bottom: .8rem;
     }
-    .testimonial-name { font-weight: 700; font-size: .88rem; }
-    .testimonial-role { font-size: .78rem; color: var(--muted); }
+
+    .testimonial-text {
+      font-size: .9rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+    }
+
+    .testimonial-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: .85rem;
+      color: #fff;
+    }
+
+    .testimonial-name {
+      font-weight: 700;
+      font-size: .88rem;
+    }
+
+    .testimonial-role {
+      font-size: .78rem;
+      color: var(--muted);
+    }
 
     /* ===== CTA BAND ===== */
     .cta-band {
-      background: var(--red); color: #fff;
-      padding: 3.5rem 0; text-align: center;
+      background: var(--red);
+      color: #fff;
+      padding: 3.5rem 0;
+      text-align: center;
     }
-    .cta-band h3 { font-family: 'Nunito', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: .5rem; }
-    .cta-band p { opacity: .85; margin-bottom: 1.5rem; font-size: 1rem; }
+
+    .cta-band h3 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: .5rem;
+    }
+
+    .cta-band p {
+      opacity: .85;
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+    }
+
     .btn-cta-white {
-      background: #fff; color: var(--red);
-      border-radius: 12px; padding: .7rem 2rem;
-      font-weight: 700; border: none; font-size: .95rem;
-      text-decoration: none; display: inline-flex;
-      align-items: center; gap: .5rem; transition: all .25s;
+      background: #fff;
+      color: var(--red);
+      border-radius: 12px;
+      padding: .7rem 2rem;
+      font-weight: 700;
+      border: none;
+      font-size: .95rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      transition: all .25s;
     }
-    .btn-cta-white:hover { background: var(--red-light); box-shadow: 0 4px 20px rgba(0,0,0,.15); color: var(--red); }
-    .btn-cta-white:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+    .btn-cta-white:hover {
+      background: var(--red-light);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .15);
+      color: var(--red);
+    }
+
+    .btn-cta-white:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 3px;
+    }
 
     /* ===== FOOTER ===== */
-    footer { background: var(--text); color: rgba(255,255,255,.45); padding: 2.5rem 0; font-size: .85rem; }
-    footer .footer-brand { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.1rem; color: #fff; }
-    footer a { color: rgba(255,255,255,.55); text-decoration: none; transition: .2s; }
-    footer a:hover { color: #fff; }
-    footer a:focus-visible { outline: 1px solid rgba(255,255,255,.6); outline-offset: 2px; border-radius: 2px; }
+    footer {
+      background: var(--text);
+      color: rgba(255, 255, 255, .45);
+      padding: 2.5rem 0;
+      font-size: .85rem;
+    }
+
+    footer .footer-brand {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
+    footer a {
+      color: rgba(255, 255, 255, .55);
+      text-decoration: none;
+      transition: .2s;
+    }
+
+    footer a:hover {
+      color: #fff;
+    }
+
+    footer a:focus-visible {
+      outline: 1px solid rgba(255, 255, 255, .6);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
 
     /* ===== BACK TO TOP ===== */
     #backToTop {
       position: fixed;
-      bottom: 2rem; right: 2rem;
-      width: 52px; height: 52px;
-      background: var(--red); border: none;
-      border-radius: 50%; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 20px rgba(230,57,70,.4);
-      opacity: 0; transform: translateY(20px) scale(.85);
-      transition: opacity .35s, transform .35s, box-shadow .25s;
-      z-index: 9999; pointer-events: none;
-    }
-    #backToTop.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-    #backToTop:hover { background: var(--red-dark); box-shadow: 0 6px 28px rgba(230,57,70,.55); transform: translateY(-3px) scale(1.06); }
-    #backToTop:focus-visible { outline: 3px solid rgba(255,255,255,.8); outline-offset: 2px; }
-    #backToTop::before {
-      content: ''; position: absolute; inset: -4px;
+      bottom: 2rem;
+      right: 2rem;
+      width: 52px;
+      height: 52px;
+      background: var(--red);
+      border: none;
       border-radius: 50%;
-      border: 2px solid rgba(230,57,70,.45);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(230, 57, 70, .4);
+      opacity: 0;
+      transform: translateY(20px) scale(.85);
+      transition: opacity .35s, transform .35s, box-shadow .25s;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    #backToTop.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    #backToTop:hover {
+      background: var(--red-dark);
+      box-shadow: 0 6px 28px rgba(230, 57, 70, .55);
+      transform: translateY(-3px) scale(1.06);
+    }
+
+    #backToTop:focus-visible {
+      outline: 3px solid rgba(255, 255, 255, .8);
+      outline-offset: 2px;
+    }
+
+    #backToTop::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid rgba(230, 57, 70, .45);
       animation: ringPulse 2s ease-out infinite;
     }
+
     @keyframes ringPulse {
-      0%   { transform: scale(1);   opacity: .7; }
-      70%  { transform: scale(1.4); opacity: 0; }
-      100% { transform: scale(1.4); opacity: 0; }
+      0% {
+        transform: scale(1);
+        opacity: .7;
+      }
+
+      70% {
+        transform: scale(1.4);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1.4);
+        opacity: 0;
+      }
     }
-    #backToTop svg { width: 26px; height: 26px; animation: pulse-heart 1.5s ease-in-out infinite; }
+
+    #backToTop svg {
+      width: 26px;
+      height: 26px;
+      animation: pulse-heart 1.5s ease-in-out infinite;
+    }
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 991px) {
-      .navbar-nav { padding-top: 1rem; border-top: 1px solid var(--border); margin-top: 1rem; }
-      .auth-container { flex-direction: column; align-items: flex-start !important; gap: 1rem; margin-top: 1rem; }
-      .user-info { margin-right: 0; }
-      .stat-divider { display: none; }
-      .hero-stats-row { gap: 1.5rem; }
-      .step-connector { display: none; }
-      .step-card { max-width: 100%; }
+      .navbar-nav {
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        margin-top: 1rem;
+      }
+
+      .auth-container {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .user-info {
+        margin-right: 0;
+      }
+
+      .stat-divider {
+        display: none;
+      }
+
+      .hero-stats-row {
+        gap: 1.5rem;
+      }
+
+      .step-connector {
+        display: none;
+      }
+
+      .step-card {
+        max-width: 100%;
+      }
     }
+
     @media (max-width: 576px) {
-      #backToTop { bottom: 1.2rem; right: 1.2rem; width: 46px; height: 46px; }
+      #backToTop {
+        bottom: 1.2rem;
+        right: 1.2rem;
+        width: 46px;
+        height: 46px;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <!-- ===== NAVBAR ===== -->
@@ -426,30 +1005,32 @@
         <span class="brand-dot" aria-hidden="true"><i class="bi bi-droplet-fill"></i></span>
         DonSang
       </a>
-      <button class="navbar-toggler border-0" type="button"
-              data-bs-toggle="collapse" data-bs-target="#navMenu"
-              aria-controls="navMenu" aria-expanded="false" aria-label="Ouvrir le menu">
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
+        aria-controls="navMenu" aria-expanded="false" aria-label="Ouvrir le menu">
         <i class="bi bi-list" style="font-size:1.5rem;" aria-hidden="true"></i>
       </button>
       <div class="collapse navbar-collapse" id="navMenu">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-          <li class="nav-item"><a class="nav-link" href="/hopitaux/"><i class="bi bi-hospital me-1" aria-hidden="true"></i>Hôpitaux</a></li>
-          <li class="nav-item"><a class="nav-link" href="/donneurs/"><i class="bi bi-droplet-half me-1" aria-hidden="true"></i>Donneurs</a></li>
-          <li class="nav-item"><a class="nav-link" href="/administration/"><i class="bi bi-shield-check me-1" aria-hidden="true"></i>Administration</a></li>
+          <li class="nav-item"><a class="nav-link" href="/hopitaux/"><i class="bi bi-hospital me-1"
+                aria-hidden="true"></i>Hôpitaux</a></li>
+          <li class="nav-item"><a class="nav-link" href="/donneurs/"><i class="bi bi-droplet-half me-1"
+                aria-hidden="true"></i>Donneurs</a></li>
+          <li class="nav-item"><a class="nav-link" href="/administration/"><i class="bi bi-shield-check me-1"
+                aria-hidden="true"></i>Administration</a></li>
         </ul>
         <div class="d-flex align-items-center auth-container">
           {% if user.is_authenticated %}
-            <div class="user-info">
-              <div class="user-avatar" aria-hidden="true">{{ user.username|slice:":2"|upper }}</div>
-              <span style="font-weight:700;font-size:.9rem;color:var(--text);">{{ user.username }}</span>
-            </div>
-            <a href="{% url 'accounts:logout' %}" class="btn-nav btn-logout" aria-label="Se déconnecter">
-              <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Déconnexion
-            </a>
+          <div class="user-info">
+            <div class="user-avatar" aria-hidden="true">{{ user.username|slice:":2"|upper }}</div>
+            <span style="font-weight:700;font-size:.9rem;color:var(--text);">{{ user.username }}</span>
+          </div>
+          <a href="{% url 'accounts:logout' %}" class="btn-nav btn-logout" aria-label="Se déconnecter">
+            <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Déconnexion
+          </a>
           {% else %}
-            <a href="{% url 'accounts:login' %}" class="btn-nav" aria-label="Se connecter à DonSang">
-              <i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i>Connexion
-            </a>
+          <a href="{% url 'accounts:login' %}" class="btn-nav" aria-label="Se connecter à DonSang">
+            <i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i>Connexion
+          </a>
           {% endif %}
         </div>
       </div>
@@ -459,36 +1040,70 @@
   <!-- ===== HERO ===== -->
   <section class="hero" aria-labelledby="hero-title">
     <svg class="hero-ecg" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true">
-      <path class="ecg-line" d="M0,50 L120,50 L150,50 L165,15 L180,70 L195,30 L210,50 L330,50 L360,50 L375,15 L390,70 L405,30 L420,50 L540,50 L570,50 L585,15 L600,70 L615,30 L630,50 L750,50 L780,50 L795,15 L810,70 L825,30 L840,50 L960,50 L990,50 L1005,15 L1020,70 L1035,30 L1050,50 L1200,50"/>
+      <path class="ecg-line"
+        d="M0,50 L120,50 L150,50 L165,15 L180,70 L195,30 L210,50 L330,50 L360,50 L375,15 L390,70 L405,30 L420,50 L540,50 L570,50 L585,15 L600,70 L615,30 L630,50 L750,50 L780,50 L795,15 L810,70 L825,30 L840,50 L960,50 L990,50 L1005,15 L1020,70 L1035,30 L1050,50 L1200,50" />
     </svg>
 
     <div class="container position-relative" style="z-index:2;">
-      <div class="hero-badge" data-aos="fade-down">
-        <i class="bi bi-heart-pulse-fill pulse-icon" aria-hidden="true"></i>
-        Plateforme nationale de don de sang
-      </div>
-      <h1 id="hero-title" data-aos="fade-up" data-aos-delay="100">
-        Chaque don compte.<br><span>Sauvez des vies.</span>
-      </h1>
-      <p data-aos="fade-up" data-aos-delay="200">
-        Mettez en relation donneurs volontaires et établissements hospitaliers pour répondre aux besoins urgents en sang.
-      </p>
+      <div class="row align-items-center">
+        <!-- Colonne Gauche : Texte -->
+        <div class="col-lg-7 mb-5 mb-lg-0">
+          <div class="hero-badge" data-aos="fade-down">
+            <i class="bi bi-heart-pulse-fill pulse-icon" aria-hidden="true"></i>
+            Plateforme nationale de don de sang
+          </div>
+          <h1 id="hero-title" data-aos="fade-right" data-aos-delay="100">
+            Chaque don compte.<br><span>Sauvez des vies.</span>
+          </h1>
+          <p class="hero-text-p" data-aos="fade-right" data-aos-delay="200">
+            Mettez en relation donneurs volontaires et établissements hospitaliers pour répondre aux besoins urgents en sang.
+          </p>
+          <div class="d-flex gap-3 flex-wrap" data-aos="fade-up" data-aos-delay="300">
+            <a href="{% url 'accounts:register' %}" class="btn btn-danger px-4 py-3 fw-bold floating-el"
+              style="border-radius:12px;box-shadow:0 10px 25px rgba(230,57,70,.3);font-size:1rem;"
+              aria-label="Créer un compte donneur">
+              <i class="bi bi-person-plus-fill me-2" aria-hidden="true"></i>Devenir donneur
+            </a>
+            <a href="{% url 'accounts:dashboard_hopital' %}" class="btn btn-outline-danger px-4 py-3 fw-bold"
+              style="border-radius:12px;font-size:1rem;" aria-label="Accéder à l'espace hôpital">
+              <i class="bi bi-hospital me-2" aria-hidden="true"></i>Espace hôpital
+            </a>
+          </div>
+        </div>
 
-      <div class="d-flex justify-content-center gap-3 flex-wrap" data-aos="fade-up" data-aos-delay="300">
-        <a href="{% url 'accounts:register' %}" class="btn btn-danger px-4 py-2 fw-bold floating-el"
-           style="border-radius:12px;box-shadow:0 6px 20px rgba(230,57,70,.35);font-size:.95rem;"
-           aria-label="Créer un compte donneur">
-          <i class="bi bi-person-plus-fill me-2" aria-hidden="true"></i>Devenir donneur
-        </a>
-        <a href="{% url 'accounts:dashboard_hopital' %}" class="btn btn-outline-danger px-4 py-2 fw-bold"
-           style="border-radius:12px;font-size:.95rem;"
-           aria-label="Accéder à l'espace hôpital">
-          <i class="bi bi-hospital me-2" aria-hidden="true"></i>Espace hôpital
-        </a>
+        <!-- Colonne Droite : Image + Badges -->
+        <div class="col-lg-5">
+          <div class="hero-image-wrap" data-aos="zoom-in" data-aos-delay="200">
+            <div class="hero-circle-bg"></div>
+            <img src="/static/img/image.png" alt="Don de Sang" class="hero-main-img floating-el">
+            
+            <!-- Badge Flottant 1 : Sécurisé -->
+            <div class="hero-float-badge badge-1">
+              <div class="badge-icon-box bg-red-soft">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="badge-content-wrap">
+                <b>Sécurisé</b>
+                <span>Données protégées</span>
+              </div>
+            </div>
+
+            <!-- Badge Flottant 2 : Communauté -->
+            <div class="hero-float-badge badge-2">
+              <div class="badge-icon-box bg-blue-soft">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div class="badge-content-wrap">
+                <b>Communauté</b>
+                <span>Milliers de donneurs</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Animated stats -->
-      <div class="hero-stats-row" data-aos="fade-up" data-aos-delay="400" aria-label="Chiffres clés">
+      <!-- Animated stats (horizontal row at bottom) -->
+      <div class="hero-stats-row mt-5 pt-lg-5" data-aos="fade-up" data-aos-delay="400" aria-label="Chiffres clés">
         <div class="text-center">
           <span class="hero-stat-val" data-count="4500" data-suffix="+">0</span>
           <span class="hero-stat-label">Donneurs actifs</span>
@@ -531,21 +1146,24 @@
           <div class="step-num" aria-hidden="true">1</div>
           <div class="step-icon"><i class="bi bi-person-plus-fill" aria-hidden="true"></i></div>
           <div class="step-title">S'inscrire</div>
-          <p class="step-desc">Créez votre profil donneur en 3 minutes. Renseignez votre groupe sanguin et vos coordonnées.</p>
+          <p class="step-desc">Créez votre profil donneur en 3 minutes. Renseignez votre groupe sanguin et vos
+            coordonnées.</p>
         </div>
         <div class="step-connector" aria-hidden="true"><i class="bi bi-chevron-right"></i></div>
         <div class="step-card" data-aos="fade-up" data-aos-delay="200">
           <div class="step-num" aria-hidden="true">2</div>
           <div class="step-icon"><i class="bi bi-bell-fill" aria-hidden="true"></i></div>
           <div class="step-title">Être alerté</div>
-          <p class="step-desc">Recevez des notifications en temps réel quand un hôpital proche a besoin de votre groupe sanguin.</p>
+          <p class="step-desc">Recevez des notifications en temps réel quand un hôpital proche a besoin de votre groupe
+            sanguin.</p>
         </div>
         <div class="step-connector" aria-hidden="true"><i class="bi bi-chevron-right"></i></div>
         <div class="step-card" data-aos="fade-up" data-aos-delay="300">
           <div class="step-num" aria-hidden="true">3</div>
           <div class="step-icon"><i class="bi bi-heart-pulse-fill pulse-icon" aria-hidden="true"></i></div>
           <div class="step-title">Donner</div>
-          <p class="step-desc">Confirmez votre disponibilité et rendez-vous au centre de collecte. Un geste simple, une vie sauvée.</p>
+          <p class="step-desc">Confirmez votre disponibilité et rendez-vous au centre de collecte. Un geste simple, une
+            vie sauvée.</p>
         </div>
       </div>
     </div>
@@ -565,14 +1183,17 @@
           <a href="/hopitaux/" class="app-card card-hopital" aria-label="Accéder à l'espace Hôpitaux">
             <div class="card-icon-wrap" aria-hidden="true"><i class="bi bi-hospital-fill card-icon-beat"></i></div>
             <div class="card-title">Espace Hôpitaux</div>
-            <p class="card-desc">Publiez des demandes urgentes de sang, gérez vos campagnes de collecte et suivez les réponses des donneurs en temps réel.</p>
+            <p class="card-desc">Publiez des demandes urgentes de sang, gérez vos campagnes de collecte et suivez les
+              réponses des donneurs en temps réel.</p>
             <div class="card-tags" aria-label="Fonctionnalités">
               <span class="card-tag"><i class="bi bi-exclamation-circle me-1" aria-hidden="true"></i>Urgences</span>
               <span class="card-tag">Campagnes</span>
               <span class="card-tag">Suivi</span>
             </div>
             <span class="card-link">Accéder à l'espace <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
-            <svg class="card-ecg" viewBox="0 0 80 40" aria-hidden="true"><path d="M0,25 L15,25 L20,10 L25,35 L30,15 L35,25 L80,25"/></svg>
+            <svg class="card-ecg" viewBox="0 0 80 40" aria-hidden="true">
+              <path d="M0,25 L15,25 L20,10 L25,35 L30,15 L35,25 L80,25" />
+            </svg>
           </a>
         </div>
 
@@ -580,14 +1201,17 @@
           <a href="/donneurs/" class="app-card card-donneurs" aria-label="Accéder à l'espace Donneurs">
             <div class="card-icon-wrap" aria-hidden="true"><i class="bi bi-droplet-half card-icon-beat"></i></div>
             <div class="card-title">Espace Donneurs</div>
-            <p class="card-desc">Consultez les appels urgents près de chez vous, répondez aux demandes et suivez votre historique de dons.</p>
+            <p class="card-desc">Consultez les appels urgents près de chez vous, répondez aux demandes et suivez votre
+              historique de dons.</p>
             <div class="card-tags" aria-label="Fonctionnalités">
               <span class="card-tag"><i class="bi bi-exclamation-circle me-1" aria-hidden="true"></i>Urgences</span>
               <span class="card-tag">Historique</span>
               <span class="card-tag">Carte</span>
             </div>
             <span class="card-link">Accéder à l'espace <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
-            <svg class="card-ecg" viewBox="0 0 80 40" aria-hidden="true"><path d="M0,25 L15,25 L20,10 L25,35 L30,15 L35,25 L80,25"/></svg>
+            <svg class="card-ecg" viewBox="0 0 80 40" aria-hidden="true">
+              <path d="M0,25 L15,25 L20,10 L25,35 L30,15 L35,25 L80,25" />
+            </svg>
           </a>
         </div>
 
@@ -595,14 +1219,17 @@
           <a href="/administration/" class="app-card card-admin" aria-label="Accéder à l'espace Administration">
             <div class="card-icon-wrap" aria-hidden="true"><i class="bi bi-shield-check card-icon-beat"></i></div>
             <div class="card-title">Administration</div>
-            <p class="card-desc">Validez les comptes, gérez les utilisateurs et consultez les statistiques globales de la plateforme.</p>
+            <p class="card-desc">Validez les comptes, gérez les utilisateurs et consultez les statistiques globales de
+              la plateforme.</p>
             <div class="card-tags" aria-label="Fonctionnalités">
               <span class="card-tag">Validation</span>
               <span class="card-tag">Statistiques</span>
               <span class="card-tag">Gestion</span>
             </div>
             <span class="card-link">Accéder à l'espace <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
-            <svg class="card-ecg" viewBox="0 0 80 40" aria-hidden="true"><path d="M0,25 L15,25 L20,10 L25,35 L30,15 L35,25 L80,25"/></svg>
+            <svg class="card-ecg" viewBox="0 0 80 40" aria-hidden="true">
+              <path d="M0,25 L15,25 L20,10 L25,35 L30,15 L35,25 L80,25" />
+            </svg>
           </a>
         </div>
       </div>
@@ -616,11 +1243,15 @@
         <div class="col-lg-4" data-aos="fade-right">
           <p class="section-label">Groupes sanguins</p>
           <h2 class="section-title" id="blood-title">Besoins actuels en sang</h2>
-          <p class="section-sub mt-2">Les barres indiquent le niveau de besoin relatif pour chaque groupe. <strong>O−</strong> et <strong>AB−</strong> sont les plus critiques.</p>
+          <p class="section-sub mt-2">Les barres indiquent le niveau de besoin relatif pour chaque groupe.
+            <strong>O−</strong> et <strong>AB−</strong> sont les plus critiques.</p>
           <div class="mt-3 d-flex align-items-center gap-2" style="font-size:.82rem;color:var(--muted);">
-            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--red);"></span> Critique &nbsp;
-            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f59e0b;"></span> Modéré &nbsp;
-            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#10b981;"></span> Suffisant
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--red);"></span>
+            Critique &nbsp;
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f59e0b;"></span>
+            Modéré &nbsp;
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#10b981;"></span>
+            Suffisant
           </div>
         </div>
         <div class="col-lg-8" data-aos="fade-left">
@@ -628,38 +1259,62 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <div class="blood-item" style="--bar-color:#E63946;">
-                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> O−</span><span class="pct">92%</span></div>
-                  <div class="blood-bar-bg"><div class="blood-bar-fill" data-width="92"></div></div>
+                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> O−</span><span
+                      class="pct">92%</span></div>
+                  <div class="blood-bar-bg">
+                    <div class="blood-bar-fill" data-width="92"></div>
+                  </div>
                 </div>
                 <div class="blood-item" style="--bar-color:#E63946;">
-                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> O+</span><span class="pct">78%</span></div>
-                  <div class="blood-bar-bg"><div class="blood-bar-fill" data-width="78"></div></div>
+                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> O+</span><span
+                      class="pct">78%</span></div>
+                  <div class="blood-bar-bg">
+                    <div class="blood-bar-fill" data-width="78"></div>
+                  </div>
                 </div>
                 <div class="blood-item" style="--bar-color:#f59e0b;">
-                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> A−</span><span class="pct">55%</span></div>
-                  <div class="blood-bar-bg"><div class="blood-bar-fill" data-width="55"></div></div>
+                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> A−</span><span
+                      class="pct">55%</span></div>
+                  <div class="blood-bar-bg">
+                    <div class="blood-bar-fill" data-width="55"></div>
+                  </div>
                 </div>
                 <div class="blood-item" style="--bar-color:#10b981;">
-                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> A+</span><span class="pct">38%</span></div>
-                  <div class="blood-bar-bg"><div class="blood-bar-fill" data-width="38"></div></div>
+                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> A+</span><span
+                      class="pct">38%</span></div>
+                  <div class="blood-bar-bg">
+                    <div class="blood-bar-fill" data-width="38"></div>
+                  </div>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="blood-item" style="--bar-color:#E63946;">
-                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> AB−</span><span class="pct">88%</span></div>
-                  <div class="blood-bar-bg"><div class="blood-bar-fill" data-width="88"></div></div>
+                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> AB−</span><span
+                      class="pct">88%</span></div>
+                  <div class="blood-bar-bg">
+                    <div class="blood-bar-fill" data-width="88"></div>
+                  </div>
                 </div>
                 <div class="blood-item" style="--bar-color:#f59e0b;">
-                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> AB+</span><span class="pct">60%</span></div>
-                  <div class="blood-bar-bg"><div class="blood-bar-fill" data-width="60"></div></div>
+                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> AB+</span><span
+                      class="pct">60%</span></div>
+                  <div class="blood-bar-bg">
+                    <div class="blood-bar-fill" data-width="60"></div>
+                  </div>
                 </div>
                 <div class="blood-item" style="--bar-color:#f59e0b;">
-                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> B−</span><span class="pct">65%</span></div>
-                  <div class="blood-bar-bg"><div class="blood-bar-fill" data-width="65"></div></div>
+                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> B−</span><span
+                      class="pct">65%</span></div>
+                  <div class="blood-bar-bg">
+                    <div class="blood-bar-fill" data-width="65"></div>
+                  </div>
                 </div>
                 <div class="blood-item" style="--bar-color:#10b981;">
-                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> B+</span><span class="pct">30%</span></div>
-                  <div class="blood-bar-bg"><div class="blood-bar-fill" data-width="30"></div></div>
+                  <div class="blood-label"><span class="badge-blood"><span class="dot"></span> B+</span><span
+                      class="pct">30%</span></div>
+                  <div class="blood-bar-bg">
+                    <div class="blood-bar-fill" data-width="30"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -680,7 +1335,8 @@
         <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
           <div class="testimonial-card">
             <div class="testimonial-stars" aria-label="5 étoiles">★★★★★</div>
-            <p class="testimonial-text">"En moins de 5 minutes, j'ai reçu une alerte d'un hôpital à 2 km. J'ai pu donner le lendemain matin. Ce que j'ai ressenti après est indescriptible."</p>
+            <p class="testimonial-text">"En moins de 5 minutes, j'ai reçu une alerte d'un hôpital à 2 km. J'ai pu donner
+              le lendemain matin. Ce que j'ai ressenti après est indescriptible."</p>
             <div class="testimonial-author">
               <div class="testimonial-avatar" style="background:#E63946;" aria-hidden="true">SK</div>
               <div>
@@ -693,7 +1349,8 @@
         <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
           <div class="testimonial-card">
             <div class="testimonial-stars" aria-label="5 étoiles">★★★★★</div>
-            <p class="testimonial-text">"Notre service a réduit de 40% le délai de réponse aux besoins urgents depuis que nous utilisons la plateforme. Un outil indispensable."</p>
+            <p class="testimonial-text">"Notre service a réduit de 40% le délai de réponse aux besoins urgents depuis
+              que nous utilisons la plateforme. Un outil indispensable."</p>
             <div class="testimonial-author">
               <div class="testimonial-avatar" style="background:#3b82f6;" aria-hidden="true">DM</div>
               <div>
@@ -706,7 +1363,8 @@
         <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
           <div class="testimonial-card">
             <div class="testimonial-stars" aria-label="5 étoiles">★★★★★</div>
-            <p class="testimonial-text">"Je ne savais pas que je pouvais avoir un impact aussi fort. Depuis que je suis inscrit, j'ai déjà donné 4 fois. La plateforme rend tout tellement simple."</p>
+            <p class="testimonial-text">"Je ne savais pas que je pouvais avoir un impact aussi fort. Depuis que je suis
+              inscrit, j'ai déjà donné 4 fois. La plateforme rend tout tellement simple."</p>
             <div class="testimonial-author">
               <div class="testimonial-avatar" style="background:#10b981;" aria-hidden="true">RB</div>
               <div>
@@ -736,7 +1394,8 @@
     <div class="container">
       <div class="row align-items-center">
         <div class="col-md-6 mb-4 mb-md-0">
-          <span class="footer-brand"><i class="bi bi-droplet-fill text-danger me-2" aria-hidden="true"></i>DonSang</span>
+          <span class="footer-brand"><i class="bi bi-droplet-fill text-danger me-2"
+              aria-hidden="true"></i>DonSang</span>
           <p class="mt-2 mb-0 opacity-75">Plateforme de gestion du don de sang — Projet Django 2026</p>
         </div>
         <div class="col-md-6 text-md-end">
@@ -753,8 +1412,11 @@
   <!-- ===== BACK TO TOP ===== -->
   <button id="backToTop" aria-label="Retour en haut de la page">
     <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M13 21.5C13 21.5 3.5 15 3.5 8.5C3.5 6 5.5 4 8 4C10 4 11.8 5.2 13 7C14.2 5.2 16 4 18 4C20.5 4 22.5 6 22.5 8.5C22.5 15 13 21.5 13 21.5Z" fill="white" opacity="0.92"/>
-      <polyline points="6,13 8.5,13 9.5,10 10.5,16 11.5,11.5 12.5,13 16,13" stroke="#E63946" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path
+        d="M13 21.5C13 21.5 3.5 15 3.5 8.5C3.5 6 5.5 4 8 4C10 4 11.8 5.2 13 7C14.2 5.2 16 4 18 4C20.5 4 22.5 6 22.5 8.5C22.5 15 13 21.5 13 21.5Z"
+        fill="white" opacity="0.92" />
+      <polyline points="6,13 8.5,13 9.5,10 10.5,16 11.5,11.5 12.5,13 16,13" stroke="#E63946" stroke-width="1.4"
+        stroke-linecap="round" stroke-linejoin="round" fill="none" />
     </svg>
   </button>
 
@@ -778,12 +1440,12 @@
       const counterObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (!entry.isIntersecting) return;
-          const el     = entry.target;
+          const el = entry.target;
           const target = +el.dataset.count;
           const suffix = el.dataset.suffix || '';
           const duration = 1600;
-          const start  = performance.now();
-          const tick   = (now) => {
+          const start = performance.now();
+          const tick = (now) => {
             const elapsed = now - start;
             const progress = Math.min(elapsed / duration, 1);
             const ease = 1 - Math.pow(1 - progress, 4);
@@ -805,7 +1467,7 @@
         entries.forEach(entry => {
           if (!entry.isIntersecting) return;
           const bar = entry.target;
-          const w   = bar.dataset.width;
+          const w = bar.dataset.width;
           setTimeout(() => { bar.style.width = w + '%'; }, 100);
           barObserver.unobserve(bar);
         });
@@ -824,4 +1486,5 @@
     });
   </script>
 </body>
+
 </html>
