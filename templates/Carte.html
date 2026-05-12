@@ -363,7 +363,7 @@
               <div class="urgence-nom">Hôpital Sahloul</div>
             </div>
             <div class="urgence-meta">
-              <i class="bi bi-geo-alt"></i> Sousse · 4.1 km
+              <i class="bi bi-geo-alt"></i> 
             </div>
             <div class="urgence-poches" style="color:var(--muted);">
               <i class="bi bi-droplet me-1"></i>5 poches · Compatible
@@ -412,24 +412,20 @@
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  /* ══════════════════════════════════════════════════
-     COORDONNÉES DE TEST
-     Départ  : Université de Sousse
-     Arrivée : Hôpital Ibn Al Jazzar, Sousse
-  ══════════════════════════════════════════════════ */
+  
   const DONNEUR_LAT = 35.8321;
   const DONNEUR_LNG = 10.6388;
   const GROUPE      = "{{ donneur.groupe_sanguin|default:'A+' }}";
   const PRENOM      = "{{ donneur.user.first_name|default:donneur.user.username|escapejs }}";
 
   const HOPITAL = {
-    lat:     35.8284,
-    lng:     10.6350,
-    nom:     "Hôpital Ibn Al Jazzar",
-    ville:   "Sousse",
-    poches:  3,
+    lat:     {{ hopital.latitude }},
+    lng:     {{ hopital.longitude }},
+    nom:     "{{ hopital.nom|escapejs }}",
+    ville:   "{{ hopital.ville|escapejs }}",
+    poches:  {{ hopital.poches|default:3 }},
     groupe:  GROUPE,
-    adresse: "Route de Kairouan, Sousse"
+    adresse: "{{ hopital.adresse|escapejs }}"
   };
 
   /* ── CARTE (tiles clair pour matcher le style light du site) ── */

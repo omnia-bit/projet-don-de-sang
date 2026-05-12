@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from .forms import UserRegisterForm, ModifierProfilForm, ModifierHopitalProfilForm
 from django.contrib import messages
 from .models import DonneurProfile, HopitalProfile
-
+import json
 def index(request):
     return HttpResponse("Page accounts fonctionne")
 
@@ -51,7 +51,7 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt # pour permettre le POST sans token CSRF (à utiliser avec précaution)
 
 # LOGIN CUSTOM
 @csrf_exempt
@@ -141,4 +141,34 @@ def modifier_profil(request):
         'form': form,
         'profil': profil,
         'role': request.user.role
+    })
+# Dans ta vue qui rend Carte.html, ajoute juste "hopital" au contexte :
+
+from accounts.models import HopitalProfile
+
+@login_required
+def carte(request):
+    donneur = request.user.donneur_profile
+
+    # Récupère l'hôpital le plus proche (ou le premier urgence active)
+    # Option 1 — si tu as un AppelUrgent lié à un hôpital :
+    # from dons.models import AppelUrgent
+    # appel   = AppelUrgent.objects.filter(actif=True, groupe_sanguin=donneur.groupe_sanguin).first()
+    # hopital = appel.hopital if appel else None
+    # hopital.poches = appel.poches_necessaires  # attribut temporaire pour le template
+
+    # Option 2 — premier hôpital validé avec coordonnées GPS (simple) :
+    hopital = HopitalProfile.objects.filter(
+        valide=True,
+        latitude__isnull=False,
+        longitude__isnull=False,
+    ).first()
+
+    # Ajoute un attribut "poches" temporaire si ton modèle n'en a pas
+    if hopital:
+        hopital.poches = 3   # remplace par ton champ réel si tu l'as
+
+    return render(request, 'registration/carte.html', {
+        'donneur': donneur,
+        'hopital': hopital,       # ← SEUL AJOUT par rapport à avant
     })
