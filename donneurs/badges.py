@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.db.models import Min, Max
 
 
-# ── Définition des badges ────────────────────────────────────────────────────
+# ── Définition des badges: liste contenant les badges du système ────────────────────────────────────────────────────
 BADGE_DEFINITIONS = [
     {
         'code':        'premier_don',
@@ -65,7 +65,7 @@ BADGE_DEFINITIONS = [
     },
 ]
 
-BADGE_MAP = {b['code']: b for b in BADGE_DEFINITIONS}
+BADGE_MAP = {b['code']: b for b in BADGE_DEFINITIONS} #Pour accéder rapidement à un badge avec son code
 
 
 def _check_premier_don(donneur):
@@ -107,7 +107,7 @@ def _check_sauveur_vies(donneur):
     return Don.objects.filter(donneur=donneur).count() >= 4
 
 
-CHECKERS = {
+CHECKERS = {                #dictionnaire qui associe le code du badge a sa fct de verification 
     'premier_don':      _check_premier_don,
     'donneur_regulier': _check_donneur_regulier,
     'heros_sang':       _check_heros_sang,
@@ -124,7 +124,7 @@ def calculer_badges(donneur):
     """
     from .models import DonneurBadge
 
-    obtenus = []
+    obtenus = []                #liste des badges gagnés
     for code, checker in CHECKERS.items():
         if checker(donneur):
             obtenus.append(code)

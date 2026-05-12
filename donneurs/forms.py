@@ -2,7 +2,7 @@ from django import forms
 from django.utils import timezone
 from .models import Don, ReponseAppel
 
-
+#bloc de récupération des hôpitaux validés
 try:
     from accounts.models import HopitalProfile
     HOPITAL_QUERYSET = HopitalProfile.objects.filter(valide=True)
@@ -28,7 +28,7 @@ class DonForm(forms.ModelForm):
             'date_don': forms.DateInput(attrs={
                 'class': 'form-control',
                 'type':  'date',
-                'max':   timezone.now().date().isoformat(),   # pas de date future
+                
             }),
             'quantite': forms.NumberInput(attrs={
                 'class':       'form-control',

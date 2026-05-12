@@ -399,6 +399,7 @@ def chatbot_ia(request):
 
             delai = 84 if getattr(donneur, 'sexe', 'M') == 'F' else 56
 
+            #Texte envoyé à l’IA pour lui expliquer son rôle
             system_prompt = f"""Tu es un assistant spécialisé en don de sang pour DonSang (Tunisie). Réponds en français, de façon concise (3-4 phrases max).
 Profil: {donneur.user.first_name or donneur.user.username}, groupe {donneur.groupe_sanguin}, {'femme' if getattr(donneur, 'sexe', 'M') == 'F' else 'homme'}, délai {delai}j, {'éligible' if est_eligible else f'prochain don le {prochaine_date}'}, {Don.objects.filter(donneur=donneur).count()} dons effectués."""
 
@@ -406,16 +407,16 @@ Profil: {donneur.user.first_name or donneur.user.username}, groupe {donneur.grou
                 "message": question,
                 "model":   "command-a-03-2025",
                 "preamble": system_prompt,
-                "max_tokens": 200,
-                "temperature": 0.7
+                "max_tokens": 200,      #taille max de la reponse
+                "temperature": 0.7      #créativité de l'ia
             }).encode('utf-8')
 
             req = urllib.request.Request(
-                'https://api.cohere.com/v1/chat',
+                'https://api.cohere.com/v1/chat',       #Endpoint du chatbot Cohere
                 data=payload,
                 headers={
                     'Content-Type':  'application/json',
-                    'Authorization': f'Bearer {settings.COHERE_API_KEY}'
+                    'Authorization': f'Bearer {settings.COHERE_API_KEY}'   #Clé API utilisée pour authentifier notre plateforme
                 },
                 method='POST'
             )
