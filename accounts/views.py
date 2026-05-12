@@ -6,6 +6,7 @@ from .forms import UserRegisterForm, ModifierProfilForm, ModifierHopitalProfilFo
 from django.contrib import messages
 from .models import DonneurProfile, HopitalProfile
 import json
+from hopitaux.models import DemandeSang
 def index(request):
     return HttpResponse("Page accounts fonctionne")
 
@@ -144,31 +145,4 @@ def modifier_profil(request):
     })
 # Dans ta vue qui rend Carte.html, ajoute juste "hopital" au contexte :
 
-from accounts.models import HopitalProfile
 
-@login_required
-def carte(request):
-    donneur = request.user.donneur_profile
-
-    # Récupère l'hôpital le plus proche (ou le premier urgence active)
-    # Option 1 — si tu as un AppelUrgent lié à un hôpital :
-    # from dons.models import AppelUrgent
-    # appel   = AppelUrgent.objects.filter(actif=True, groupe_sanguin=donneur.groupe_sanguin).first()
-    # hopital = appel.hopital if appel else None
-    # hopital.poches = appel.poches_necessaires  # attribut temporaire pour le template
-
-    # Option 2 — premier hôpital validé avec coordonnées GPS (simple) :
-    hopital = HopitalProfile.objects.filter(
-        valide=True,
-        latitude__isnull=False,
-        longitude__isnull=False,
-    ).first()
-
-    # Ajoute un attribut "poches" temporaire si ton modèle n'en a pas
-    if hopital:
-        hopital.poches = 3   # remplace par ton champ réel si tu l'as
-
-    return render(request, 'registration/carte.html', {
-        'donneur': donneur,
-        'hopital': hopital,       # ← SEUL AJOUT par rapport à avant
-    })

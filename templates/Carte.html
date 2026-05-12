@@ -345,14 +345,14 @@
           <!-- Item 1 — l'hôpital principal -->
           <div class="urgence-item active-urgence" id="cardHopital" onclick="zoomToHopital()">
             <div class="urgence-head">
-              <div class="groupe-badge">{{ donneur.groupe_sanguin|default:"A+" }}</div>
-              <div class="urgence-nom">Hôpital Ibn Al Jazzar</div>
+              <div class="groupe-badge">{{ demande.groupe_sanguin }}</div>
+              <div class="urgence-nom">{{ hopital.nom }}</div>
             </div>
             <div class="urgence-meta">
-              <i class="bi bi-geo-alt"></i> Sousse · 2.3 km
+              <i class="bi bi-geo-alt"></i> {{ hopital.ville }}
             </div>
             <div class="urgence-poches">
-              <i class="bi bi-droplet-fill me-1"></i>3 poches nécessaires · Urgent
+              <i class="bi bi-droplet-fill me-1"></i>{{ demande.quantite_necessaire }} poches nécessaires · Urgent
             </div>
           </div>
 
@@ -412,7 +412,6 @@
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  
   const DONNEUR_LAT = 35.8321;
   const DONNEUR_LNG = 10.6388;
   const GROUPE      = "{{ donneur.groupe_sanguin|default:'A+' }}";
@@ -423,8 +422,8 @@
     lng:     {{ hopital.longitude }},
     nom:     "{{ hopital.nom|escapejs }}",
     ville:   "{{ hopital.ville|escapejs }}",
-    poches:  {{ hopital.poches|default:3 }},
-    groupe:  GROUPE,
+    poches:  {{ demande.quantite_necessaire|default:0 }},
+    groupe:  "{{ demande.groupe_sanguin|escapejs }}",
     adresse: "{{ hopital.adresse|escapejs }}"
   };
 

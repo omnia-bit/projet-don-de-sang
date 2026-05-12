@@ -6,6 +6,7 @@ from datetime import timedelta
 from django.urls import reverse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse, JsonResponse
+from math import radians, sin, cos, sqrt, atan2
 
 from accounts.models import DonneurProfile, HopitalProfile
 from .models import Don, ReponseAppel, InscriptionCampagne
@@ -527,6 +528,47 @@ def badges(request):
     })
 
 
+from math import radians, sin, cos, sqrt, atan2
+
+@login_required
+def carte(request):
+    donneur = _get_donneur(request)
+    if donneur is None:
+        return redirect('accueil')
+
+    DONNEUR_LAT = 34.7406
+    DONNEUR_LNG = 10.7603
+
+    def distance_km(lat1, lng1, lat2, lng2):
+        R = 6371
+        lat1, lng1, lat2, lng2 = map(radians, [lat1, lng1, lat2, lng2])
+        a = sin((lat2-lat1)/2)**2 + cos(lat1)*cos(lat2)*sin((lng2-lng1)/2)**2
+        return R * 2 * atan2(sqrt(a), sqrt(1-a))
+
+    # Groupes compatibles avec le donneur
+    groupes_compatibles = COMPATIBILITE.get(donneur.groupe_sanguin, [donneur.groupe_sanguin])
+
+    # Toutes demandes actives compatibles avec GPS
+    demandes = DemandeSang.objects.filter(
+        statut='active',
+        groupe_sanguin__in=groupes_compatibles,
+        hopital__valide=True,
+        hopital__latitude__isnull=False,
+        hopital__longitude__isnull=False,
+    ).select_related('hopital')
+
+    # La plus proche
+    demande = min(
+        demandes,
+        key=lambda d: distance_km(DONNEUR_LAT, DONNEUR_LNG, d.hopital.latitude, d.hopital.longitude),
+        default=None
+    )
+
+    return render(request, 'donneurs/carte.html', {
+        'donneur': donneur,
+        'hopital': demande.hopital if demande else None,
+        'demande': demande,
+    })
 
 def index(request):
     return HttpResponse("Page donneurs fonctionne")
