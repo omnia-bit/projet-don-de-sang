@@ -1,78 +1,307 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Nos Demandes - {{ block.super }}{% endblock %}
+{% block title %}Demandes de Sang — DonSang{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: #f8fafc; }
+
+    /* ── Hero Header ── */
+    .camp-hero {
+        background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+        padding: 3.5rem 0 5rem;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .camp-hero::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(239,68,68,0.08) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .camp-hero h1 {
+        color: #0f172a;
+        font-weight: 800;
+        font-size: 2rem;
+        letter-spacing: -0.5px;
+    }
+    .camp-hero .subtitle { color: #64748b; font-size: 0.9rem; font-weight: 600; }
+    .btn-new-camp {
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.65rem 1.5rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.25s;
+        box-shadow: 0 4px 15px rgba(239,68,68,0.3);
+    }
+    .btn-new-camp:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(239,68,68,0.4);
+        color: white;
+    }
+
+    /* ── Stats Strip ── */
+    .stats-strip {
+        margin-top: -2.5rem;
+        position: relative;
+        z-index: 10;
+    }
+    .stat-pill {
+        background: white;
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        border: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: transform 0.2s;
+    }
+    .stat-pill:hover { transform: translateY(-3px); }
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    .stat-val { font-size: 1.6rem; font-weight: 800; color: #1a202c; line-height: 1; }
+    .stat-lbl { font-size: 0.7rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ── Campaign Cards ── */
+    .camp-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #f1f5f9;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .camp-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        border-color: transparent;
+    }
+    .camp-card-header {
+        padding: 1.5rem 1.5rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    .camp-card-body { padding: 1rem 1.5rem; flex-grow: 1; }
+    .camp-card-footer {
+        padding: 1rem 1.5rem 1.25rem;
+        border-top: 1px solid #f8fafc;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    /* Badges */
+    .status-badge {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0.3rem 0.75rem;
+        border-radius: 8px;
+    }
+    .badge-encours { background: #ecfdf5; color: #10b981; }
+    .badge-terminee { background: #f8fafc; color: #94a3b8; }
+
+    /* Info rows */
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+        font-size: 0.85rem;
+        color: #475569;
+    }
+    .info-row i { width: 18px; text-align: center; color: #94a3b8; font-size: 0.9rem; }
+    .info-row strong { color: #1e293b; }
+
+    /* Action buttons */
+    .btn-card-action {
+        border-radius: 10px;
+        padding: 0.5rem 1rem;
+        font-weight: 700;
+        font-size: 0.78rem;
+        border: 1.5px solid #e2e8f0;
+        color: #475569;
+        background: white;
+        transition: all 0.2s;
+    }
+    .btn-card-action:hover { border-color: #3b82f6; color: #3b82f6; background: #eff6ff; }
+    .btn-card-danger { border-color: #fee2e2; color: #ef4444; }
+    .btn-card-danger:hover { border-color: #ef4444; background: #fef2f2; color: #dc2626; }
+
+    /* Empty state */
+    .empty-state-wrap {
+        background: white;
+        border-radius: 24px;
+        padding: 4rem 2rem;
+        text-align: center;
+        border: 2px dashed #e2e8f0;
+    }
+    .empty-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: #fef2f2;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #ef4444;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold mb-1">Nos Demandes de Sang</h2>
-            <p class="text-muted">Gérez vos appels urgents publiés sur la plateforme.</p>
+<!-- ═══ Hero Header ═══ -->
+<div class="camp-hero">
+    <div class="container position-relative" style="z-index: 5;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <div class="subtitle mb-2"><i class="bi bi-activity me-1"></i> Gestion Hospitalière</div>
+                <h1>Vos Demandes de Sang</h1>
+            </div>
+            <a href="{% url 'hopitaux:creer_demande' %}" class="btn btn-new-camp">
+                <i class="bi bi-plus-lg me-2"></i>Nouvelle Demande
+            </a>
         </div>
-        <a href="{% url 'hopitaux:creer_demande' %}" class="btn btn-danger rounded-pill px-4">
-            <i class="bi bi-plus-circle me-2"></i>Nouvelle Demande
-        </a>
     </div>
+</div>
 
-    <div class="card border-0 shadow-sm rounded-4">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
-                    <tr>
-                        <th class="ps-4">Groupe</th>
-                        <th>Date</th>
-                        <th>Quantité</th>
-                        <th>Statut</th>
-                        <th>Réponses</th>
-                        <th class="text-end pe-4">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for d in demandes %}
-                    <tr>
-                        <td class="ps-4">
-                            <span class="badge bg-danger rounded-pill px-3">{{ d.groupe_sanguin }}</span>
-                        </td>
-                        <td>{{ d.date_publication|date:"d M Y" }}</td>
-                        <td>{{ d.quantite_necessaire }} poches</td>
-                        <td>
-                            {% if d.statut == 'active' %}
-                                <span class="badge bg-success-light text-success rounded-pill px-3">Active</span>
-                            {% else %}
-                                <span class="badge bg-secondary-light text-secondary rounded-pill px-3">Clôturée</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{% url 'hopitaux:voir_reponses' d.pk %}" class="text-decoration-none">
-                                <i class="bi bi-people me-1"></i>{{ d.reponses.count }} donneur(s)
-                            </a>
-                        </td>
-                        <td class="text-end pe-4">
-                            <div class="dropdown">
-                                <button class="btn btn-light btn-sm rounded-circle" type="button" data-bs-toggle="dropdown">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
-                                    <li><a class="dropdown-item" href="{% url 'hopitaux:voir_reponses' d.pk %}"><i class="bi bi-eye me-2"></i>Voir réponses</a></li>
-                                    {% if d.statut == 'active' %}
-                                    <li><a class="dropdown-item" href="{% url 'hopitaux:modifier_demande' d.pk %}"><i class="bi bi-pencil me-2"></i>Modifier</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item text-danger" href="{% url 'hopitaux:cloturer_demande' d.pk %}"><i class="bi bi-check2-circle me-2"></i>Clôturer</a></li>
-                                    {% endif %}
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">
-                            Aucune demande publiée pour le moment.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<!-- ═══ Stats Strip ═══ -->
+<div class="container stats-strip mb-4">
+    <div class="row g-3">
+        <div class="col-6 col-md-4">
+            <div class="stat-pill">
+                <div class="stat-icon" style="background: #fef2f2; color: #ef4444;"><i class="bi bi-inbox"></i></div>
+                <div>
+                    <div class="stat-val">{{ stats.total }}</div>
+                    <div class="stat-lbl">Total</div>
+                </div>
+            </div>
         </div>
+        <div class="col-6 col-md-4">
+            <div class="stat-pill">
+                <div class="stat-icon" style="background: #ecfdf5; color: #10b981;"><i class="bi bi-broadcast"></i></div>
+                <div>
+                    <div class="stat-val">{{ stats.actives }}</div>
+                    <div class="stat-lbl">Actives</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="stat-pill">
+                <div class="stat-icon" style="background: #f8fafc; color: #94a3b8;"><i class="bi bi-check-circle"></i></div>
+                <div>
+                    <div class="stat-val">{{ stats.cloturees }}</div>
+                    <div class="stat-lbl">Clôturées</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ Demandes Cards ═══ -->
+<div class="container pb-5">
+    {% include 'includes/messages.html' %}
+
+    <div class="row g-4">
+        {% if demandes %}
+            {% for d in demandes %}
+            <div class="col-md-6 col-lg-4">
+                <div class="camp-card">
+                    <!-- Header -->
+                    <div class="camp-card-header">
+                        <h5 class="fw-bold mb-0" style="color: #ef4444; font-size: 1.25rem; line-height: 1.4;">{{ d.groupe_sanguin }}</h5>
+                        {% if d.statut == 'active' %}
+                            <span class="status-badge badge-encours"><i class="bi bi-broadcast me-1"></i>Active</span>
+                        {% else %}
+                            <span class="status-badge badge-terminee"><i class="bi bi-check-lg me-1"></i>Clôturée</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Body -->
+                    <div class="camp-card-body">
+                        <p class="text-muted mb-3" style="font-size: 0.8rem; line-height: 1.6;">
+                            {{ d.description|truncatewords:18 }}
+                        </p>
+
+                        <div class="info-row">
+                            <i class="bi bi-droplet-fill text-danger"></i>
+                            <span>Quantité : <strong>{{ d.quantite_necessaire }} poches</strong></span>
+                        </div>
+                        <div class="info-row">
+                            <i class="bi bi-calendar3"></i>
+                            <span>Publié le : {{ d.date_publication|date:"d M Y" }}</span>
+                        </div>
+                        {% if d.delai %}
+                        <div class="info-row">
+                            <i class="bi bi-hourglass-split text-warning"></i>
+                            <span>Délai : <strong>{{ d.delai }} heures</strong></span>
+                        </div>
+                        {% endif %}
+
+                        <!-- Inscription progress (Réponses) -->
+                        <div class="mt-3 p-3 rounded-3" style="background: #f8fafc;">
+                            <div class="d-flex justify-content-between align-items-center" style="font-size: 0.78rem;">
+                                <span class="fw-bold" style="color: #475569;"><i class="bi bi-people-fill me-1"></i> {{ d.reponses.count }} donneur{{ d.reponses.count|pluralize:"s" }}</span>
+                                <a href="{% url 'hopitaux:voir_reponses' d.pk %}" class="fw-bold text-decoration-none" style="color: #3b82f6;">Voir les réponses <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="camp-card-footer">
+                        {% if d.statut == 'active' %}
+                        <a href="{% url 'hopitaux:modifier_demande' d.pk %}" class="btn btn-card-action flex-grow-1">
+                            <i class="bi bi-pencil-square me-1"></i>Modifier
+                        </a>
+                        <a href="{% url 'hopitaux:cloturer_demande' d.pk %}" class="btn btn-card-action btn-card-danger"
+                           onclick="return confirm('Voulez-vous vraiment clôturer cette demande ?')">
+                            <i class="bi bi-check2-circle"></i> Clôturer
+                        </a>
+                        {% else %}
+                        <span class="text-muted small text-center w-100 p-2">Demande archivée</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="empty-state-wrap">
+                    <div class="empty-icon">
+                        <i class="bi bi-inbox"></i>
+                    </div>
+                    <h4 class="fw-bold mb-2" style="color: #1e293b;">Aucune demande publiée</h4>
+                    <p class="text-muted mb-4" style="max-width: 400px; margin: 0 auto;">Vous n'avez pas encore publié de demande de sang urgente.</p>
+                    <a href="{% url 'hopitaux:creer_demande' %}" class="btn btn-new-camp">
+                        <i class="bi bi-plus-lg me-2"></i>Publier une demande
+                    </a>
+                </div>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

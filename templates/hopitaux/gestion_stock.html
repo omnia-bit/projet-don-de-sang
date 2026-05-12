@@ -1,194 +1,302 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Gestion du Stock - {{ block.super }}{% endblock %}
+{% block title %}Gestion du Stock — BloodConnect{% endblock %}
 
 {% block extra_css %}
 <style>
-    .stock-card {
-        border: none;
-        border-radius: 20px;
-        background: white;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    body { background: #f8fafc; }
+
+    /* ── Hero Header ── */
+    .stock-hero {
+        background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+        padding: 3.5rem 0 5rem;
+        position: relative;
         overflow: hidden;
+        border-bottom: 1px solid #e2e8f0;
     }
-    .stock-header {
-        background: linear-gradient(135deg, #1d3557 0%, #457b9d 100%);
-        color: white;
+    .stock-hero::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(239,68,68,0.08) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .stock-hero h1 {
+        color: #0f172a;
+        font-weight: 800;
+        font-size: 2rem;
+        letter-spacing: -0.5px;
+    }
+    .stock-hero .subtitle { color: #64748b; font-size: 0.9rem; font-weight: 600; }
+
+    /* ── Stats Strip ── */
+    .stats-strip {
+        margin-top: -2.5rem;
+        position: relative;
+        z-index: 10;
+    }
+    .stat-pill {
+        background: white;
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        border: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: transform 0.2s;
+    }
+    .stat-pill:hover { transform: translateY(-3px); }
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    .stat-val { font-size: 1.6rem; font-weight: 800; color: #1a202c; line-height: 1; }
+    .stat-lbl { font-size: 0.7rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ── Cards & Forms ── */
+    .glass-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #f1f5f9;
         padding: 2rem;
+        height: 100%;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
     }
-    .group-pill {
-        width: 60px;
-        height: 60px;
-        border-radius: 15px;
+    
+    .form-label { font-weight: 700; color: #475569; font-size: 0.85rem; margin-bottom: 0.5rem; }
+    .form-control, .form-select {
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid #e2e8f0;
+        background: #f8fafc;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 4px rgba(239,68,68,0.1);
+        background: white;
+    }
+
+    /* ── Stock Table ── */
+    .table-container { overflow: hidden; border-radius: 15px; }
+    .table thead th {
+        background: #f8fafc;
+        border: none;
+        color: #64748b;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        padding: 1rem;
+        letter-spacing: 0.5px;
+    }
+    .table tbody td { padding: 1.25rem 1rem; vertical-align: middle; border-bottom: 1px solid #f1f5f9; }
+    
+    .group-circle {
+        width: 45px;
+        height: 45px;
+        background: #f1f5f9;
+        color: #1e293b;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 800;
-        font-size: 1.2rem;
-        background: #f8f9fa;
-        color: #1d3557;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        font-size: 1rem;
     }
-    .group-pill.low-stock {
-        background: #ffe5e5;
-        color: #e63946;
-        animation: pulse-red 2s infinite;
+    
+    /* Progress Bars */
+    .progress-custom { height: 8px; background: #f1f5f9; border-radius: 10px; overflow: hidden; margin-top: 6px; }
+    .progress-fill { height: 100%; border-radius: 10px; transition: width 1s ease; }
+    .bg-danger-soft { background: #ef4444; }
+    .bg-warning-soft { background: #f59e0b; }
+    .bg-success-soft { background: #10b981; }
+
+    @keyframes heartbeat {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+        70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
     }
-    /* Jauge de stock (Stock Santé) */
-    .stock-progress-container {
-        height: 10px;
-        background: #e9ecef;
-        border-radius: 5px;
-        overflow: hidden;
-        margin-top: 8px;
-        width: 100%;
+    .status-pulse { animation: pulse-red 2s infinite; }
+    .critical-glow {
+        animation: heartbeat 1.5s infinite ease-in-out;
+        position: relative;
     }
-    .stock-progress-bar {
-        height: 100%;
-        transition: width 0.6s ease;
-    }
-    .bg-critical {
-        background-color: #e63946 !important;
-        animation: blink-danger 1s infinite;
-    }
-    .bg-low {
-        background-color: #f4a261 !important;
-    }
-    .bg-optimal {
-        background-color: #2a9d8f !important;
-    }
-    @keyframes blink-danger {
-        0% { opacity: 1; }
-        50% { opacity: 0.4; }
-        100% { opacity: 1; }
-    }
-    .form-section {
-        background: #f1f4f8;
-        border-radius: 15px;
-        padding: 1.5rem;
-    }
-    .table thead th {
-        border: none;
-        color: #6c757d;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 1px;
+    .critical-glow::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        border-radius: 12px;
+        background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%);
+        z-index: -1;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <!-- Bouton Retour -->
-    <div class="mb-4">
-        <a href="{% url 'hopitaux:dashboard' %}" class="btn btn-outline-primary rounded-pill px-4 fw-bold">
-            <i class="bi bi-arrow-left me-2"></i>Retour au Dashboard
-        </a>
+<div class="stock-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="subtitle"><i class="bi bi-box-seam me-1"></i> Inventaire Hospitalier</div>
+                <h1>Gestion des Réserves</h1>
+                <p class="text-muted mt-2 mb-0">Mettez à jour vos stocks de sang en temps réel pour garantir une réactivité optimale face aux urgences.</p>
+            </div>
+            <div class="col-lg-5 text-lg-end mt-4 mt-lg-0">
+                <a href="{% url 'hopitaux:dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4 fw-bold">
+                    <i class="bi bi-arrow-left me-2"></i> Dashboard
+                </a>
+            </div>
+        </div>
     </div>
+</div>
 
+<div class="container stats-strip">
     <div class="row g-4">
-        <!-- Formulaire de mise à jour -->
+        <div class="col-md-4">
+            <div class="stat-pill">
+                <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;">
+                    <i class="bi bi-droplet-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-val">{{ stats.total_poches }}</div>
+                    <div class="stat-lbl">Poches au Total</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-pill">
+                <div class="stat-icon" style="background: #fff1f2; color: #ef4444;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-val">{{ stats.groupes_critiques }}</div>
+                    <div class="stat-lbl">Groupes en Pénurie</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-pill">
+                <div class="stat-icon" style="background: #f0fdf4; color: #10b981;">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div>
+                    <div class="stat-val" style="font-size: 1.1rem;">{{ stats.derniere_maj|date:"d M H:i"|default:"--" }}</div>
+                    <div class="stat-lbl">Dernière MAJ</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5 mt-4">
+    <div class="row g-4">
+        <!-- Update Form -->
         <div class="col-lg-4">
-            <div class="stock-card p-4 h-100">
-                <h4 class="fw-bold mb-4 text-primary">Mettre à jour</h4>
-                <p class="text-muted small mb-4">Ajustez les niveaux de stock pour chaque groupe sanguin disponible dans votre établissement.</p>
+            <div class="glass-card shadow-sm">
+                <h5 class="fw-bold text-dark mb-4"><i class="bi bi-pencil-square text-danger me-2"></i> Mise à jour</h5>
                 
-                <form method="post" class="form-section">
+                <form method="post" class="p-2">
                     {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small">Groupe Sanguin</label>
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3 small py-2 px-3 mb-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.75rem;"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="mb-4">
+                        <label class="form-label">GROUPE SANGUIN</label>
                         {{ form.groupe_sanguin }}
                     </div>
                     <div class="mb-4">
-                        <label class="form-label fw-bold small">Quantité (Poches)</label>
+                        <label class="form-label">QUANTITÉ (POCHES)</label>
                         {{ form.quantite_poches }}
+                        <div class="form-text text-muted" style="font-size: 0.7rem;">Saisissez le nombre total de poches utilisables.</div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold">
-                        <i class="bi bi-save me-2"></i>Enregistrer
+                    <button type="submit" class="btn btn-danger w-100 py-3 rounded-4 fw-bold shadow-sm">
+                        <i class="bi bi-check2-circle me-2"></i> Enregistrer le stock
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- Liste des stocks -->
+        <!-- Inventory List -->
         <div class="col-lg-8">
-            <div class="stock-card h-100">
-                <div class="stock-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="mb-1 fw-bold">Inventaire Actuel</h3>
-                            <p class="mb-0 opacity-75">Visualisez l'état de vos réserves en temps réel.</p>
-                        </div>
-                        <i class="bi bi-box-seam fs-1 opacity-25"></i>
-                    </div>
+            <div class="glass-card shadow-sm p-0 overflow-hidden">
+                <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-list-stars text-danger me-2"></i> Inventaire Réel</h5>
+                    <span class="text-muted small">Mise à jour auto</span>
                 </div>
                 
-                <div class="p-4">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Groupe</th>
-                                    <th>Quantité disponible</th>
-                                    <th>Statut</th>
-                                    <th>Dernière MAJ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for s in stocks %}
-                                <tr>
-                                    <td>
-                                        <div class="group-pill {% if s.quantite_poches < 5 %}low-stock{% endif %}">
-                                            {{ s.groupe_sanguin }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <h5 class="mb-0 fw-bold">{{ s.quantite_poches }} <span class="fs-6 text-muted fw-normal">poches</span></h5>
-                                        <!-- Jauge de Stock Santé (Nouveauté) -->
-                                        <div class="stock-progress-container">
-                                            <div class="stock-progress-bar {{ s.status_class }}" 
-                                                 role="progressbar" 
-                                                 style="width: {{ s.pourcentage }}%" 
-                                                 aria-valuenow="{{ s.pourcentage }}" 
-                                                 aria-valuemin="0" 
-                                                 aria-valuemax="100">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {% if s.quantite_poches < 5 %}
-                                            <span class="badge bg-danger rounded-pill px-3">Pénurie Critique</span>
-                                        {% elif s.quantite_poches < 15 %}
-                                            <span class="badge bg-warning text-dark rounded-pill px-3">Stock Bas</span>
-                                        {% else %}
-                                            <span class="badge bg-success rounded-pill px-3">Stock OK</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="small text-muted">
-                                        {{ s.derniere_mise_a_jour|date:"d/m/Y H:i" }}
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="4" class="text-center py-5 text-muted">
-                                        <i class="bi bi-inbox fs-2 d-block mb-3"></i>
-                                        Aucun stock enregistré.
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>GROUPE</th>
+                                <th>NIVEAU DE RÉSERVE</th>
+                                <th>STATUT</th>
+                                <th>HISTORIQUE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in stocks %}
+                            <tr>
+                                <td>
+                                    <div class="group-circle {% if s.quantite_poches < 5 %}bg-danger text-white critical-glow{% endif %}">
+                                        {{ s.groupe_sanguin }}
+                                    </div>
+                                </td>
+                                <td style="min-width: 200px;">
+                                    <div class="d-flex justify-content-between align-items-end mb-1">
+                                        <span class="fw-bold text-dark" style="font-size: 1.1rem;">{{ s.quantite_poches }} <small class="fw-normal text-muted" style="font-size: 0.7rem;">poches</small></span>
+                                        <span class="text-muted" style="font-size: 0.7rem;">Capacité: 50</span>
+                                    </div>
+                                    <div class="progress-custom">
+                                        {% with pct=s.quantite_poches|add:0 %}
+                                        <div class="progress-fill {% if pct < 5 %}bg-danger-soft status-pulse{% elif pct < 15 %}bg-warning-soft{% else %}bg-success-soft{% endif %}" 
+                                             style="width: {% if pct > 50 %}100{% else %}{{ pct|add:pct }}{% endif %}%"></div>
+                                        {% endwith %}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if s.quantite_poches < 5 %}
+                                        <span class="badge bg-danger rounded-pill px-3 py-2">Critique</span>
+                                    {% elif s.quantite_poches < 15 %}
+                                        <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Stock Bas</span>
+                                    {% else %}
+                                        <span class="badge bg-success rounded-pill px-3 py-2">Optimal</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted" style="font-size: 0.75rem;">
+                                    {{ s.derniere_mise_a_jour|date:"d M Y" }}<br>
+                                    <span class="opacity-50">{{ s.derniere_mise_a_jour|time:"H:i" }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <div class="mb-3 opacity-20"><i class="bi bi-inbox" style="font-size: 3rem;"></i></div>
+                                    <h6 class="fw-bold">Aucun stock répertorié</h6>
+                                    <p class="small">Commencez par ajouter un groupe sanguin à gauche.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

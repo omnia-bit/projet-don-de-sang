@@ -8,7 +8,7 @@ from .models import User, DonneurProfile, HopitalProfile
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
     role = forms.ChoiceField(choices=User.ROLE_CHOICES)
-    
+
     # Champs additionnels pour le donneur (seront affichés via JS)
     groupe_sanguin = forms.ChoiceField(
         choices=[('', 'Choisir votre groupe')] + list(DonneurProfile.GROUPE_CHOICES), 

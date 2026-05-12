@@ -6,25 +6,25 @@
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
-    /* Isolation from base.html */
+    /* On enleve les menus par defaut */
     .main-navbar, .main-footer { display: none !important; }
     body { background-color: #f8f9fa; font-family: 'Nunito', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
     
-    /* Layout */
+    /* Mise en page */
     .admin-wrapper { display: flex; min-height: 100vh; }
     .sidebar { width: 260px; background: white; border-right: 1px solid #edf2f7; display: flex; flex-direction: column; padding: 1.5rem 1rem; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; overflow-y: auto;}
     .main-content { flex-grow: 1; margin-left: 260px; padding: 1.5rem 2rem; background-color: #f8f9fa; }
     
-    /* Sidebar Links */
+    /* Menu lateral */
     .sidebar-link { display: flex; align-items: center; padding: 0.8rem 1rem; color: #4a5568; text-decoration: none; border-radius: 0.5rem; margin-bottom: 0.25rem; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; }
     .sidebar-link:hover { background-color: #fef2f2; color: #dc2626; }
     .sidebar-link.active { background-color: #ef4444; color: white; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3); }
     .sidebar-link i { font-size: 1.1rem; margin-right: 0.8rem; width: 20px; text-align: center; }
     
-    /* Cards */
+    /* Style des blocs */
     .glass-card { background: white; border-radius: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; }
     
-    /* Stats Cards */
+    /* Blocs de chiffres */
     .stat-card { padding: 1.25rem; position: relative; overflow: hidden; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
     .stat-title { font-size: 0.65rem; font-weight: 800; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; }
     .stat-number { font-size: 1.8rem; font-weight: 800; color: #1a202c; line-height: 1; }
@@ -33,28 +33,86 @@
     .stat-trend.down { color: #ef4444; }
     .stat-icon { width: 40px; height: 40px; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
     
-    /* Alert Banner */
+    /* Bandeau d'alerte */
     .alert-banner-custom { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border-radius: 1rem; position: relative; overflow: hidden; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; }
     .alert-banner-custom .bg-graphics { position: absolute; right: 15%; top: 50%; transform: translateY(-50%); opacity: 0.15; font-size: 6rem; line-height: 1; pointer-events: none;}
     
-    /* Badges */
+    /* Les badges */
     .badge-urgent { background-color: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
     .badge-moyen { background-color: #fef3c7; color: #f59e0b; border: 1px solid #fde68a; }
     .badge-faible { background-color: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
     
-    /* Map */
-    #map { height: 100%; width: 100%; border-radius: 0.5rem; z-index: 1;}
+    /* La carte */
+    #map { height: 100%; width: 100%; border-radius: 0.75rem; z-index: 1; }
     .leaflet-control-attribution { display: none; }
+    .leaflet-control-zoom a { border-radius: 8px !important; border: none !important; background: rgba(15,23,42,0.8) !important; color: white !important; width: 30px !important; height: 30px !important; line-height: 30px !important; font-size: 14px !important; }
+    .leaflet-control-zoom { border: none !important; box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important; border-radius: 10px !important; overflow: hidden; }
+
+    /* Animation du point sur la carte */
+    @keyframes radar-ping {
+        0% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(3.5); opacity: 0; }
+    }
+    @keyframes marker-glow {
+        0%, 100% { box-shadow: 0 0 6px 2px rgba(239, 68, 68, 0.6); }
+        50% { box-shadow: 0 0 12px 4px rgba(239, 68, 68, 0.9); }
+    }
+    .radar-marker {
+        position: relative;
+        width: 12px; height: 12px;
+        background: #ef4444;
+        border-radius: 50%;
+        border: 2.5px solid white;
+        animation: marker-glow 2s ease-in-out infinite;
+        z-index: 20;
+    }
+    .radar-marker::before {
+        content: '';
+        position: absolute;
+        top: 50%; left: 50%;
+        width: 12px; height: 12px;
+        margin: -6px 0 0 -6px;
+        border-radius: 50%;
+        background: rgba(239, 68, 68, 0.4);
+        animation: radar-ping 2s ease-out infinite;
+        z-index: -1;
+    }
+
+    /* Radar dashed circle via Leaflet CSS */
+    .radar-dashed-circle {
+        stroke: #ef4444;
+        stroke-opacity: 0.3;
+        stroke-width: 1.5;
+        stroke-dasharray: 8 5;
+        fill: #ef4444;
+        fill-opacity: 0.03;
+    }
+
+    /* Modern Popup */
+    .leaflet-popup-content-wrapper {
+        border-radius: 14px !important;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important;
+        padding: 0;
+        border: 1px solid rgba(0,0,0,0.05);
+        background: #ffffff !important;
+    }
+    .leaflet-popup-content { margin: 14px 18px !important; line-height: 1.4 !important; }
+    .popup-content-custom { text-align: center; }
+    .popup-content-custom .popup-city { margin: 0 0 2px; font-weight: 800; color: #1e293b; font-size: 0.9rem; }
+    .popup-content-custom .popup-count { margin: 0; font-size: 0.75rem; color: #ef4444; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .popup-content-custom .popup-divider { height: 1px; background: rgba(0,0,0,0.05); margin: 6px 0; }
+    .popup-content-custom .popup-label { margin: 0; font-size: 0.65rem; color: #64748b; }
+    .leaflet-popup-tip { background: #ffffff !important; border: none; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="admin-wrapper">
-    <!-- ═══════════ SIDEBAR ═══════════ -->
+    <!-- Le menu a gauche -->
     <aside class="sidebar">
         <!-- Brand -->
         <div class="d-flex flex-column align-items-center mb-4 px-2 mt-2 text-center">
-            <img src="{% static 'img/logo_admin.png' %}" alt="Logo" class="mb-2" style="width: 55px; height: 55px; object-fit: contain;">
+            <img src="{% static 'img/logo_admin.png' %}" alt="Logo" class="mb-2" style="width: 70px; height: 70px; object-fit: contain;">
             <div>
                 <h4 class="mb-0 fw-bold" style="color: #1a202c; font-size: 1.1rem; letter-spacing: -0.5px;">BloodConnect</h4>
                 <div class="text-muted" style="font-size: 0.6rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Admin Panel</div>
@@ -183,8 +241,8 @@
                     </div>
                     <div class="mt-3 d-flex justify-content-between align-items-end">
                         <div>
-                            <div class="stat-number">{{ stats.total_donneurs|default:"8" }}</div>
-                            <div class="stat-trend up">+2 ce mois</div>
+                            <div class="stat-number">{{ stats.total_donneurs }}</div>
+                            <div class="stat-trend up">Utilisateurs actifs</div>
                         </div>
                         <div style="width: 60px; height: 30px;"><canvas id="sparkline1"></canvas></div>
                     </div>
@@ -199,8 +257,8 @@
                     </div>
                     <div class="mt-3 d-flex justify-content-between align-items-end">
                         <div>
-                            <div class="stat-number">{{ stats.total_hopitaux|default:"9" }}</div>
-                            <div class="stat-trend up">+1 ce mois</div>
+                            <div class="stat-number">{{ stats.total_hopitaux }}</div>
+                            <div class="stat-trend up">Partenaires</div>
                         </div>
                         <div style="width: 60px; height: 30px;"><canvas id="sparkline2"></canvas></div>
                     </div>
@@ -215,8 +273,8 @@
                     </div>
                     <div class="mt-3 d-flex justify-content-between align-items-end">
                         <div>
-                            <div class="stat-number">{{ stats.demandes_actives|default:"2" }}</div>
-                            <div class="stat-trend down">-1 ce mois</div>
+                            <div class="stat-number">{{ stats.demandes_actives }}</div>
+                            <div class="stat-trend text-muted">En cours</div>
                         </div>
                         <div style="width: 60px; height: 30px;"><canvas id="sparkline3"></canvas></div>
                     </div>
@@ -231,8 +289,8 @@
                     </div>
                     <div class="mt-3 d-flex justify-content-between align-items-end">
                         <div>
-                            <div class="stat-number">{{ stats.total_dons|default:"7" }}</div>
-                            <div class="stat-trend up">+3 ce mois</div>
+                            <div class="stat-number">{{ stats.total_dons }}</div>
+                            <div class="stat-trend up">Poches collectées</div>
                         </div>
                         <div style="width: 60px; height: 30px;"><canvas id="sparkline4"></canvas></div>
                     </div>
@@ -249,27 +307,14 @@
                     <div class="d-flex flex-grow-1 position-relative">
                         <!-- Legend List -->
                         <div class="pe-3 d-flex flex-column justify-content-center" style="width: 130px; z-index: 10;">
-                            {% for v in demandes_par_ville|slice:":4" %}
+                            {% for v in demandes_par_ville %}
                             <div class="d-flex align-items-center justify-content-between mb-3 bg-white p-2 rounded shadow-sm border" style="font-size: 0.75rem;">
-                                <div><span class="rounded-circle d-inline-block me-1" style="width: 6px; height: 6px; background-color: {% if v.total > 0 %}#ef4444{% else %}#10b981{% endif %};"></span> {{ v.hopital__ville }}</div>
+                                <div><span class="rounded-circle d-inline-block me-1 {% if v.total > 0 %}bg-danger{% else %}bg-success{% endif %}" style="width: 6px; height: 6px;"></span> {{ v.hopital__ville }}</div>
                                 <span class="badge rounded-pill {% if v.total > 0 %}bg-danger{% else %}bg-success{% endif %}">{{ v.total }}</span>
                             </div>
                             {% empty %}
-                            <div class="d-flex align-items-center justify-content-between mb-3 bg-white p-2 rounded shadow-sm border" style="font-size: 0.75rem;">
-                                <div><span class="rounded-circle d-inline-block me-1 bg-danger" style="width: 6px; height: 6px;"></span> Rabat</div>
-                                <span class="badge rounded-pill bg-danger">1</span>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between mb-3 bg-white p-2 rounded shadow-sm border" style="font-size: 0.75rem;">
-                                <div><span class="rounded-circle d-inline-block me-1 bg-danger" style="width: 6px; height: 6px;"></span> Casablanca</div>
-                                <span class="badge rounded-pill bg-danger">2</span>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between mb-3 bg-white p-2 rounded shadow-sm border" style="font-size: 0.75rem;">
-                                <div><span class="rounded-circle d-inline-block me-1 bg-danger" style="width: 6px; height: 6px;"></span> Fès</div>
-                                <span class="badge rounded-pill bg-danger">1</span>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between mb-3 bg-white p-2 rounded shadow-sm border" style="font-size: 0.75rem;">
-                                <div><span class="rounded-circle d-inline-block me-1 bg-success" style="width: 6px; height: 6px;"></span> Marrakech</div>
-                                <span class="badge rounded-pill bg-success">0</span>
+                            <div class="text-center py-3">
+                                <p class="text-muted small mb-0">Aucune ville active</p>
                             </div>
                             {% endfor %}
                         </div>
@@ -289,59 +334,24 @@
                         <a href="{% url 'administration:liste_demandes' %}" class="text-danger fw-bold text-decoration-none" style="font-size: 0.75rem;">Voir tout <i class="bi bi-arrow-right"></i></a>
                     </div>
                     <div class="flex-grow-1">
-                        {% for d in dernieres_demandes|slice:":3" %}
+                        {% for d in dernieres_demandes %}
                         <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
                             <div class="d-flex align-items-center">
                                 <div class="bg-danger text-white rounded me-3 d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 36px; height: 36px; font-size: 0.85rem;">{{ d.groupe_sanguin }}</div>
                                 <div>
                                     <div class="fw-bold text-dark" style="font-size: 0.85rem;">{{ d.hopital.nom }}</div>
-                                    <div class="text-muted" style="font-size: 0.75rem;">{{ d.quantite_necessaire|default:"5" }} poches nécessaires</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">{{ d.quantite_necessaire }} poches nécessaires</div>
                                 </div>
                             </div>
                             <div class="text-end">
-                                <div class="text-muted mb-1" style="font-size: 0.7rem;">Aujourd'hui</div>
-                                <span class="badge badge-urgent rounded-pill px-2">Urgent</span>
+                                <div class="text-muted mb-1" style="font-size: 0.7rem;">{{ d.date_publication|date:"d M Y" }}</div>
+                                <span class="badge {% if d.statut == 'active' %}badge-urgent{% else %}badge-faible{% endif %} rounded-pill px-2">{% if d.statut == 'active' %}Urgent{% else %}Clôturé{% endif %}</span>
                             </div>
                         </div>
                         {% empty %}
-                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-danger text-white rounded me-3 d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 36px; height: 36px; font-size: 0.85rem;">O+</div>
-                                <div>
-                                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">Hôpital Militaire</div>
-                                    <div class="text-muted" style="font-size: 0.75rem;">200 poches nécessaires</div>
-                                </div>
-                            </div>
-                            <div class="text-end">
-                                <div class="text-muted mb-1" style="font-size: 0.7rem;">8 heures, 28 minutes</div>
-                                <span class="badge badge-urgent rounded-pill px-2">Urgent</span>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-danger text-white rounded me-3 d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 36px; height: 36px; font-size: 0.85rem;">O+</div>
-                                <div>
-                                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">Hôpital Test</div>
-                                    <div class="text-muted" style="font-size: 0.75rem;">5 poches nécessaires</div>
-                                </div>
-                            </div>
-                            <div class="text-end">
-                                <div class="text-muted mb-1" style="font-size: 0.7rem;">1 semaine, 1 jour</div>
-                                <span class="badge badge-moyen rounded-pill px-2">Moyen</span>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-danger text-white rounded me-3 d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 36px; height: 36px; font-size: 0.85rem;">B-</div>
-                                <div>
-                                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">Centre Hospitalier Ibn Sina</div>
-                                    <div class="text-muted" style="font-size: 0.75rem;">12 poches nécessaires</div>
-                                </div>
-                            </div>
-                            <div class="text-end">
-                                <div class="text-muted mb-1" style="font-size: 0.7rem;">2 jours, 5 heures</div>
-                                <span class="badge badge-faible rounded-pill px-2">Faible</span>
-                            </div>
+                        <div class="text-center py-5">
+                            <i class="bi bi-check2-circle text-success fs-1 mb-2"></i>
+                            <p class="text-muted small">Aucune demande urgente en attente.</p>
                         </div>
                         {% endfor %}
                     </div>
@@ -369,11 +379,6 @@
                     <h6 class="fw-bold text-dark mb-4">Évolution des Dons (30 derniers jours)</h6>
                     <div style="height: 220px; position: relative;">
                         <canvas id="lineChart"></canvas>
-                        <!-- Tooltip mock -->
-                        <div class="position-absolute bg-white shadow-sm border rounded p-1 text-center" style="top: 10%; right: 5%; font-size: 0.65rem;">
-                            <div class="text-muted">09 Mai</div>
-                            <div class="fw-bold text-dark">180 dons</div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -387,48 +392,99 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
+<!-- Data Island: Django injects data as JSON into a hidden script tag -->
+<script id="dashboard-data" type="application/json">
+{
+    "sparkDonneurs": {{ spark_donneurs|safe }},
+    "sparkHopitaux": {{ spark_hopitaux|safe }},
+    "sparkDemandes": {{ spark_demandes|safe }},
+    "sparkDons": {{ spark_dons|safe }},
+    "labelsStock": {{ labels_stock_json|safe }},
+    "dataStock": {{ data_stock_json|safe }},
+    "lineLabels": {{ line_labels_json|safe }},
+    "lineData": {{ line_data_json|safe }},
+    "cities": [
+        {% for v in demandes_par_ville %}
+        {"name": "{{ v.hopital__ville }}", "total": {{ v.total }}}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+
 <script>
-    // --- Leaflet Map (Morocco) ---
-    var map = L.map('map', {zoomControl: true, attributionControl: false}).setView([31.7917, -7.0926], 5);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+    // Parse data from the data island
+    var D = JSON.parse(document.getElementById('dashboard-data').textContent);
+
+    // --- Leaflet Map (Tunisia) — Radar Theme ---
+    var map = L.map('map', {
+        zoomControl: true,
+        attributionControl: false,
+        scrollWheelZoom: false
+    }).setView([34.5, 9.8], 6);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         maxZoom: 19
     }).addTo(map);
 
-    var redIcon = L.divIcon({className: 'bg-danger rounded-circle shadow border border-white border-2', iconSize: [16, 16]});
+    var radarIcon = L.divIcon({className: 'radar-marker', iconSize: [12, 12], iconAnchor: [6, 6]});
 
     var cityCoords = {
-        'Rabat': [34.0209, -6.8416],
-        'Casablanca': [33.5731, -7.5898],
-        'Fès': [34.0331, -5.0003],
-        'Marrakech': [31.6295, -7.9811],
-        'Tanger': [35.7595, -5.8340],
-        'Agadir': [30.4278, -9.5981],
-        'Oujda': [34.6867, -1.9114],
-        'Kénitra': [34.2610, -6.5802],
-        'Tétouan': [35.5889, -5.3626],
-        'Safi': [32.2994, -9.2372]
+        'Tunis': [36.8065, 10.1815],
+        'Sfax': [34.7400, 10.7600],
+        'Sousse': [35.8256, 10.6369],
+        'Kairouan': [35.6781, 10.0963],
+        'Bizerte': [37.2744, 9.8739],
+        'Gabès': [33.8814, 10.0983],
+        'Ariana': [36.8665, 10.1647],
+        'Gafsa': [34.4250, 8.7842],
+        'La Marsa': [36.8781, 10.3247],
+        'Ben Arous': [36.7531, 10.2189],
+        'Monastir': [35.7780, 10.8262],
+        'Nabeul': [36.4561, 10.7376]
     };
 
     var hasData = false;
-    {% for v in demandes_par_ville %}
-        var city = "{{ v.hopital__ville }}";
-        if (cityCoords[city] && {{ v.total }} > 0) {
-            L.marker(cityCoords[city], {icon: redIcon})
-             .bindPopup("<b>" + city + "</b><br>" + {{ v.total }} + " demande(s) active(s)")
+    var markerPoints = [];
+
+    D.cities.forEach(function(v) {
+        var city = v.name;
+        var count = v.total;
+        if (cityCoords[city] && count > 0) {
+            var radarRadius = Math.max(15000, count * 12000);
+            L.circle(cityCoords[city], {
+                radius: radarRadius,
+                className: 'radar-dashed-circle',
+                interactive: false
+            }).addTo(map);
+
+            L.marker(cityCoords[city], {icon: radarIcon})
+             .bindPopup(
+                '<div class="popup-content-custom">' +
+                    '<p class="popup-city">' + city + '</p>' +
+                    '<div class="popup-divider"></div>' +
+                    '<p class="popup-count"><i class="bi bi-droplet-fill"></i> ' + count + ' demande' + (count > 1 ? 's' : '') + ' active' + (count > 1 ? 's' : '') + '</p>' +
+                    '<p class="popup-label">Zone de couverture</p>' +
+                '</div>'
+             )
              .addTo(map);
+
+            markerPoints.push(cityCoords[city]);
             hasData = true;
         }
-    {% endfor %}
+    });
 
-    // Fallback if no data (just for demo)
     if (!hasData) {
-        L.marker([34.020882, -6.841650], {icon: redIcon}).addTo(map).bindPopup("Rabat (Demo)");
-        L.marker([33.573110, -7.589843], {icon: redIcon}).addTo(map).bindPopup("Casablanca (Demo)");
+        L.circle([36.8065, 10.1815], {radius: 20000, className: 'radar-dashed-circle', interactive: false}).addTo(map);
+        L.marker([36.8065, 10.1815], {icon: radarIcon}).addTo(map).bindPopup('<div class="popup-content-custom"><p class="popup-city">Tunis</p><div class="popup-divider"></div><p class="popup-count"><i class="bi bi-droplet-fill"></i> Démo</p></div>');
+        L.circle([34.7400, 10.7600], {radius: 20000, className: 'radar-dashed-circle', interactive: false}).addTo(map);
+        L.marker([34.7400, 10.7600], {icon: radarIcon}).addTo(map).bindPopup('<div class="popup-content-custom"><p class="popup-city">Sfax</p><div class="popup-divider"></div><p class="popup-count"><i class="bi bi-droplet-fill"></i> Démo</p></div>');
+    } else {
+        var bounds = L.latLngBounds(markerPoints);
+        map.fitBounds(bounds, {padding: [40, 40], maxZoom: 8});
     }
 
     // --- Chart.js ---
-    // Sparkline configurations
-    const sparklineOptions = {
+    var sparklineOptions = {
         plugins: { legend: { display: false }, tooltip: { enabled: false } },
         scales: { x: { display: false }, y: { display: false } },
         elements: { point: { radius: 0 }, line: { tension: 0.4, borderWidth: 2 } },
@@ -437,22 +493,22 @@
 
     new Chart(document.getElementById('sparkline1'), {
         type: 'line',
-        data: { labels: ['1','2','3','4','5'], datasets: [{ data: [10, 15, 12, 18, 20], borderColor: '#10b981' }] },
+        data: { labels: ['1','2','3','4','5'], datasets: [{ data: D.sparkDonneurs, borderColor: '#10b981' }] },
         options: sparklineOptions
     });
     new Chart(document.getElementById('sparkline2'), {
         type: 'line',
-        data: { labels: ['1','2','3','4','5'], datasets: [{ data: [2, 4, 3, 5, 6], borderColor: '#3b82f6' }] },
+        data: { labels: ['1','2','3','4','5'], datasets: [{ data: D.sparkHopitaux, borderColor: '#3b82f6' }] },
         options: sparklineOptions
     });
     new Chart(document.getElementById('sparkline3'), {
         type: 'line',
-        data: { labels: ['1','2','3','4','5'], datasets: [{ data: [8, 5, 6, 4, 2], borderColor: '#8b5cf6' }] },
+        data: { labels: ['1','2','3','4','5'], datasets: [{ data: D.sparkDemandes, borderColor: '#8b5cf6' }] },
         options: sparklineOptions
     });
     new Chart(document.getElementById('sparkline4'), {
         type: 'line',
-        data: { labels: ['1','2','3','4','5'], datasets: [{ data: [3, 7, 5, 9, 12], borderColor: '#10b981' }] },
+        data: { labels: ['1','2','3','4','5'], datasets: [{ data: D.sparkDons, borderColor: '#10b981' }] },
         options: sparklineOptions
     });
 
@@ -460,9 +516,9 @@
     new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
-            labels: ['O-', 'A-', 'B+', 'O+', 'A+', 'B-', 'AB+', 'AB-'],
+            labels: D.labelsStock,
             datasets: [{
-                data: [120, 80, 150, 200, 180, 60, 40, 30],
+                data: D.dataStock,
                 backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#dc2626', '#f97316', '#10b981', '#8b5cf6', '#64748b'],
                 borderRadius: 4
             }]
@@ -478,9 +534,9 @@
     new Chart(document.getElementById('lineChart'), {
         type: 'line',
         data: {
-            labels: ['01 Mai','05 Mai','10 Mai','15 Mai','20 Mai','25 Mai','30 Mai'],
+            labels: D.lineLabels,
             datasets: [{
-                data: [50, 60, 100, 80, 120, 90, 180],
+                data: D.lineData,
                 borderColor: '#ef4444',
                 backgroundColor: 'rgba(239, 68, 68, 0.1)',
                 borderWidth: 2,
@@ -498,3 +554,4 @@
     });
 </script>
 {% endblock %}
+

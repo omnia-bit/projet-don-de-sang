@@ -17,4 +17,5 @@ urlpatterns = [
     path('assistant/conversation/<int:conv_id>/', views.detail_conversation, name='detail_conversation'),
     path('assistant/supprimer/<int:conv_id>/', views.supprimer_conversation, name='supprimer_conversation'),
     path('badges/', views.badges, name='badges'),
+    path('carte/', views.carte, name='carte'),
 ]

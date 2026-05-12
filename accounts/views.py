@@ -5,7 +5,8 @@ from django.http import HttpResponse
 from .forms import UserRegisterForm, ModifierProfilForm, ModifierHopitalProfilForm
 from django.contrib import messages
 from .models import DonneurProfile, HopitalProfile
-
+import json
+from hopitaux.models import DemandeSang
 def index(request):
     return HttpResponse("Page accounts fonctionne")
 
@@ -51,7 +52,7 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt # pour permettre le POST sans token CSRF (à utiliser avec précaution)
 
 # LOGIN CUSTOM
 @csrf_exempt
@@ -142,3 +143,6 @@ def modifier_profil(request):
         'profil': profil,
         'role': request.user.role
     })
+# Dans ta vue qui rend Carte.html, ajoute juste "hopital" au contexte :
+
+

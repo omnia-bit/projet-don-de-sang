@@ -1,126 +1,324 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Réponses - {{ block.super }}{% endblock %}
+{% block title %}Réponses — {{ demande.groupe_sanguin }} — BloodConnect{% endblock %}
 
 {% block extra_css %}
 <style>
-    .response-card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    .avatar-circle { width: 50px; height: 50px; background: #e5edff; color: #1d3557; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-    .bg-soft-primary { background: #e5edff; color: #1d3557; }
+    body { background: #f8fafc; }
+
+    /* ── Hero Header ── */
+    .hero-header {
+        background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+        padding: 3.5rem 0 5rem;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .hero-header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(239,68,68,0.08) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .hero-header h1 {
+        color: #0f172a;
+        font-weight: 800;
+        font-size: 2rem;
+        letter-spacing: -0.5px;
+    }
+    .hero-header .subtitle { color: #64748b; font-size: 0.9rem; font-weight: 600; }
+    
+    .badge-groupe {
+        width: 60px;
+        height: 60px;
+        background: #ef4444;
+        color: white;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        box-shadow: 0 8px 20px rgba(239,68,68,0.3);
+    }
+
+    /* ── Stats Strip ── */
+    .stats-strip {
+        margin-top: -2.5rem;
+        position: relative;
+        z-index: 10;
+    }
+    .stat-pill {
+        background: white;
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        border: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    .stat-val { font-size: 1.6rem; font-weight: 800; color: #1a202c; line-height: 1; }
+    .stat-lbl { font-size: 0.7rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ── Response Cards ── */
+    .response-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #f1f5f9;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+    .response-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        border-color: #e2e8f0;
+    }
+    .avatar-circle {
+        width: 55px;
+        height: 55px;
+        background: #f1f5f9;
+        color: #1e293b;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.2rem;
+        border: 2px solid white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    
+    .btn-contact {
+        background: #f1f5f9;
+        color: #1e293b;
+        border: none;
+        border-radius: 12px;
+        padding: 0.6rem 1.25rem;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+    .btn-contact:hover {
+        background: #ef4444;
+        color: white;
+        transform: scale(1.05);
+    }
+
+    /* Details Panel */
+    .details-panel {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #f1f5f9;
+        padding: 1.5rem;
+        position: sticky;
+        top: 2rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="mb-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'hopitaux:dashboard' %}">Dashboard</a></li>
-                <li class="breadcrumb-item active">Réponses aux appels</li>
-            </ol>
-        </nav>
-        <h2 class="fw-bold">Réponses pour le groupe <span class="text-danger">{{ demande.groupe_sanguin }}</span></h2>
-        <p class="text-muted small">Publié le {{ demande.date_publication|date:"d M Y" }}</p>
-    </div>
-
-    {% include 'includes/messages.html' %}
-
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card response-card p-4">
-                <h5 class="fw-bold mb-4">Donneurs intéressés</h5>
-                
-                <div class="list-group list-group-flush">
-                    {% for r in reponses %}
-                    <div class="list-group-item px-0 py-3 border-0 border-bottom">
-                        <div class="d-flex align-items-center">
-                            <div class="avatar-circle me-3">
-                                {{ r.donneur.user.username|slice:":1"|upper }}
-                            </div>
-                            <div class="flex-grow-1">
-                                <h6 class="mb-0 fw-bold">{{ r.donneur.user.get_full_name|default:r.donneur.user.username }}</h6>
-                                <p class="mb-0 text-muted small"><i class="bi bi-geo-alt me-1"></i>{{ r.donneur.ville }}</p>
-                            </div>
-                            <div class="text-end">
-                                <span class="badge bg-soft-primary px-3 rounded-pill mb-1 d-block">{{ r.donneur.groupe_sanguin }}</span>
-                                <small class="text-muted d-block">{{ r.date_reponse|timesince }}</small>
-                            </div>
-                        </div>
-                        <div class="mt-3 text-end">
-                            <button class="btn btn-sm btn-primary rounded-pill px-3" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#emailModal" 
-                                    data-donneur-email="{{ r.donneur.user.email }}"
-                                    data-donneur-nom="{{ r.donneur.user.username }}">
-                                <i class="bi bi-envelope me-1"></i>Contacter
-                            </button>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <div class="text-center py-5">
-                        <i class="bi bi-people fs-1 text-muted opacity-25 mb-3 d-block"></i>
-                        <p class="text-muted">Aucun donneur n'a encore répondu à cet appel.</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-4">
-            <div class="card response-card p-4 bg-light border-0">
-                <h6 class="fw-bold mb-3 text-primary">Détails de la demande</h6>
-                <div class="small mb-3">
-                    <div class="text-muted mb-1">Quantité demandée</div>
-                    <div class="fw-bold">{{ demande.quantite_necessaire }} poches</div>
-                </div>
-                <div class="small mb-3">
-                    <div class="text-muted mb-1">Délai imparti</div>
-                    <div class="fw-bold">{{ demande.delai }} heures</div>
-                </div>
-                <hr>
-                <div class="small">
-                    <div class="text-muted mb-2">Description</div>
-                    <div class="text-dark">{{ demande.description }}</div>
+<div class="hero-header">
+    <div class="container">
+        <div class="d-flex align-items-center gap-4">
+            <div class="badge-groupe">{{ demande.groupe_sanguin }}</div>
+            <div>
+                <div class="subtitle"><i class="bi bi-megaphone-fill me-1"></i> Demande de sang active</div>
+                <h1>Réponses des donneurs</h1>
+                <div class="d-flex gap-3 mt-2">
+                    <span class="text-muted small"><i class="bi bi-calendar-event me-1"></i> Publié le {{ demande.date_publication|date:"d M Y" }}</span>
+                    <span class="text-muted small"><i class="bi bi-clock me-1"></i> Délai : {{ demande.delai }}h</span>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal pour l'envoi d'email -->
-<div class="modal fade" id="emailModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-header border-0 p-4">
-                <h5 class="modal-title fw-bold">Contacter le donneur</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="container stats-strip">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="stat-pill">
+                <div class="stat-icon" style="background: #ecfdf5; color: #10b981;">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-val">{{ reponses.count }}</div>
+                    <div class="stat-lbl">Réponses reçues</div>
+                </div>
             </div>
-            <form action="{% url 'hopitaux:envoyer_email_donneur' demande.pk %}" method="POST">
-                {% csrf_token %}
-                <div class="modal-body p-4 pt-0">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Destinataire</label>
-                        <input type="email" name="email" id="modal-email" class="form-control bg-light" readonly>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-pill">
+                <div class="stat-icon" style="background: #fff1f2; color: #ef4444;">
+                    <i class="bi bi-droplet-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-val">{{ demande.quantite_necessaire }}</div>
+                    <div class="stat-lbl">Poches demandées</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5 mt-4">
+    <div class="row g-4">
+        <!-- List of Responses -->
+        <div class="col-lg-8">
+            <h5 class="fw-bold mb-4 d-flex align-items-center">
+                <i class="bi bi-person-heart text-danger me-2"></i> 
+                Volontaires inscrits
+            </h5>
+            
+            {% for r in reponses %}
+            <div class="response-card">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar-circle">
+                            {{ r.donneur.user.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold" style="font-size: 1rem; color: #0f172a;">{{ r.donneur.user.get_full_name|default:r.donneur.user.username }}</h6>
+                            <div class="text-muted small">
+                                <i class="bi bi-geo-alt-fill me-1" style="color: #ef4444;"></i>{{ r.donneur.ville }} · {{ r.date_reponse|timesince }}
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Sujet</label>
-                        <input type="text" name="sujet" class="form-control" value="Besoin urgent de votre don - BloodConnect">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Votre message</label>
-                        <textarea name="message" class="form-control" rows="5" placeholder="Bonjour, nous avons besoin de votre don..."></textarea>
+                    <div class="d-flex align-items-center gap-4">
+                        <div class="text-center">
+                            <span class="badge rounded-pill px-3 py-2" style="background: #f1f5f9; color: #475569; font-weight: 700; font-size: 0.8rem;">
+                                {{ r.donneur.groupe_sanguin }}
+                            </span>
+                        </div>
+                        <button class="btn btn-contact d-flex align-items-center gap-2" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#emailModal" 
+                                data-donneur-email="{{ r.donneur.user.email }}"
+                                data-donneur-nom="{{ r.donneur.user.get_full_name|default:r.donneur.user.username }}">
+                            <i class="bi bi-envelope"></i> Contacter
+                        </button>
                     </div>
                 </div>
-                <div class="modal-footer border-0 p-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4">
-                        <i class="bi bi-send me-1"></i>Envoyer l'email
+            </div>
+            {% empty %}
+            <div class="text-center py-5 bg-white rounded-4 border border-dashed">
+                <div class="mb-3 text-muted opacity-20">
+                    <i class="bi bi-people" style="font-size: 4rem;"></i>
+                </div>
+                <h6 class="fw-bold text-dark">Aucune réponse pour le moment</h6>
+                <p class="text-muted small">Dès qu'un donneur accepte votre appel, il apparaîtra ici.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Request Details Sidebar -->
+        <div class="col-lg-4">
+            <div class="details-panel shadow-sm">
+                <h6 class="fw-bold text-dark mb-4 d-flex align-items-center">
+                    <i class="bi bi-info-circle text-primary me-2"></i> Détails de la demande
+                </h6>
+                
+                <div class="mb-4">
+                    <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Description</label>
+                    <p class="text-dark mb-0" style="font-size: 0.9rem; line-height: 1.6;">
+                        {{ demande.description|default:"Aucune description supplémentaire fournie." }}
+                    </p>
+                </div>
+
+                <div class="p-3 rounded-4 bg-light">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small fw-bold">Statut</span>
+                        <span class="badge {% if demande.statut == 'active' %}bg-success{% else %}bg-secondary{% endif %} rounded-pill">
+                            {{ demande.get_statut_display }}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted small fw-bold">ID Demande</span>
+                        <span class="text-dark small fw-bold">#{{ demande.pk }}</span>
+                    </div>
+                </div>
+
+                <a href="{% url 'hopitaux:liste_demandes' %}" class="btn btn-outline-secondary w-100 rounded-pill mt-4 fw-bold" style="font-size: 0.85rem;">
+                    <i class="bi bi-arrow-left me-2"></i> Retour aux demandes
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour l'envoi d'email Premium Simplifié -->
+<div class="modal fade" id="emailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden; background: #fff;">
+            <!-- Simple & Expert Header -->
+            <div class="p-4 border-bottom d-flex align-items-center justify-content-between bg-white">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                        <i class="bi bi-envelope-heart text-danger fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="modal-title-text">Contacter le donneur</h5>
+                        <p class="text-muted small mb-0">Envoyer une notification directe</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form action="{% url 'hopitaux:envoyer_email_donneur' demande.pk %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted mb-2">DESTINATAIRE</label>
+                        <div class="d-flex align-items-center p-3 rounded-3 bg-light border-0">
+                            <i class="bi bi-at text-danger me-2 fs-5"></i>
+                            <input type="email" name="email" id="modal-email" class="form-control border-0 bg-transparent p-0 fw-bold shadow-none" readonly style="font-size: 0.9rem;">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted mb-2">SUJET DE L'URGENCE</label>
+                        <input type="text" name="sujet" class="form-control rounded-3 border-light shadow-none py-2 fw-semibold" value="Besoin urgent de votre don - BloodConnect" style="font-size: 0.9rem;">
+                    </div>
+
+                    <div class="mb-0">
+                        <label class="form-label small fw-bold text-muted mb-2">MESSAGE</label>
+                        <textarea name="message" class="form-control rounded-3 border-light shadow-none p-3" rows="5" placeholder="Bonjour, votre don est crucial pour un patient..." style="font-size: 0.9rem; resize: none; border: 1.5px solid #f1f5f9;"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-link text-muted text-decoration-none fw-bold small" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 py-2 fw-bold shadow-sm">
+                        <i class="bi bi-send-fill me-2"></i> Envoyer le message
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<style>
+    .focus-within-danger:focus-within { border-color: #ef4444 !important; }
+    .transform-hover { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .transform-hover:hover { transform: translateY(-3px) scale(1.02); }
+    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+</style>
 {% endblock %}
 
 {% block extra_js %}
@@ -133,7 +331,7 @@
             const nom = button.getAttribute('data-donneur-nom');
             
             const modalEmailInput = emailModal.querySelector('#modal-email');
-            const modalTitle = emailModal.querySelector('.modal-title');
+            const modalTitle = emailModal.querySelector('#modal-title-text');
             
             modalEmailInput.value = email;
             modalTitle.innerText = "Contacter " + nom;
