@@ -48,7 +48,7 @@
    ```
 
 ## 📋 Données de test
-- **Admin** : admin / password123
+- **Admin** : adminDon / Admin@2026
 - **Hôpitaux** : au moins 2 comptes validés inclus.
 - **Donneurs** : au moins 5 profils avec groupes sanguins variés.
 
